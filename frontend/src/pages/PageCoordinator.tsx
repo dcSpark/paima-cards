@@ -12,6 +12,7 @@ import { Lobby } from "./DiceGame/Lobby";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { IGetLobbyByIdResult } from "@dice/db";
 import BuyPack from "./BuyPack";
+import Collection from "./Collection";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -54,6 +55,7 @@ const PageCoordinator: React.FC = () => {
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />
         <Route path={Page.Landing} element={<LandingPage />} />
+        <Route path={Page.Collection} element={<Collection />} />
         <Route path={Page.BuyPacks} element={<BuyPack />} />
         <Route element={<div>There was something wrong...</div>} />
       </Routes>

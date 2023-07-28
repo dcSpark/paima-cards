@@ -4,6 +4,7 @@ import {
   LobbyState,
   genBotDeck,
   genCommitments,
+  DECK_LENGTH,
 } from "@dice/game-logic";
 import type { CardRegistryId, LocalCard } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
@@ -23,6 +24,7 @@ export enum Page {
   OpenLobbies = "/open_lobbies",
   Game = "/game",
   MyGames = "/my_games",
+  Collection = "/collection",
   BuyPacks = "/buy_packs",
 }
 
@@ -137,12 +139,19 @@ class MainController {
     this.callback(null, true, null);
     console.log(
       "create lobby: ",
+      creatorNftId,
+      creatorDeck,
       numOfRounds,
       roundLength,
       timePerPlayer,
       isHidden,
       isPractice
     );
+
+    if (creatorDeck?.length !== DECK_LENGTH) {
+      // shouldn't happen
+      throw new Error(`createLobby: invalid deck`);
+    }
 
     const commitments = await genCommitments(window.crypto, creatorDeck);
     const localDeck: LocalCard[] = creatorDeck.map((cardId, i) => ({
@@ -176,6 +185,11 @@ class MainController {
   ): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
+
+    if (deck?.length !== DECK_LENGTH) {
+      // shouldn't happen
+      throw new Error(`joinLobby: invalid deck`);
+    }
 
     const commitments = await genCommitments(window.crypto, deck);
     const localDeck: LocalCard[] = deck.map((cardId, i) => ({

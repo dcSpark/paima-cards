@@ -14,7 +14,7 @@ const CreateLobby: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
-    collection,
+    selectedDeckState: [selectedDeck],
   } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("5");
@@ -30,8 +30,7 @@ const CreateLobby: React.FC = () => {
 
     await mainController.createLobby(
       selectedNft.nft,
-      // TODO: select cards, make sure you have enough
-      collection.cards.slice(0, DECK_LENGTH),
+      selectedDeck,
       numberOfRoundsNum,
       roundLengthNum,
       playersTimeNum,

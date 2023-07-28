@@ -70,9 +70,8 @@ const NoNFTMenu = () => {
 };
 
 const HasNFTMenu = () => {
-  const mainController: MainController = useContext(AppContext);
   const {
-    selectedNftState: [selectedNft],
+    selectedDeckState: [selectedDeck],
   } = useGlobalStateContext();
   const navigate = useNavigate();
 
@@ -81,12 +80,14 @@ const HasNFTMenu = () => {
       <Button
         sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
         onClick={() => navigate(Page.CreateLobby)}
+        disabled={selectedDeck == null}
       >
         Create
       </Button>
       <Button
         sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
         onClick={() => navigate(Page.OpenLobbies)}
+        disabled={selectedDeck == null}
       >
         Lobbies
       </Button>
@@ -95,6 +96,12 @@ const HasNFTMenu = () => {
         onClick={() => navigate(Page.MyGames)}
       >
         My Games
+      </Button>
+      <Button
+        sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
+        onClick={() => navigate(Page.Collection)}
+      >
+        Collection
       </Button>
       <Button
         sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}

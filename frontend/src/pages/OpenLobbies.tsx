@@ -44,7 +44,7 @@ const OpenLobbies: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
-    collection,
+    selectedDeckState: [selectedDeck],
   } = useGlobalStateContext();
   const [lobbies, setLobbies] = useState<LobbyState[]>([]);
   const [page, setPage] = useState(0);
@@ -140,8 +140,7 @@ const OpenLobbies: React.FC = () => {
                                 onClick={() =>
                                   mainController.joinLobby(
                                     selectedNft.nft,
-                                    // TODO: select cards, make sure you have enough
-                                    collection.cards.slice(0, 10),
+                                    selectedDeck,
                                     lobby.lobby_id
                                   )
                                 }

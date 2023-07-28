@@ -26,6 +26,7 @@ type GlobalState = {
         packs: CardRegistryId[][];
         cards: CardRegistryId[];
       };
+  selectedDeckState: UseStateResponse<undefined | CardRegistryId[]>;
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
@@ -55,6 +56,9 @@ export function GlobalStateProvider({
         packs: CardRegistryId[][];
         cards: CardRegistryId[];
       }
+  >();
+  const [selectedDeck, setSelectedDeck] = useState<
+    undefined | CardRegistryId[]
   >();
 
   useEffect(() => {
@@ -131,6 +135,7 @@ export function GlobalStateProvider({
       connectedWallet: lastConnectedWallet,
       selectedNftState: [selectedNft, setSelectedNft],
       collection,
+      selectedDeckState: [selectedDeck, setSelectedDeck],
     }),
     [lastConnectedWallet, selectedNft, setSelectedNft]
   );
