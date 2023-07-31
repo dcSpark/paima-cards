@@ -2,7 +2,7 @@ import type { Pool } from 'pg';
 
 import parse from './parser.js';
 import type Prando from 'paima-sdk/paima-prando';
-import type { SubmittedChainData } from 'paima-sdk/paima-utils';
+import { SCHEDULED_DATA_ADDRESS, type SubmittedChainData } from 'paima-sdk/paima-utils';
 import {
   createdLobby,
   joinedLobby,
@@ -14,6 +14,7 @@ import {
   cardPackBuy,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
+import { GENERIC_PAYMENT_MESSAGES } from '@dice/game-logic';
 
 export default async function (
   inputData: SubmittedChainData,
@@ -30,8 +31,22 @@ export default async function (
   switch (parsed.input) {
     case 'nftMint':
       return mintNft(parsed);
-    case 'cardPackBuy':
-      return cardPackBuy(parsed, dbConn, randomnessGenerator);
+    case 'genericPayment': {
+      if (inputData.userAddress !== SCHEDULED_DATA_ADDRESS) {
+        console.log('DISCARD: scheduled data from regular address');
+        return [];
+      }
+
+      switch (parsed.message) {
+        case GENERIC_PAYMENT_MESSAGES.buyCardPack: {
+          return cardPackBuy(parsed, dbConn, randomnessGenerator);
+        }
+        default: {
+          console.log('DISCARD: unknown message');
+          return [];
+        }
+      }
+    }
     case 'createdLobby':
       return createdLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
     case 'joinedLobby':

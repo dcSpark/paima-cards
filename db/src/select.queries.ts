@@ -820,8 +820,8 @@ export interface IGetOwnedPacksParams {
 /** 'GetOwnedPacks' return type */
 export interface IGetOwnedPacksResult {
   cards: numberArray;
+  id: number;
   owner_nft_id: number;
-  token_id: number;
 }
 
 /** 'GetOwnedPacks' query type */

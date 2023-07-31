@@ -28,7 +28,7 @@ export default function BuyPack(): React.ReactElement {
     if (collectionCache == null) return;
 
     const lastPackRaw = collection.raw.reduce(
-      (acc, next) => (acc == null || acc.token_id < next.token_id ? next : acc),
+      (acc, next) => (acc == null || acc.id < next.id ? next : acc),
       undefined as undefined | IGetOwnedPacksResult
     );
 
