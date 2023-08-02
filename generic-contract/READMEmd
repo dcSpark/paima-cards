@@ -1,0 +1,15 @@
+### Deploying generic payment contract
+
+This folder contains some resources that can help deploy this contract.
+
+The `GenericPayment.sol` can be directly copied into `contracts/nft/src`, and it will be built
+during deployment.
+
+The `13_deploy_generic_payment.js` belongs into `contracts/nft/migrations`, but the `13` may be taken by another contract later.
+In that case it should be renamed and also replaced in `deploy.sh` on the line
+```   
+  npx truffle migrate --f 13 --to 13 --network $TARGET_NETWORK
+```
+The `deploy.sh` needs to be run from the `contracts/nft`, but it's best not to replace the existing script,
+because this one is likely to get outdated. The reporting script does not exist for this deployments so
+you'll have to find the address in `contract-addresses.json`, and the rest on an explorer.

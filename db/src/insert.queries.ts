@@ -319,7 +319,6 @@ export const updateStats = new PreparedQuery<IUpdateStatsParams,IUpdateStatsResu
 export interface INewCardPackParams {
   cards: numberArray;
   owner_nft_id: number;
-  token_id: number;
 }
 
 /** 'NewCardPack' return type */
@@ -331,18 +330,16 @@ export interface INewCardPackQuery {
   result: INewCardPackResult;
 }
 
-const newCardPackIR: any = {"usedParamSet":{"token_id":true,"owner_nft_id":true,"cards":true},"params":[{"name":"token_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":82}]},{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":87,"b":100}]},{"name":"cards","required":true,"transform":{"type":"scalar"},"locs":[{"a":105,"b":111}]}],"statement":"INSERT INTO card_packs(\n  token_id,\n  owner_nft_id,\n  cards\n)\nVALUES (\n  :token_id!,\n  :owner_nft_id!,\n  :cards!\n)"};
+const newCardPackIR: any = {"usedParamSet":{"owner_nft_id":true,"cards":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":74}]},{"name":"cards","required":true,"transform":{"type":"scalar"},"locs":[{"a":79,"b":85}]}],"statement":"INSERT INTO card_packs(\n  owner_nft_id,\n  cards\n)\nVALUES (\n  :owner_nft_id!,\n  :cards!\n)"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO card_packs(
- *   token_id,
  *   owner_nft_id,
  *   cards
  * )
  * VALUES (
- *   :token_id!,
  *   :owner_nft_id!,
  *   :cards!
  * )

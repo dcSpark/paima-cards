@@ -1,9 +1,19 @@
 import type { ConciseResult, SerializedMove } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
+export type ParsedSubmittedInputRaw =
+  | NftMintInput
+  | CreatedLobbyInput
+  | JoinedLobbyInput
+  | ClosedLobbyInput
+  | SubmittedMovesInput
+  | PracticeMovesInput
+  | ScheduledDataInput
+  | InvalidInput;
+
 export type ParsedSubmittedInput =
   | NftMintInput
-  | CardPackBuyInput
+  | GenericPaymentInput
   | CreatedLobbyInput
   | JoinedLobbyInput
   | ClosedLobbyInput
@@ -23,11 +33,11 @@ export interface NftMintInput {
   address: WalletAddress;
 }
 
-export interface CardPackBuyInput {
-  input: 'cardPackBuy';
-  tokenId: string;
-  // contract address
-  address: WalletAddress;
+export interface GenericPaymentInput {
+  input: 'genericPayment';
+  message: string;
+  payer: WalletAddress;
+  amount: bigint;
 }
 
 export interface CreatedLobbyInput {

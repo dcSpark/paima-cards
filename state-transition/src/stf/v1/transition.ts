@@ -43,9 +43,9 @@ import {
 } from './persist';
 import { isValidMove } from '@dice/game-logic';
 import type {
-  CardPackBuyInput,
   ClosedLobbyInput,
   CreatedLobbyInput,
+  GenericPaymentInput,
   JoinedLobbyInput,
   NftMintInput,
   PracticeMovesInput,
@@ -53,14 +53,13 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { CARD_PACK_NFT_NAME, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import type { IGetRoundResult } from '@dice/db/src/select.queries';
 import { getMatch, getRound, getRoundMoves } from '@dice/db/src/select.queries';
 import crypto from 'crypto';
 import { newCardPack, type INewCardPackParams } from '@dice/db/src/insert.queries';
-import { getNftOwner } from 'paima-sdk/paima-utils-backend';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -73,25 +72,22 @@ export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
 };
 
 export const cardPackBuy = async (
-  input: CardPackBuyInput,
+  input: GenericPaymentInput,
   dbConn: Pool,
   randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
-  const tokenId = BigInt(Number.parseInt(input.tokenId));
-  const owner = await getNftOwner(dbConn, CARD_PACK_NFT_NAME, tokenId);
-  if (owner == null) {
-    console.log('DISCARD: no owner');
+  if (input.amount < CARD_PACK_PRICE) {
+    console.log('DISCARD: paid less than card pack price');
     return [];
   }
 
-  const nft = await getOwnedNft(dbConn, NFT_NAME, owner);
+  const nft = await getOwnedNft(dbConn, NFT_NAME, input.payer);
   if (nft == null) {
     console.log('DISCARD: user does not own any nft');
     return [];
   }
 
   const newPackProps: INewCardPackParams = {
-    token_id: Number.parseInt(input.tokenId),
     owner_nft_id: nft,
     cards: genCardPack(randomnessGenerator),
   };

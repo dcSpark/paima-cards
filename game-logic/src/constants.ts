@@ -32,3 +32,7 @@ export const CARD_REGISTRY: CardRegistry = {
 };
 
 export const CARD_IDS = Object.keys(CARD_REGISTRY).map(key => Number.parseInt(key));
+
+export const GENERIC_PAYMENT_MESSAGES = {
+  buyCardPack: 'pack',
+} as const;

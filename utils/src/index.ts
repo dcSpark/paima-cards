@@ -10,6 +10,7 @@ export const GAME_NAME = 'Paima Dice';
 export const PRACTICE_BOT_NFT_ID = -1;
 export const NFT_NAME = 'Dice NFT contract';
 export const CARD_PACK_NFT_NAME = 'Card pack contract';
+export const CARD_PACK_PRICE = BigInt('2') * BigInt('10') ** BigInt('18');
 
 /** Large number that should be safe anywhere */
 export const SAFE_NUMBER = 2 ** 31 - 1;

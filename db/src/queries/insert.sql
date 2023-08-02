@@ -118,12 +118,10 @@ ties = EXCLUDED.ties;
 
 /* @name newCardPack */
 INSERT INTO card_packs(
-  token_id,
   owner_nft_id,
   cards
 )
 VALUES (
-  :token_id!,
   :owner_nft_id!,
   :cards!
 );

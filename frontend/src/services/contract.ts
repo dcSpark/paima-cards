@@ -1,10 +1,16 @@
 import type { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber as EthersBigNumber, providers } from "ethers";
 
-import { NATIVE_PROXY, CHAIN_URI, CARD_PACK_NATIVE_PROXY } from "./constants";
+import { NATIVE_PROXY, CHAIN_URI, GENERIC_PAYMENT } from "./constants";
 import { characterToNumberMap } from "./utils";
-import { NativeNftSale__factory, Nft__factory } from "@src/typechain";
+import {
+  GenericPayment__factory,
+  NativeNftSale__factory,
+  Nft__factory,
+} from "@src/typechain";
 import BigNumber from "bignumber.js";
+import { GENERIC_PAYMENT_MESSAGES } from "@dice/game-logic";
+import { CARD_PACK_PRICE } from "@dice/utils";
 
 declare let window: any;
 
@@ -91,21 +97,19 @@ export const buyNft = async (account: string) => {
 
 export const buyCardPack = async (account: string) => {
   const signer = getSignerOrProvider(account);
-  const nativeNftSaleProxyContract = NativeNftSale__factory.connect(
-    CARD_PACK_NATIVE_PROXY,
+  const gasPrice = await signer.getGasPrice();
+  const genericPaymentContract = GenericPayment__factory.connect(
+    GENERIC_PAYMENT,
     signer
   );
-  const tokenPrice = await nativeNftSaleProxyContract.nftPrice();
+  const tx = await genericPaymentContract.pay(
+    GENERIC_PAYMENT_MESSAGES.buyCardPack,
+    {
+      gasPrice,
+      gasLimit: 800000,
+      value: EthersBigNumber.from(CARD_PACK_PRICE),
+    }
+  );
 
-  const provider = getSignerOrProvider();
-  const gasPrice = await provider.getGasPrice();
-
-  const characterNumber = characterToNumberMap["null"];
-
-  const tx = await nativeNftSaleProxyContract.buyNft(account, characterNumber, {
-    gasPrice,
-    gasLimit: 800000,
-    value: tokenPrice.toString(),
-  });
   return tx;
 };

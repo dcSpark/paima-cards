@@ -1,12 +1,13 @@
 import type { ParserRecord } from 'paima-sdk/paima-utils-backend';
 import { PaimaParser } from 'paima-sdk/paima-utils-backend';
 import type {
-  CardPackBuyInput,
   ClosedLobbyInput,
   CreatedLobbyInput,
+  GenericPaymentInput,
   JoinedLobbyInput,
   NftMintInput,
   ParsedSubmittedInput,
+  ParsedSubmittedInputRaw,
   PracticeMovesInput,
   SubmittedMovesInput,
   UserStats,
@@ -16,7 +17,6 @@ import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
-cardPackBuy         = cardpack|address|tokenId
 createdLobby        = c|creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID|commitments
 closedLobby         = cs|*lobbyID
@@ -27,10 +27,6 @@ userScheduledData   = u|*user|result
 `;
 
 const nftMint: ParserRecord<NftMintInput> = {
-  address: PaimaParser.WalletAddress(),
-  tokenId: PaimaParser.NumberParser(),
-};
-const cardPackBuy: ParserRecord<CardPackBuyInput> = {
   address: PaimaParser.WalletAddress(),
   tokenId: PaimaParser.NumberParser(),
 };
@@ -75,9 +71,8 @@ const userScheduledData: ParserRecord<UserStats> = {
   result: PaimaParser.RegexParser(/^[w|t|l]$/),
 };
 
-const parserCommands: Record<string, ParserRecord<ParsedSubmittedInput>> = {
+const parserCommands: Record<string, ParserRecord<ParsedSubmittedInputRaw>> = {
   nftMint,
-  cardPackBuy,
   createdLobby,
   joinedLobby,
   closedLobby,
@@ -87,9 +82,48 @@ const parserCommands: Record<string, ParserRecord<ParsedSubmittedInput>> = {
   userScheduledData,
 };
 
+/**
+ * PaimaParser seems unable to accept some of the characters in stringified JSON
+ * so we parse it manually here.
+ */
+function manualParse(input: string): undefined | GenericPaymentInput {
+  const parts = input.split('|');
+
+  if (parts.length !== 2) return;
+
+  if (parts[0] !== 'generic') return;
+
+  try {
+    const parsed = JSON.parse(parts[1]);
+    if (
+      !Object.hasOwn(parsed, 'message') ||
+      !Object.hasOwn(parsed, 'payer') ||
+      !Object.hasOwn(parsed, 'amount') ||
+      typeof parsed.message !== 'string' ||
+      typeof parsed.payer !== 'string' ||
+      typeof parsed.amount !== 'string'
+    ) {
+      return;
+    }
+    const amount = BigInt(parsed.amount);
+
+    return {
+      input: 'genericPayment',
+      message: parsed.message,
+      payer: parsed.payer,
+      amount,
+    };
+  } catch (e) {
+    return;
+  }
+}
+
 const myParser = new PaimaParser(myGrammar, parserCommands);
 
 function parse(s: string): ParsedSubmittedInput {
+  const manuallyParsed = manualParse(s);
+  if (manuallyParsed != null) return manuallyParsed;
+
   try {
     const parsed = myParser.start(s);
     if (parsed.command === 'createdLobby') {
