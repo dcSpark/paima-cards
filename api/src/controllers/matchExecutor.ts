@@ -36,14 +36,13 @@ export class MatchExecutorController extends Controller {
     }
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
+      hitPoints: raw.hit_points,
       startingCommitments: raw.starting_commitments,
       currentDeck: raw.current_deck,
       currentHand: raw.current_hand.map(deserializeHandCard),
       currentBoard: raw.current_board.map(deserializeBoardCard),
       currentDraw: raw.current_draw,
       botLocalDeck: undefined,
-      points: raw.points,
-      score: raw.score,
       turn: raw.turn ?? undefined,
     }));
 

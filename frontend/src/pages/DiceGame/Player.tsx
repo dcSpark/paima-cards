@@ -13,7 +13,6 @@ export type PlayerProps = {
   localDeck?: LocalCard[];
   turn: number;
   selectedCardState: UseStateResponse<undefined | CardIndex>;
-  onDraw?: () => void;
   onEndTurn?: () => void;
   onTargetCard?: (index: CardIndex) => void;
   onConfirmCard?: (index: CardIndex) => void;
@@ -25,7 +24,6 @@ export default function Player({
   localDeck,
   turn,
   selectedCardState: [selectedCard, setSelectedCard],
-  onDraw,
   onEndTurn,
   onTargetCard,
   onConfirmCard,
@@ -120,16 +118,7 @@ export default function Player({
             lineHeight: "1.75rem",
           }}
         >
-          Points: {lobbyPlayer.points}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            fontSize: "1.25rem",
-            lineHeight: "1.75rem",
-          }}
-        >
-          Score: {lobbyPlayer.score}
+          {lobbyPlayer.hitPoints}HP
         </Typography>
         {isThisPlayer && (
           <Box
@@ -138,9 +127,6 @@ export default function Player({
               gap: 1,
             }}
           >
-            <Button disabled={onDraw == null} onClick={onDraw}>
-              draw
-            </Button>
             <Button disabled={onEndTurn == null} onClick={onEndTurn}>
               end turn
             </Button>

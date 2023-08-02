@@ -3,6 +3,7 @@ import { Box, ButtonBase, Modal, Typography } from "@mui/material";
 import { CardRegistryId } from "@dice/game-logic";
 import PaimaLogo from "./PaimaLogo";
 import { UseStateResponse } from "@src/utils";
+import { imageRegistry } from "./imageMapping";
 
 export const cardHeight = "160px";
 export const cardWidth = "100px";
@@ -29,6 +30,8 @@ function StaticCard({
         flex: "none",
         width: `calc(${scale} * ${cardWidth})`,
         height: `calc(${scale} * ${cardHeight})`,
+        backgroundImage: cardId == null ? "" : imageRegistry[cardId],
+        backgroundSize: "100%",
         backgroundColor: "rgb(18, 39, 31)",
         borderRadius: "8px",
         border: "1px solid #777",
@@ -53,17 +56,6 @@ function StaticCard({
           scale={scale}
         />
       )}
-      <Typography
-        sx={{
-          fontSize: "2rem",
-          lineHeight: "2.5rem",
-          position: "absolute",
-          top: "10%",
-          left: "10%",
-        }}
-      >
-        {cardId}
-      </Typography>
     </ButtonBase>
   );
 }

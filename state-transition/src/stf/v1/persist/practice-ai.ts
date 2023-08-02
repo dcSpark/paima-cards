@@ -1,5 +1,5 @@
 import type { MatchState, Move } from '@dice/game-logic';
-import { MOVE_KIND, getTurnPlayer } from '@dice/game-logic';
+import { MOVE_KIND, applyEvent, genPostTxEvents, getTurnPlayer } from '@dice/game-logic';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import type Prando from 'paima-sdk/paima-prando';
 
@@ -12,6 +12,11 @@ export class PracticeAI {
 
   constructor(matchState: MatchState, randomnessGenerator: Prando) {
     this.randomnessGenerator = randomnessGenerator;
+
+    const postTx = genPostTxEvents(matchState, randomnessGenerator);
+    postTx.forEach(event => {
+      applyEvent(matchState, event);
+    });
     this.matchState = matchState;
   }
 
@@ -24,13 +29,6 @@ export class PracticeAI {
     if (me.nftId !== PRACTICE_BOT_NFT_ID)
       throw new Error(`getNextMove: bot move for non-bot player`);
     if (me.botLocalDeck == null) throw new Error(`getNextMove: bot does not have a deck saved`);
-    // Note: matchState is at the end of last round, i.e. without current round's post-tx events.
-    // That means this way the bot will draw until it has 5 cards
-    if (me.currentHand.length < 4 && me.currentDeck.length > 0) {
-      return {
-        kind: MOVE_KIND.drawCard,
-      };
-    }
 
     if (me.currentBoard.length < 2 && me.currentHand.length > 0) {
       return {

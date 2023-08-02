@@ -32,6 +32,7 @@ VALUES(
 INSERT INTO lobby_player(
   lobby_id,
   nft_id,
+  hit_points,
   starting_commitments,
   current_deck,
   bot_local_deck
@@ -39,6 +40,7 @@ INSERT INTO lobby_player(
 VALUES(
   :lobby_id!,
   :nft_id!,
+  :hit_points!,
   :starting_commitments!,
   :current_deck!,
   :bot_local_deck

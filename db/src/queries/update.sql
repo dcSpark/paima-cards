@@ -24,8 +24,7 @@ WHERE lobby_id = :lobby_id!;
 /* @name updateLobbyPlayer */
 UPDATE lobby_player
 SET
-  points = :points!,
-  score = :score!,
+  hit_points = :hit_points!,
   turn = :turn,
   current_deck = :current_deck!,
   current_draw = :current_draw!,

@@ -127,7 +127,7 @@ export function deserializeMove(move: SerializedMove): Move {
     };
   }
 
-  if (parts[0] === MOVE_KIND.endTurn || parts[0] === MOVE_KIND.drawCard) {
+  if (parts[0] === MOVE_KIND.endTurn) {
     return {
       kind: parts[0],
     };

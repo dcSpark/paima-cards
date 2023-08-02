@@ -2,10 +2,13 @@ import type { IGetLobbyPlayersResult } from '@dice/db';
 import type {
   CardDraw,
   CardIndex,
+  ConciseResult,
   DrawIndex,
   LobbyPlayer,
   LobbyWithStateProps,
+  MatchResult,
   MatchState,
+  Move,
   PostTxTickEvent,
 } from './types';
 import Prando from 'paima-sdk/paima-prando';
@@ -16,8 +19,23 @@ import {
   deserializeMove,
 } from './helpers';
 import { COMMITMENT_LENGTH, MOVE_KIND, TICK_EVENT_KIND } from './constants';
-import { getTurnPlayer } from './dice-logic';
 import cryptoRandomString from 'crypto-random-string';
+
+export function isValidMove(
+  _randomnessGenerator: Prando,
+  _matchState: MatchState,
+  _move: Move
+): boolean {
+  return true;
+}
+
+export function matchResults(matchState: MatchState): MatchResult {
+  const results: ConciseResult[] = matchState.players.map(player => {
+    return player.hitPoints <= 0 ? 'l' : 'w';
+  });
+
+  return results;
+}
 
 export function genCardDraw(
   currentDraw: DrawIndex,
@@ -42,6 +60,7 @@ export function buildCurrentMatchState(
 
     return {
       nftId: player.nft_id,
+      hitPoints: player.hit_points,
       startingCommitments: player.starting_commitments,
       currentDeck: player.current_deck,
       currentHand: player.current_hand.map(deserializeHandCard),
@@ -49,8 +68,6 @@ export function buildCurrentMatchState(
       currentDraw: player.current_draw,
       botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
       turn: player.turn,
-      points: player.points,
-      score: player.score,
     };
   });
 
@@ -71,15 +88,44 @@ export function genPostTxEvents(
   randomnessGenerator: Prando
 ): PostTxTickEvent[] {
   const player = getTurnPlayer(matchState);
-  const currentDraw = player.currentDraw;
-  const currentDeck = player.currentDeck;
-  if (matchState.txEventMove?.kind === MOVE_KIND.drawCard) {
-    return [
-      {
+  let currentDraw = player.currentDraw;
+  let currentDeck = player.currentDeck;
+  const events: PostTxTickEvent[] = [];
+
+  // draw 5 at start of match
+  if (
+    matchState.properRound === 0 &&
+    // 1st player's first turn
+    (matchState.txEventMove == null ||
+      // 2nd player's first turn
+      matchState.txEventMove.kind === MOVE_KIND.endTurn)
+  ) {
+    Array.from(Array(5).keys()).forEach(() => {
+      const event = {
         kind: TICK_EVENT_KIND.postTx,
         draw: genCardDraw(currentDraw, currentDeck, randomnessGenerator),
-      },
-    ];
+      };
+      currentDeck = event.draw.newDeck;
+      currentDraw++;
+      events.push(event);
+    });
+    return events;
+  }
+
+  // draw 2 at start of turn
+  if (matchState.txEventMove?.kind === MOVE_KIND.endTurn) {
+    {
+      Array.from(Array(2).keys()).forEach(() => {
+        const event = {
+          kind: TICK_EVENT_KIND.postTx,
+          draw: genCardDraw(currentDraw, currentDeck, randomnessGenerator),
+        };
+        currentDeck = event.draw.newDeck;
+        currentDraw++;
+        events.push(event);
+      });
+      return events;
+    }
   }
 
   return [];
@@ -144,4 +190,16 @@ export async function checkCommitment(
 
   const responseCommitment = await buildCommitment(crypto, salt, cardId);
   return commitment.toString() === responseCommitment.toString();
+}
+
+export function getTurnPlayer(matchState: MatchState): LobbyPlayer {
+  const turnPlayer = matchState.players.find(player => player.turn === matchState.turn);
+  if (turnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
+  return turnPlayer;
+}
+
+export function getNonTurnPlayer(matchState: MatchState): LobbyPlayer {
+  const nonTurnPlayer = matchState.players.find(player => player.turn !== matchState.turn);
+  if (nonTurnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
+  return nonTurnPlayer;
 }

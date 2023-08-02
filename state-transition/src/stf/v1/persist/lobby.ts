@@ -4,6 +4,7 @@ import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
 import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@dice/game-logic';
 import {
+  INITIAL_HIT_POINTS,
   genBotDeck,
   genCommitments,
   initialCurrentDeck,
@@ -46,14 +47,13 @@ export async function persistLobbyCreation(
   // join creator to lobby
   lobbyPlayers.push({
     nftId: inputData.creatorNftId,
+    hitPoints: INITIAL_HIT_POINTS,
     startingCommitments: inputData.creatorCommitments,
     currentDeck: initialCurrentDeck(),
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
     botLocalDeck: undefined,
-    points: 0,
-    score: 0,
     turn: undefined,
   });
   const joinCreatorUpdates = persistLobbyJoin({
@@ -78,14 +78,13 @@ export async function persistLobbyCreation(
 
           lobbyPlayers.push({
             nftId: PRACTICE_BOT_NFT_ID,
+            hitPoints: INITIAL_HIT_POINTS,
             startingCommitments: commitments.commitments,
             currentDeck: initialCurrentDeck(),
             currentHand: [],
             currentBoard: [],
             currentDraw: 0,
             botLocalDeck: localDeck,
-            points: 0,
-            score: 0,
             turn: undefined,
           });
           return persistLobbyJoin({
@@ -142,6 +141,7 @@ export function persistLobbyJoin(req: IJoinPlayerToLobbyRequest): SQLUpdate[] {
   const params: IJoinPlayerToLobbyParams = {
     lobby_id: req.lobby_id,
     nft_id: req.nft_id,
+    hit_points: INITIAL_HIT_POINTS,
     starting_commitments: Buffer.from(req.startingCommitments),
     current_deck: initialCurrentDeck(),
     bot_local_deck: req.botLocalDeck ?? null,
