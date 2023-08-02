@@ -1,9 +1,8 @@
 import React from "react";
-import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
-import Card, { cardHeight } from "../CardGame/Card";
-import Deck from "../CardGame/Deck";
+import Card, { cardHeight } from "./Card";
+import Deck from "./Deck";
 import { CardIndex, LobbyPlayer, LocalCard } from "@dice/game-logic";
 import { UseStateResponse } from "@src/utils";
 

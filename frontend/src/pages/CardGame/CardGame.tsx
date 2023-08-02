@@ -1,6 +1,6 @@
-import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
-import "./DiceGame.scss";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import "./CardGame.scss";
 import type {
   MatchState,
   TickEvent,
@@ -19,18 +19,17 @@ import {
   TICK_EVENT_KIND,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
-import { DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
 
-interface DiceGameProps {
+interface CardGameProps {
   lobbyState: LobbyState;
   refetchLobbyState: () => Promise<void>;
   selectedNft: number;
   localDeck: LocalCard[];
 }
 
-const DiceGame: React.FC<DiceGameProps> = ({
+const DiceGame: React.FC<CardGameProps> = ({
   lobbyState,
   refetchLobbyState,
   selectedNft,
@@ -138,9 +137,11 @@ const DiceGame: React.FC<DiceGameProps> = ({
   );
 
   async function submit(move: Move) {
-    const moveResult = await DiceService.submitMove(
+    const moveResult = await Paima.default.submitMoves(
       selectedNft,
-      lobbyState,
+      lobbyState.lobby_id,
+      lobbyState.current_match,
+      lobbyState.current_round,
       move
     );
     console.log("Move result:", moveResult);
