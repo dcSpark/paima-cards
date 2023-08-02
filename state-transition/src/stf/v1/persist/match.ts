@@ -8,6 +8,7 @@ import type {
   MatchState,
 } from '@dice/game-logic';
 import {
+  INITIAL_HIT_POINTS,
   genPermutation,
   initialCurrentDeck,
   serializeBoardCard,
@@ -94,6 +95,7 @@ export function persistInitialMatchState(
     turn: 0,
     players: players.map((player, i) => ({
       nftId: player.nftId,
+      hitPoints: INITIAL_HIT_POINTS,
       startingCommitments: player.startingCommitments,
       currentDeck: initialCurrentDeck(),
       currentHand: [],
@@ -101,8 +103,6 @@ export function persistInitialMatchState(
       currentDraw: player.currentDraw,
       botLocalDeck: player.botLocalDeck,
       turn: newTurnOrder[i],
-      points: 0,
-      score: 0,
     })),
     result: undefined,
     txEventMove: undefined,
@@ -239,12 +239,11 @@ export function persistUpdateMatchState(
   const playerParams: IUpdateLobbyPlayerParams[] = newMatchState.players.map(player => ({
     lobby_id: lobbyId,
     nft_id: player.nftId,
+    hit_points: player.hitPoints,
     current_deck: player.currentDeck,
     current_hand: player.currentHand.map(serializeHandCard),
     current_draw: player.currentDraw,
     current_board: player.currentBoard.map(serializeBoardCard),
-    points: player.points,
-    score: player.score,
     turn: player.turn,
   }));
   const playerUpdates: SQLUpdate[] = playerParams.map(param => [updateLobbyPlayer, param]);

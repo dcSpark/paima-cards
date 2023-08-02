@@ -1,6 +1,6 @@
-import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
-import "./DiceGame.scss";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import "./CardGame.scss";
 import type {
   MatchState,
   TickEvent,
@@ -12,24 +12,24 @@ import type {
 } from "@dice/game-logic";
 import {
   applyEvent,
-  cloneMatchState,
+  CARD_REGISTRY,
   genPostTxEvents,
+  getTurnPlayer,
   MOVE_KIND,
   TICK_EVENT_KIND,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
-import { DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
 
-interface DiceGameProps {
+interface CardGameProps {
   lobbyState: LobbyState;
   refetchLobbyState: () => Promise<void>;
   selectedNft: number;
   localDeck: LocalCard[];
 }
 
-const DiceGame: React.FC<DiceGameProps> = ({
+const DiceGame: React.FC<CardGameProps> = ({
   lobbyState,
   refetchLobbyState,
   selectedNft,
@@ -123,7 +123,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
         const [playedEvent, ...restEvents] = postTxEventQueue;
         setPostTxEventQueue(restEvents);
         setDisplay((oldDisplay) => {
-          const newMatchState = cloneMatchState(oldDisplay.matchState);
+          const newMatchState = structuredClone(oldDisplay.matchState);
           applyEvent(newMatchState, playedEvent);
           return {
             ...oldDisplay,
@@ -137,9 +137,11 @@ const DiceGame: React.FC<DiceGameProps> = ({
   );
 
   async function submit(move: Move) {
-    const moveResult = await DiceService.submitMove(
+    const moveResult = await Paima.default.submitMoves(
       selectedNft,
-      lobbyState,
+      lobbyState.lobby_id,
+      lobbyState.current_match,
+      lobbyState.current_round,
       move
     );
     console.log("Move result:", moveResult);
@@ -169,35 +171,26 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
         // apply events to state
         setDisplay((oldDisplay) => {
-          const newMatchState = cloneMatchState(oldDisplay.matchState);
+          const newMatchState = structuredClone(oldDisplay.matchState);
           applyEvent(newMatchState, tickEvent);
           return { ...oldDisplay, matchState: newMatchState };
         });
 
         // show animations after applying events to sate
         if (tickEvent.kind === TICK_EVENT_KIND.postTx) {
+          console.log("HELLO");
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
 
-        if (tickEvent.kind === TICK_EVENT_KIND.applyPoints) {
+        if (tickEvent.kind === TICK_EVENT_KIND.turnEnd) {
           setCaption(
             (() => {
-              const thisPlayerIndex = display.matchState.players.findIndex(
-                (player) => player.nftId === selectedNft
-              );
+              const turnPlayer = getTurnPlayer(display.matchState);
 
-              const you = tickEvent.points[thisPlayerIndex];
-              const opponents = tickEvent.points.filter(
-                (_, i) => i !== thisPlayerIndex
-              );
+              const target =
+                turnPlayer.nftId === selectedNft ? "You deal" : "You take";
 
-              if (you === 2) return "21! You get 2 points";
-              if (you === 1) return "You win! You get a point";
-              if (opponents.some((points) => points === 1))
-                return "You lose! Opponent gets a point";
-              if (opponents.some((points) => points === 2))
-                return "You lose! Opponent gets 2 points";
-              return "It's a tie";
+              return `${target} ${tickEvent.damageDealt} damage!`;
             })()
           );
           await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -301,7 +294,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
     thisPlayer.turn !== display.matchState.turn ||
     isTickDisplaying;
 
-  const canRoll = !disableInteraction;
   const canPass = !disableInteraction;
   const canPlay = !disableInteraction;
 
@@ -349,6 +341,12 @@ const DiceGame: React.FC<DiceGameProps> = ({
                   );
                   if (toBoardPosition === -1) return;
 
+                  const fromCardId =
+                    thisPlayer.currentBoard[fromBoardPosition].cardId;
+                  const toCardId =
+                    opponent.currentBoard[toBoardPosition].cardId;
+                  if (CARD_REGISTRY[fromCardId].defeats !== toCardId) return;
+
                   await submit({
                     kind: MOVE_KIND.targetCardWithBoardCard,
                     fromBoardPosition,
@@ -365,13 +363,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
           localDeck={localDeck}
           turn={display.matchState.turn}
           selectedCardState={[selectedCard, setSelectedCard]}
-          onDraw={
-            canRoll
-              ? () => {
-                  submit({ kind: MOVE_KIND.drawCard });
-                }
-              : undefined
-          }
           onEndTurn={
             canPass
               ? () => {

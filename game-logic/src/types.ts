@@ -42,12 +42,9 @@ export type DestroyCardTickEvent = {
   newFromBoard: BoardCard[];
   newToBoard: BoardCard[];
 };
-export type ApplyPointsTickEvent = {
-  kind: typeof TICK_EVENT_KIND.applyPoints;
-  points: number[];
-};
 export type TurnEndTickEvent = {
   kind: typeof TICK_EVENT_KIND.turnEnd;
+  damageDealt: number;
 };
 export type RoundEndTickEvent = {
   kind: typeof TICK_EVENT_KIND.roundEnd;
@@ -62,7 +59,6 @@ export type TickEvent =
   | PostTxTickEvent
   | PlayCardTickEvent
   | DestroyCardTickEvent
-  | ApplyPointsTickEvent
   | TurnEndTickEvent
   | RoundEndTickEvent
   | MatchEndTickEvent;
@@ -135,6 +131,7 @@ export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export type LobbyPlayer = {
   nftId: number;
+  hitPoints: number;
   readonly startingCommitments: Uint8Array;
   currentDeck: number[]; // indices
   currentHand: HandCard[];
@@ -142,8 +139,6 @@ export type LobbyPlayer = {
   currentDraw: number;
   botLocalDeck: undefined | LocalCard[]; // only defined for bot player
   turn: undefined | number;
-  points: number;
-  score: number;
 };
 
 type LobbyStateProps = 'current_match' | 'current_round' | 'current_turn' | 'current_proper_round';
@@ -194,9 +189,6 @@ export type CardRegistry = Record<CardRegistryId, RegistryCard>;
 
 export type MoveKind = ValuesType<typeof MOVE_KIND>;
 export type Move =
-  | {
-      kind: typeof MOVE_KIND.drawCard;
-    }
   | {
       kind: typeof MOVE_KIND.endTurn;
     }

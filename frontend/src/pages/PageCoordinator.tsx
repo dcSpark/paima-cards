@@ -8,7 +8,7 @@ import CreateLobby from "./CreateLobby";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
-import { Lobby } from "./DiceGame/Lobby";
+import { Lobby } from "./CardGame/Lobby";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { IGetLobbyByIdResult } from "@dice/db";
 import BuyPack from "./BuyPack";

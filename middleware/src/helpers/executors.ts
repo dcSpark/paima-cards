@@ -3,6 +3,7 @@ import { matchExecutor } from 'paima-sdk/paima-executors';
 import Prando from 'paima-sdk/paima-prando';
 
 import {
+  INITIAL_HIT_POINTS,
   extractMatchEnvironment,
   initRoundExecutor,
   initialCurrentDeck,
@@ -34,6 +35,7 @@ export function buildMatchExecutor({
   const initialState: MatchState = {
     players: lobby.players.map((player, i) => ({
       nftId: player.nftId,
+      hitPoints: INITIAL_HIT_POINTS,
       startingCommitments: player.startingCommitments,
       currentDeck: initialCurrentDeck(),
       currentHand: [],
@@ -41,8 +43,6 @@ export function buildMatchExecutor({
       currentDraw: 0,
       botLocalDeck: player.botLocalDeck,
       turn: matchTurnOrder[i],
-      points: 0,
-      score: 0,
     })),
     properRound: 0,
     turn: 0,

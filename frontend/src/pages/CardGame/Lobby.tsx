@@ -1,13 +1,13 @@
-import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Lobby.scss";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import type { LobbyState } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
-import { DiceService } from "./GameLogic";
-import DiceGame from "./DiceGame";
+import CardGame from "./CardGame";
 import { IGetLobbyByIdResult } from "@dice/db";
 import { localDeckCache } from "@src/GlobalStateContext";
+import * as Paima from "@dice/middleware";
 
 export function Lobby({
   initialLobbyRaw,
@@ -22,11 +22,11 @@ export function Lobby({
     const fetchLobbyData = async () => {
       if (initialLobbyRaw == null) return;
 
-      const newLobbyState = await DiceService.getLobbyState(
+      const newLobbyState = await Paima.default.getLobbyState(
         initialLobbyRaw.lobby_id
       );
-      if (newLobbyState == null) return;
-      setLobbyState(newLobbyState);
+      if (!newLobbyState.success) return;
+      setLobbyState(newLobbyState.lobby);
     };
 
     // Fetch data every 5 seconds
@@ -61,15 +61,15 @@ export function Lobby({
               throw new Error(`Lobby: local deck not in cache`);
             }
             return (
-              <DiceGame
+              <CardGame
                 lobbyState={lobbyState}
                 selectedNft={selectedNft}
                 refetchLobbyState={async () => {
-                  const response = await DiceService.getLobbyState(
+                  const response = await Paima.default.getLobbyState(
                     initialLobbyRaw.lobby_id
                   );
-                  if (response == null) return;
-                  setLobbyState(response);
+                  if (!response.success) return;
+                  setLobbyState(response.lobby);
                 }}
                 localDeck={localDeck}
               />

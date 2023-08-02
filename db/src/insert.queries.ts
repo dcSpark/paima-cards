@@ -71,6 +71,7 @@ export const createLobby = new PreparedQuery<ICreateLobbyParams,ICreateLobbyResu
 export interface IJoinPlayerToLobbyParams {
   bot_local_deck: stringArray | null | void;
   current_deck: numberArray;
+  hit_points: number;
   lobby_id: string;
   nft_id: number;
   starting_commitments: Buffer;
@@ -85,7 +86,7 @@ export interface IJoinPlayerToLobbyQuery {
   result: IJoinPlayerToLobbyResult;
 }
 
-const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true,"starting_commitments":true,"current_deck":true,"bot_local_deck":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":117,"b":126}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":138}]},{"name":"starting_commitments","required":true,"transform":{"type":"scalar"},"locs":[{"a":143,"b":164}]},{"name":"current_deck","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":182}]},{"name":"bot_local_deck","required":false,"transform":{"type":"scalar"},"locs":[{"a":187,"b":201}]}],"statement":"INSERT INTO lobby_player(\n  lobby_id,\n  nft_id,\n  starting_commitments,\n  current_deck,\n  bot_local_deck\n)\nVALUES(\n  :lobby_id!,\n  :nft_id!,\n  :starting_commitments!,\n  :current_deck!,\n  :bot_local_deck\n)"};
+const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true,"hit_points":true,"starting_commitments":true,"current_deck":true,"bot_local_deck":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":140}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":145,"b":152}]},{"name":"hit_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":157,"b":168}]},{"name":"starting_commitments","required":true,"transform":{"type":"scalar"},"locs":[{"a":173,"b":194}]},{"name":"current_deck","required":true,"transform":{"type":"scalar"},"locs":[{"a":199,"b":212}]},{"name":"bot_local_deck","required":false,"transform":{"type":"scalar"},"locs":[{"a":217,"b":231}]}],"statement":"INSERT INTO lobby_player(\n  lobby_id,\n  nft_id,\n  hit_points,\n  starting_commitments,\n  current_deck,\n  bot_local_deck\n)\nVALUES(\n  :lobby_id!,\n  :nft_id!,\n  :hit_points!,\n  :starting_commitments!,\n  :current_deck!,\n  :bot_local_deck\n)"};
 
 /**
  * Query generated from SQL:
@@ -93,6 +94,7 @@ const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true,
  * INSERT INTO lobby_player(
  *   lobby_id,
  *   nft_id,
+ *   hit_points,
  *   starting_commitments,
  *   current_deck,
  *   bot_local_deck
@@ -100,6 +102,7 @@ const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true,
  * VALUES(
  *   :lobby_id!,
  *   :nft_id!,
+ *   :hit_points!,
  *   :starting_commitments!,
  *   :current_deck!,
  *   :bot_local_deck

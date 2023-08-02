@@ -1,6 +1,5 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type {
-  ApplyPointsTickEvent,
   MatchEndTickEvent,
   RoundEndTickEvent,
   TurnEndTickEvent,
@@ -89,7 +88,7 @@ export function processTick(
         kind: TICK_EVENT_KIND.destroyCard,
         fromBoardPosition: move.fromBoardPosition,
         toBoardPosition: move.toBoardPosition,
-        newFromBoard: turnPlayer.currentBoard.filter((_, i) => i !== move.fromBoardPosition),
+        newFromBoard: turnPlayer.currentBoard,
         newToBoard: nonTurnPlayer.currentBoard.filter((_, i) => i !== move.toBoardPosition),
       },
     ];
@@ -103,43 +102,14 @@ export function processTick(
   const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
   const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
-  const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
-    if (!roundEnds) return [];
-
-    // rules:
-    // Anyone who scored 21 gets 2 points.
-    // If nobody scored 21:
-    //   Over 21 gets 0 points.
-    //   Closest to 21 gets 1 point, but tie is 0 points.
-
-    const points = (() => {
-      // replace going over 21 with -1 score, simplifies logic
-      const scores = matchState.players.map(player => (player.score > 21 ? -1 : player.score));
-      const someoneScored21 = scores.some(score => score === 21);
-      if (someoneScored21) {
-        return scores.map(score => (score === 21 ? 2 : 0));
-      } else {
-        const max = Math.max(...scores);
-
-        if (scores.filter(value => value === max).length > 1) return scores.map(() => 0);
-
-        return scores.map(score => (score === max ? 1 : 0));
-      }
-    })();
-
-    return [
-      {
-        kind: TICK_EVENT_KIND.applyPoints,
-        points,
-      },
-    ];
-  })();
-  for (const event of applyPointsEvents) {
-    applyEvent(matchState, event);
-    events.push(event);
-  }
-
-  const turnEndEvents: TurnEndTickEvent[] = turnEnds ? [{ kind: TICK_EVENT_KIND.turnEnd }] : [];
+  const turnEndEvents: TurnEndTickEvent[] = turnEnds
+    ? [
+        {
+          kind: TICK_EVENT_KIND.turnEnd,
+          damageDealt: getTurnPlayer(matchState).currentBoard.length,
+        },
+      ]
+    : [];
   for (const event of turnEndEvents) {
     applyEvent(matchState, event);
     events.push(event);
@@ -178,6 +148,7 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     matchState.players[turnPlayerIndex].currentDraw++;
     matchState.players[turnPlayerIndex].currentDeck = event.draw.newDeck;
     matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
+    matchState.txEventMove = undefined;
     return;
   }
 
@@ -196,22 +167,18 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     matchState.players[nonTurnPlayerIndex].currentBoard = event.newToBoard;
   }
 
-  if (event.kind === TICK_EVENT_KIND.applyPoints) {
-    for (const i in matchState.players) {
-      matchState.players[i].points += event.points[i];
-    }
-  }
-
   if (event.kind === TICK_EVENT_KIND.turnEnd) {
+    const nonTurnPlayerIndex = matchState.players.findIndex(
+      player => player.turn !== matchState.turn
+    );
+    matchState.players[nonTurnPlayerIndex].hitPoints -= event.damageDealt;
+
     matchState.turn = (matchState.turn + 1) % numPlayers;
     return;
   }
 
   if (event.kind === TICK_EVENT_KIND.roundEnd) {
     matchState.properRound++;
-    for (const i in matchState.players) {
-      matchState.players[i].score = 0;
-    }
   }
 
   if (event.kind === TICK_EVENT_KIND.matchEnd) {

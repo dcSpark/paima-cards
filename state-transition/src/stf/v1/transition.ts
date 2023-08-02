@@ -27,6 +27,7 @@ import {
   deserializeBoardCard,
   deserializeLocalCard,
   genCardPack,
+  INITIAL_HIT_POINTS,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -140,14 +141,13 @@ export const joinedLobby = async (
   }
   const lobbyPlayers: LobbyPlayer[] = rawPlayers.map(player => ({
     nftId: player.nft_id,
+    hitPoints: player.hit_points,
     startingCommitments: player.starting_commitments,
     currentDeck: player.current_deck,
     currentHand: player.current_hand.map(deserializeHandCard),
     currentBoard: player.current_board.map(deserializeBoardCard),
     currentDraw: player.current_draw,
     botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
-    points: player.points,
-    score: player.score,
     turn: player.turn ?? undefined,
   }));
 
@@ -168,14 +168,13 @@ export const joinedLobby = async (
   });
   lobbyPlayers.push({
     nftId: input.nftId,
+    hitPoints: INITIAL_HIT_POINTS,
     startingCommitments: input.commitments,
     currentDeck: initialCurrentDeck(),
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
     botLocalDeck: undefined,
-    points: 0,
-    score: 0,
     turn: undefined,
   });
   const isFull = rawPlayers.length + 1 >= lobby.max_players;

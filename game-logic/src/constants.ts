@@ -3,11 +3,11 @@ import type { CardRegistry } from './types';
 export const COMMITMENT_LENGTH = 16;
 export const DECK_LENGTH = 10;
 export const PACK_LENGTH = 5;
+export const INITIAL_HIT_POINTS = 20;
 
 // Values must match move_kind in db. No need for a type check, it will cause errors somewhere.
 export const MOVE_KIND = {
   endTurn: 'end',
-  drawCard: 'draw',
   playCard: 'play',
   // mini todo: Many games can target with a hand card too.
   // It makes sense to separate them, because this one doesn't need a reveal.

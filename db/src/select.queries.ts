@@ -163,11 +163,10 @@ export interface IGetLobbyPlayersResult {
   current_deck: numberArray;
   current_draw: number;
   current_hand: stringArray;
+  hit_points: number;
   id: number;
   lobby_id: string;
   nft_id: number;
-  points: number;
-  score: number;
   starting_commitments: Buffer;
   turn: number | null;
 }
