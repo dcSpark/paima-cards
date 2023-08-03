@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Box, CircularProgress } from "@mui/material";
-import MainController, { Page } from "@src/MainController";
+import { Page } from "@src/MainController";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
 import Wrapper from "@src/components/Wrapper";
@@ -8,7 +8,6 @@ import Logo from "@src/components/Logo";
 import { buyNft } from "@src/services/contract";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { LoadingButton } from "@mui/lab";
-import { AppContext } from "@src/main";
 
 const NoNFTMenu = () => {
   const {

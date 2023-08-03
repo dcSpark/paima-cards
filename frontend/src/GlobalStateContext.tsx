@@ -67,7 +67,10 @@ export function GlobalStateProvider({
       if (connectedWallet == null) return;
 
       const result = await Paima.default.getNftForWallet(connectedWallet);
-      if (result.success && result.result !== selectedNft.nft) {
+      if (
+        result.success &&
+        (result.result == null || result.result !== selectedNft.nft)
+      ) {
         setSelectedNft({
           loading: false,
           nft: result.result,
