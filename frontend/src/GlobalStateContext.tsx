@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import MainController from "./MainController";
 import { AppContext } from "./main";
 import { UseStateResponse } from "./utils";
@@ -15,6 +22,7 @@ import {
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
 } from "@dice/db/build/select.queries";
+import LocalStorage from "./LocalStorage";
 
 export const localDeckCache: Map<string, LocalCard[]> = new Map();
 
@@ -61,7 +69,6 @@ export function GlobalStateProvider({
     nft: undefined,
   });
   const [collection, setCollection] = useState<Collection>({});
-  const [selectedDeck, setSelectedDeck] = useState<undefined | CardDbId[]>();
   const [tradeNfts, setTradeNfts] = useState<
     | undefined
     | {
@@ -69,6 +76,25 @@ export function GlobalStateProvider({
         cardLookup: Record<string, IGetCardsByIdsResult>;
       }
   >();
+
+  const [selectedDeckSubscription, setSelectedDeckSubscription] =
+    useState<number>(0);
+  const selectedDeck = useMemo(() => {
+    const result = LocalStorage._getSelectedDeck();
+    if (
+      collection.cards != null &&
+      result?.some((card) => collection.cards[card] == null)
+    ) {
+      LocalStorage._setSelectedDeck(undefined);
+      return undefined;
+    }
+
+    return result;
+  }, [collection, selectedDeckSubscription]);
+  const setSelectedDeck = useCallback((cards: CardDbId[]) => {
+    LocalStorage._setSelectedDeck(cards);
+    setSelectedDeckSubscription((old) => old + 1);
+  }, []);
 
   useEffect(() => {
     // poll owned nfts
