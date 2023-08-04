@@ -120,10 +120,28 @@ ties = EXCLUDED.ties;
 
 /* @name newCardPack */
 INSERT INTO card_packs(
+  buyer_nft_id,
+  card_registry_ids
+)
+VALUES (
+  :buyer_nft_id!,
+  :card_registry_ids!
+);
+
+/* @name newCard */
+INSERT INTO cards(
   owner_nft_id,
-  cards
+  registry_id
 )
 VALUES (
   :owner_nft_id!,
-  :cards!
+  :registry_id!
+);
+
+/* @name newTradeNft */
+INSERT INTO card_trade_nft(
+  nft_id
+)
+VALUES (
+  :nft_id!
 );

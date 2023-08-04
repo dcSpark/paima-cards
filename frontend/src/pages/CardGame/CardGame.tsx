@@ -8,7 +8,7 @@ import type {
   PostTxTickEvent,
   Move,
   LocalCard,
-  CardIndex,
+  CardCommitmentIndex,
 } from "@dice/game-logic";
 import {
   applyEvent,
@@ -35,7 +35,9 @@ const DiceGame: React.FC<CardGameProps> = ({
   selectedNft,
   localDeck,
 }) => {
-  const [selectedCard, setSelectedCard] = useState<undefined | CardIndex>();
+  const [selectedCard, setSelectedCard] = useState<
+    undefined | CardCommitmentIndex
+  >();
   const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
@@ -178,7 +180,6 @@ const DiceGame: React.FC<CardGameProps> = ({
 
         // show animations after applying events to sate
         if (tickEvent.kind === TICK_EVENT_KIND.postTx) {
-          console.log("HELLO");
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
 
@@ -341,11 +342,15 @@ const DiceGame: React.FC<CardGameProps> = ({
                   );
                   if (toBoardPosition === -1) return;
 
-                  const fromCardId =
-                    thisPlayer.currentBoard[fromBoardPosition].cardId;
-                  const toCardId =
-                    opponent.currentBoard[toBoardPosition].cardId;
-                  if (CARD_REGISTRY[fromCardId].defeats !== toCardId) return;
+                  const fromCardRegistryId =
+                    thisPlayer.currentBoard[fromBoardPosition].registryId;
+                  const toCardRegistryId =
+                    opponent.currentBoard[toBoardPosition].registryId;
+                  if (
+                    CARD_REGISTRY[fromCardRegistryId].defeats !==
+                    toCardRegistryId
+                  )
+                    return;
 
                   await submit({
                     kind: MOVE_KIND.targetCardWithBoardCard,
@@ -383,7 +388,8 @@ const DiceGame: React.FC<CardGameProps> = ({
                     handPosition,
                     cardIndex: index,
                     salt: localDeck[index].salt,
-                    cardId: localDeck[index].cardId,
+                    cardId: localDeck[index].id,
+                    cardRegistryId: localDeck[index].registryId,
                   });
                   setSelectedCard(undefined);
                 }

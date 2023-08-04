@@ -56,3 +56,17 @@ UPDATE global_user_state
 SET
 ties = ties + 1
 WHERE nft_id = :nft_id;
+
+/* @name setTradeNftCards */
+UPDATE card_trade_nft
+SET cards = :cards!
+WHERE nft_id = :nft_id!;
+
+/* @name transferCard */
+UPDATE cards
+SET owner_nft_id = :owner_nft_id
+WHERE id = :id!;
+
+/* @name deleteTradeNft */
+DELETE FROM card_trade_nft
+WHERE nft_id = :nft_id!;

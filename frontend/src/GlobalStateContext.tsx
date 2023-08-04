@@ -8,10 +8,21 @@ import ConnectingModal from "./ConnectingModal";
 import { PaimaNotice } from "./components/PaimaNotice";
 import { OasysNotice } from "./components/PaimaNotice";
 import { Box } from "@mui/material";
-import { CardRegistryId, LocalCard } from "@dice/game-logic";
-import { IGetOwnedPacksResult } from "@dice/db/build/select.queries";
+import { CardDbId, LocalCard } from "@dice/game-logic";
+import {
+  IGetBoughtPacksResult,
+  IGetCardsByIdsResult,
+  IGetOwnedCardsResult,
+  IGetTradeNftsResult,
+} from "@dice/db/build/select.queries";
 
 export const localDeckCache: Map<string, LocalCard[]> = new Map();
+
+export type Collection = {
+  /** emphasis on **bought**, user might not own all cards in them anymore */
+  boughtPacks?: IGetBoughtPacksResult[];
+  cards?: Record<CardDbId, IGetOwnedCardsResult>;
+};
 
 type GlobalState = {
   connectedWallet?: WalletAddress;
@@ -19,14 +30,14 @@ type GlobalState = {
     loading: boolean;
     nft: undefined | number;
   }>;
-  collection:
+  collection: Collection;
+  selectedDeckState: UseStateResponse<undefined | CardDbId[]>;
+  tradeNfts:
     | undefined
     | {
-        raw: IGetOwnedPacksResult[];
-        packs: CardRegistryId[][];
-        cards: CardRegistryId[];
+        tradeNfts: IGetTradeNftsResult[];
+        cardLookup: Record<string, IGetCardsByIdsResult>;
       };
-  selectedDeckState: UseStateResponse<undefined | CardRegistryId[]>;
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
@@ -49,16 +60,14 @@ export function GlobalStateProvider({
     loading: true,
     nft: undefined,
   });
-  const [collection, setCollection] = useState<
+  const [collection, setCollection] = useState<Collection>({});
+  const [selectedDeck, setSelectedDeck] = useState<undefined | CardDbId[]>();
+  const [tradeNfts, setTradeNfts] = useState<
     | undefined
     | {
-        raw: IGetOwnedPacksResult[];
-        packs: CardRegistryId[][];
-        cards: CardRegistryId[];
+        tradeNfts: IGetTradeNftsResult[];
+        cardLookup: Record<string, IGetCardsByIdsResult>;
       }
-  >();
-  const [selectedDeck, setSelectedDeck] = useState<
-    undefined | CardRegistryId[]
   >();
 
   useEffect(() => {
@@ -87,19 +96,31 @@ export function GlobalStateProvider({
     const fetch = async () => {
       if (selectedNft.nft == null) return;
 
-      const result = await Paima.default.getUserPacks(selectedNft.nft);
-      if (result.success) {
-        const raw = result.result;
-        const packs = raw.map((pack) => pack.cards);
-        const cards = packs.flat();
-        setCollection({
-          raw,
-          packs,
-          cards,
-        });
-      } else {
-        setCollection(undefined);
-      }
+      Promise.all([
+        (async () => {
+          const result = await Paima.default.getUserPacks(selectedNft.nft);
+          if (result.success) {
+            setCollection((oldCollection) => ({
+              ...oldCollection,
+              boughtPacks: result.result,
+            }));
+          }
+        })(),
+        (async () => {
+          const result = await Paima.default.getUserCards(selectedNft.nft);
+          if (result.success) {
+            const raw = result.result;
+            const cards = Object.fromEntries(
+              raw.map((entry) => [entry.id, entry])
+            );
+
+            setCollection((oldCollection) => ({
+              ...oldCollection,
+              cards,
+            }));
+          }
+        })(),
+      ]);
     };
     fetch();
     const interval = setInterval(fetch, 5000);
@@ -122,6 +143,19 @@ export function GlobalStateProvider({
     return () => clearInterval(interval);
   }, [connectedWallet, mainController]);
 
+  useEffect(() => {
+    // poll trade nfts
+    const fetch = async () => {
+      if (selectedNft.nft == null) return;
+
+      const result = await Paima.default.getUserTradeNfts(selectedNft.nft);
+      if (result.success) setTradeNfts(result.result);
+    };
+    fetch();
+    const interval = setInterval(fetch, 5000);
+    return () => clearInterval(interval);
+  }, [selectedNft]);
+
   // if a user disconnects, we will suspend the pages the previously connected wallet
   // instead of setting connected wallet back to undefined
   const [lastConnectedWallet, setLastConnectedWallet] = useState<
@@ -139,6 +173,7 @@ export function GlobalStateProvider({
       selectedNftState: [selectedNft, setSelectedNft],
       collection,
       selectedDeckState: [selectedDeck, setSelectedDeck],
+      tradeNfts,
     }),
     [lastConnectedWallet, selectedNft, setSelectedNft]
   );

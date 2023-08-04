@@ -320,8 +320,8 @@ export const updateStats = new PreparedQuery<IUpdateStatsParams,IUpdateStatsResu
 
 /** 'NewCardPack' parameters type */
 export interface INewCardPackParams {
-  cards: numberArray;
-  owner_nft_id: number;
+  buyer_nft_id: number;
+  card_registry_ids: numberArray;
 }
 
 /** 'NewCardPack' return type */
@@ -333,21 +333,84 @@ export interface INewCardPackQuery {
   result: INewCardPackResult;
 }
 
-const newCardPackIR: any = {"usedParamSet":{"owner_nft_id":true,"cards":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":74}]},{"name":"cards","required":true,"transform":{"type":"scalar"},"locs":[{"a":79,"b":85}]}],"statement":"INSERT INTO card_packs(\n  owner_nft_id,\n  cards\n)\nVALUES (\n  :owner_nft_id!,\n  :cards!\n)"};
+const newCardPackIR: any = {"usedParamSet":{"buyer_nft_id":true,"card_registry_ids":true},"params":[{"name":"buyer_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":86}]},{"name":"card_registry_ids","required":true,"transform":{"type":"scalar"},"locs":[{"a":91,"b":109}]}],"statement":"INSERT INTO card_packs(\n  buyer_nft_id,\n  card_registry_ids\n)\nVALUES (\n  :buyer_nft_id!,\n  :card_registry_ids!\n)"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO card_packs(
- *   owner_nft_id,
- *   cards
+ *   buyer_nft_id,
+ *   card_registry_ids
  * )
  * VALUES (
- *   :owner_nft_id!,
- *   :cards!
+ *   :buyer_nft_id!,
+ *   :card_registry_ids!
  * )
  * ```
  */
 export const newCardPack = new PreparedQuery<INewCardPackParams,INewCardPackResult>(newCardPackIR);
+
+
+/** 'NewCard' parameters type */
+export interface INewCardParams {
+  owner_nft_id: number;
+  registry_id: number;
+}
+
+/** 'NewCard' return type */
+export type INewCardResult = void;
+
+/** 'NewCard' query type */
+export interface INewCardQuery {
+  params: INewCardParams;
+  result: INewCardResult;
+}
+
+const newCardIR: any = {"usedParamSet":{"owner_nft_id":true,"registry_id":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":75}]},{"name":"registry_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":80,"b":92}]}],"statement":"INSERT INTO cards(\n  owner_nft_id,\n  registry_id\n)\nVALUES (\n  :owner_nft_id!,\n  :registry_id!\n)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO cards(
+ *   owner_nft_id,
+ *   registry_id
+ * )
+ * VALUES (
+ *   :owner_nft_id!,
+ *   :registry_id!
+ * )
+ * ```
+ */
+export const newCard = new PreparedQuery<INewCardParams,INewCardResult>(newCardIR);
+
+
+/** 'NewTradeNft' parameters type */
+export interface INewTradeNftParams {
+  nft_id: number;
+}
+
+/** 'NewTradeNft' return type */
+export type INewTradeNftResult = void;
+
+/** 'NewTradeNft' query type */
+export interface INewTradeNftQuery {
+  params: INewTradeNftParams;
+  result: INewTradeNftResult;
+}
+
+const newTradeNftIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":50,"b":57}]}],"statement":"INSERT INTO card_trade_nft(\n  nft_id\n)\nVALUES (\n  :nft_id!\n)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO card_trade_nft(
+ *   nft_id
+ * )
+ * VALUES (
+ *   :nft_id!
+ * )
+ * ```
+ */
+export const newTradeNft = new PreparedQuery<INewTradeNftParams,INewTradeNftResult>(newTradeNftIR);
 
 

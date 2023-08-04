@@ -9,7 +9,9 @@ import type {
   ParsedSubmittedInput,
   ParsedSubmittedInputRaw,
   PracticeMovesInput,
+  SetTradeNftCardsInput,
   SubmittedMovesInput,
+  TransferTradeNftInput,
   UserStats,
   ZombieRound,
 } from './types';
@@ -17,6 +19,7 @@ import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
+tradeNftMint        = tradeMint|address|tokenId
 createdLobby        = c|creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID|commitments
 closedLobby         = cs|*lobbyID
@@ -24,9 +27,14 @@ submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|move
 practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
+setTradeNftCards    = t|tradeNftId|cards
 `;
 
 const nftMint: ParserRecord<NftMintInput> = {
+  address: PaimaParser.WalletAddress(),
+  tokenId: PaimaParser.NumberParser(),
+};
+const tradeNftMint: ParserRecord<NftMintInput> = {
   address: PaimaParser.WalletAddress(),
   tokenId: PaimaParser.NumberParser(),
 };
@@ -70,9 +78,16 @@ const userScheduledData: ParserRecord<UserStats> = {
   nftId: PaimaParser.NumberParser(),
   result: PaimaParser.RegexParser(/^[w|t|l]$/),
 };
+const setTradeNftCards: ParserRecord<SetTradeNftCardsInput> = {
+  tradeNftId: PaimaParser.NumberParser(),
+  cards: PaimaParser.ArrayParser({
+    item: PaimaParser.NumberParser(),
+  }),
+};
 
 const parserCommands: Record<string, ParserRecord<ParsedSubmittedInputRaw>> = {
   nftMint,
+  tradeNftMint,
   createdLobby,
   joinedLobby,
   closedLobby,
@@ -80,39 +95,64 @@ const parserCommands: Record<string, ParserRecord<ParsedSubmittedInputRaw>> = {
   practiceMoves,
   zombieScheduledData,
   userScheduledData,
+  setTradeNftCards,
 };
 
 /**
  * PaimaParser seems unable to accept some of the characters in stringified JSON
  * so we parse it manually here.
  */
-function manualParse(input: string): undefined | GenericPaymentInput {
+function manualParse(input: string): undefined | GenericPaymentInput | TransferTradeNftInput {
   const parts = input.split('|');
 
   if (parts.length !== 2) return;
 
-  if (parts[0] !== 'generic') return;
+  if (!['generic', 'tradeTransfer'].includes(parts[0])) return;
 
   try {
     const parsed = JSON.parse(parts[1]);
-    if (
-      !Object.hasOwn(parsed, 'message') ||
-      !Object.hasOwn(parsed, 'payer') ||
-      !Object.hasOwn(parsed, 'amount') ||
-      typeof parsed.message !== 'string' ||
-      typeof parsed.payer !== 'string' ||
-      typeof parsed.amount !== 'string'
-    ) {
-      return;
-    }
-    const amount = BigInt(parsed.amount);
 
-    return {
-      input: 'genericPayment',
-      message: parsed.message,
-      payer: parsed.payer,
-      amount,
-    };
+    if (parts[0] === 'generic') {
+      if (
+        !Object.hasOwn(parsed, 'message') ||
+        !Object.hasOwn(parsed, 'payer') ||
+        !Object.hasOwn(parsed, 'amount') ||
+        typeof parsed.message !== 'string' ||
+        typeof parsed.payer !== 'string' ||
+        typeof parsed.amount !== 'string'
+      ) {
+        return;
+      }
+      const amount = BigInt(parsed.amount);
+
+      return {
+        input: 'genericPayment',
+        message: parsed.message,
+        payer: parsed.payer,
+        amount,
+      };
+    }
+
+    if (parts[0] === 'tradeTransfer') {
+      if (
+        !Object.hasOwn(parsed, 'from') ||
+        !Object.hasOwn(parsed, 'to') ||
+        !Object.hasOwn(parsed, 'tokenId') ||
+        typeof parsed.from !== 'string' ||
+        typeof parsed.to !== 'string' ||
+        typeof parsed.tokenId !== 'string'
+      ) {
+        return;
+      }
+      const tradeNftId = Number.parseInt(parsed.tokenId);
+
+      return {
+        input: 'transferTradeNft',
+        from: parsed.from,
+        to: parsed.to,
+        tradeNftId,
+      };
+    }
   } catch (e) {
     return;
   }

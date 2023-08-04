@@ -533,6 +533,138 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"IGetOwnedCardsResult": {
+				"description": "'GetOwnedCards' return type",
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"owner_nft_id": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"registry_id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"id",
+					"owner_nft_id",
+					"registry_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetCardsResponse": {
+				"properties": {
+					"cards": {
+						"items": {
+							"$ref": "#/components/schemas/IGetOwnedCardsResult"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"cards"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"numberArray": {
+				"items": {
+					"type": "number",
+					"format": "double"
+				},
+				"type": "array"
+			},
+			"IGetBoughtPacksResult": {
+				"description": "'GetBoughtPacks' return type",
+				"properties": {
+					"buyer_nft_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"card_registry_ids": {
+						"$ref": "#/components/schemas/numberArray"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"buyer_nft_id",
+					"card_registry_ids",
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetPacksResponse": {
+				"properties": {
+					"packs": {
+						"items": {
+							"$ref": "#/components/schemas/IGetBoughtPacksResult"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"packs"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IGetTradeNftsResult": {
+				"description": "'GetTradeNfts' return type",
+				"properties": {
+					"cards": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/numberArray"
+							}
+						],
+						"nullable": true
+					},
+					"nft_id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"cards",
+					"nft_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Record_string.IGetCardsByIdsResult_": {
+				"properties": {},
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"GetTradeNftsResponse": {
+				"properties": {
+					"tradeNfts": {
+						"items": {
+							"$ref": "#/components/schemas/IGetTradeNftsResult"
+						},
+						"type": "array"
+					},
+					"cardLookup": {
+						"$ref": "#/components/schemas/Record_string.IGetCardsByIdsResult_"
+					}
+				},
+				"required": [
+					"tradeNfts",
+					"cardLookup"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -882,16 +1014,74 @@
 				]
 			}
 		},
-		"/user/packs": {
+		"/user/cards": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "GetCards",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Response"
+									"$ref": "#/components/schemas/GetCardsResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "nftId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/packs": {
+			"get": {
+				"operationId": "GetPacks",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetPacksResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "nftId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/tradeNfts": {
+			"get": {
+				"operationId": "GetTradeNfts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetTradeNftsResponse"
 								}
 							}
 						}

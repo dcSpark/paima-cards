@@ -123,8 +123,24 @@ export function backendQueryNftsForWallet(wallet: WalletAddress): string {
   return buildBackendQuery(endpoint, options);
 }
 
+export function backendQueryUserCards(nftId: number): string {
+  const endpoint = 'user/cards';
+  const options = {
+    nftId,
+  };
+  return buildBackendQuery(endpoint, options);
+}
+
 export function backendQueryUserPacks(nftId: number): string {
   const endpoint = 'user/packs';
+  const options = {
+    nftId,
+  };
+  return buildBackendQuery(endpoint, options);
+}
+
+export function backendQueryUserTradeNfts(nftId: number): string {
+  const endpoint = 'user/tradeNfts';
   const options = {
     nftId,
   };

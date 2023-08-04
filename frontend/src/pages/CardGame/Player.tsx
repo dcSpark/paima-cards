@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
 import Card, { cardHeight } from "./Card";
 import Deck from "./Deck";
-import { CardIndex, LobbyPlayer, LocalCard } from "@dice/game-logic";
+import { CardCommitmentIndex, LobbyPlayer, LocalCard } from "@dice/game-logic";
 import { UseStateResponse } from "@src/utils";
 
 export type PlayerProps = {
@@ -11,10 +11,10 @@ export type PlayerProps = {
   isThisPlayer?: boolean;
   localDeck?: LocalCard[];
   turn: number;
-  selectedCardState: UseStateResponse<undefined | CardIndex>;
+  selectedCardState: UseStateResponse<undefined | CardCommitmentIndex>;
   onEndTurn?: () => void;
-  onTargetCard?: (index: CardIndex) => void;
-  onConfirmCard?: (index: CardIndex) => void;
+  onTargetCard?: (index: CardCommitmentIndex) => void;
+  onConfirmCard?: (index: CardCommitmentIndex) => void;
 };
 
 export default function Player({
@@ -38,7 +38,7 @@ export default function Player({
       {lobbyPlayer.currentHand.map((card) => (
         <Card
           key={card.index}
-          cardId={localDeck?.[card.index].cardId}
+          cardRegistryId={localDeck?.[card.index].registryId}
           overlap
           onConfirm={() => onConfirmCard?.(card.index)}
           selectedState={[
@@ -64,7 +64,7 @@ export default function Player({
       {lobbyPlayer.currentBoard.map((card, i) => (
         <Card
           key={card.index}
-          cardId={card.cardId}
+          cardRegistryId={card.registryId}
           selectedEffect="glow"
           selectedState={[
             isThisPlayer && selectedCard === card.index,

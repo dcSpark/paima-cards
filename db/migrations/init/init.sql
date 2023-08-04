@@ -75,8 +75,21 @@ CREATE TABLE lobby_player (
   turn INTEGER
 );
 
+CREATE TABLE cards (
+  id SERIAL PRIMARY KEY,
+  -- not owned if currently assigned to a trade nft
+  owner_nft_id INTEGER references global_user_state(nft_id),
+  registry_id INTEGER NOT NULL
+);
+
+-- table used to track *bought* packs, the buyer might not own the cards anymore
 CREATE TABLE card_packs (
   id SERIAL PRIMARY KEY,
-  owner_nft_id INTEGER NOT NULL references global_user_state(nft_id),
-  cards INTEGER[] NOT NULL
+  buyer_nft_id INTEGER NOT NULL references global_user_state(nft_id),
+  card_registry_ids INTEGER[] NOT NULL
+);
+
+CREATE TABLE card_trade_nft (
+  nft_id INTEGER NOT NULL PRIMARY KEY,
+  cards INTEGER[]
 );

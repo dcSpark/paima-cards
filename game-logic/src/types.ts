@@ -16,7 +16,7 @@ export enum RoundKind {
 
 export type CardDraw = {
   card: HandCard;
-  newDeck: CardIndex[];
+  newDeck: CardCommitmentIndex[];
 };
 
 export type TickEventKind = ValuesType<typeof TICK_EVENT_KIND>;
@@ -151,28 +151,32 @@ export interface LobbyState extends LobbyWithStateProps {
   txEventMove: undefined | Move;
 }
 
+/** Uniquely identifies a card owned by a player globally */
+export type CardDbId = number;
 /** Identifies type of card (e.g. 47 -> Queen of Spades) */
 export type CardRegistryId = number;
 /** Index in starting commitments, i.e. in starting deck */
-export type CardIndex = number;
+export type CardCommitmentIndex = number;
 /** The sequential position among all cards drawn in some match by some player */
 export type DrawIndex = number;
 
 export type LocalCard = {
-  cardId: CardIndex;
+  id: CardDbId;
+  registryId: CardRegistryId;
   salt: string;
 };
 export type SerializedLocalCard = string;
 
 export type HandCard = {
-  index: CardIndex;
+  index: CardCommitmentIndex;
   draw: DrawIndex;
 };
 export type SerializedHandCard = string;
 
 export type BoardCard = {
-  index: CardIndex;
-  cardId: CardRegistryId;
+  id: CardDbId;
+  index: CardCommitmentIndex;
+  registryId: CardRegistryId;
 };
 export type SerializedBoardCard = string;
 
@@ -195,8 +199,9 @@ export type Move =
   | {
       kind: typeof MOVE_KIND.playCard;
       handPosition: number;
-      cardIndex: number;
-      cardId: number;
+      cardIndex: CardCommitmentIndex;
+      cardId: CardDbId;
+      cardRegistryId: CardRegistryId;
       salt: string;
     }
   | {

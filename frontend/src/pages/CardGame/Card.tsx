@@ -1,5 +1,5 @@
-import React, { Ref, useState } from "react";
-import { Box, ButtonBase, Modal, Typography } from "@mui/material";
+import React from "react";
+import { Box, ButtonBase, Modal } from "@mui/material";
 import { CardRegistryId } from "@dice/game-logic";
 import PaimaLogo from "./PaimaLogo";
 import { UseStateResponse } from "@src/utils";
@@ -9,14 +9,14 @@ export const cardHeight = "160px";
 export const cardWidth = "100px";
 
 function StaticCard({
-  cardId,
+  cardRegistryId,
   overlap,
   scale,
   onClick,
   transparent,
   glow,
 }: {
-  cardId: undefined | CardRegistryId;
+  cardRegistryId: undefined | CardRegistryId;
   overlap?: boolean;
   scale: number;
   onClick?: () => void;
@@ -30,7 +30,8 @@ function StaticCard({
         flex: "none",
         width: `calc(${scale} * ${cardWidth})`,
         height: `calc(${scale} * ${cardHeight})`,
-        backgroundImage: cardId == null ? "" : imageRegistry[cardId],
+        backgroundImage:
+          cardRegistryId == null ? "" : imageRegistry[cardRegistryId],
         backgroundSize: "100%",
         backgroundColor: "rgb(18, 39, 31)",
         borderRadius: "8px",
@@ -45,7 +46,7 @@ function StaticCard({
         ...(glow ? { boxShadow: "0px 0px 15px 5px rgba(255,255,255,1)" } : {}),
       }}
     >
-      {cardId == null && (
+      {cardRegistryId == null && (
         <PaimaLogo
           style={{
             position: "absolute",
@@ -61,14 +62,14 @@ function StaticCard({
 }
 
 export default function Card({
-  cardId,
+  cardRegistryId,
   overlap,
   selectedEffect,
   selectedState: [selected, setSelected],
   onConfirm: onConfirm,
 }: {
   onConfirm?: undefined | (() => void);
-  cardId: undefined | CardRegistryId;
+  cardRegistryId: undefined | CardRegistryId;
   overlap?: boolean;
   selectedState: UseStateResponse<boolean>;
   selectedEffect: "glow" | "closeup";
@@ -76,12 +77,12 @@ export default function Card({
   return (
     <>
       <StaticCard
-        cardId={cardId}
+        cardRegistryId={cardRegistryId}
         overlap={overlap}
         scale={1}
         onClick={
           // do not select face-down cards
-          cardId == null
+          cardRegistryId == null
             ? undefined
             : () => {
                 setSelected(true);
@@ -104,7 +105,11 @@ export default function Card({
             transform: "translate(-50%, -50%)",
           }}
         >
-          <StaticCard cardId={cardId} scale={2} onClick={onConfirm} />
+          <StaticCard
+            cardRegistryId={cardRegistryId}
+            scale={2}
+            onClick={onConfirm}
+          />
         </Box>
       </Modal>
     </>

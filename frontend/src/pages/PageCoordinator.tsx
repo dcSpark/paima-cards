@@ -13,6 +13,7 @@ import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { IGetLobbyByIdResult } from "@dice/db";
 import BuyPack from "./BuyPack";
 import Collection from "./Collection";
+import TradeNfts from "./TradeNfts";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -57,6 +58,7 @@ const PageCoordinator: React.FC = () => {
         <Route path={Page.Landing} element={<LandingPage />} />
         <Route path={Page.Collection} element={<Collection />} />
         <Route path={Page.BuyPacks} element={<BuyPack />} />
+        <Route path={Page.TradeNfts} element={<TradeNfts />} />
         <Route element={<div>There was something wrong...</div>} />
       </Routes>
     </div>

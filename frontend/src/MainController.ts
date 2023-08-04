@@ -2,11 +2,10 @@ import {
   MatchState,
   TickEvent,
   LobbyState,
-  genBotDeck,
   genCommitments,
   DECK_LENGTH,
 } from "@dice/game-logic";
-import type { CardRegistryId, LocalCard } from "@dice/game-logic";
+import type { CardDbId, CardRegistryId, LocalCard } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
@@ -26,6 +25,7 @@ export enum Page {
   MyGames = "/my_games",
   Collection = "/collection",
   BuyPacks = "/buy_packs",
+  TradeNfts = "/trade_nfts",
 }
 
 // This is a class that will be used to control the state of the application
@@ -128,7 +128,7 @@ class MainController {
 
   async createLobby(
     creatorNftId: number,
-    creatorDeck: CardRegistryId[],
+    creatorDeck: { id: CardDbId; registryId: CardRegistryId }[],
     numOfRounds: number,
     roundLength: number,
     timePerPlayer: number,
@@ -153,9 +153,13 @@ class MainController {
       throw new Error(`createLobby: invalid deck`);
     }
 
-    const commitments = await genCommitments(window.crypto, creatorDeck);
-    const localDeck: LocalCard[] = creatorDeck.map((cardId, i) => ({
-      cardId,
+    const commitments = await genCommitments(
+      window.crypto,
+      creatorDeck.map((card) => card.id)
+    );
+    const localDeck: LocalCard[] = creatorDeck.map((card, i) => ({
+      id: card.id,
+      registryId: card.registryId,
       salt: commitments.salt[i],
     }));
 
@@ -180,7 +184,7 @@ class MainController {
 
   async joinLobby(
     nftId: number,
-    deck: CardRegistryId[],
+    deck: { id: CardDbId; registryId: CardRegistryId }[],
     lobbyId: string
   ): Promise<void> {
     await this.enforceWalletConnected();
@@ -191,9 +195,13 @@ class MainController {
       throw new Error(`joinLobby: invalid deck`);
     }
 
-    const commitments = await genCommitments(window.crypto, deck);
-    const localDeck: LocalCard[] = deck.map((cardId, i) => ({
-      cardId,
+    const commitments = await genCommitments(
+      window.crypto,
+      deck.map((card) => card.id)
+    );
+    const localDeck: LocalCard[] = deck.map((card, i) => ({
+      id: card.id,
+      registryId: card.registryId,
       salt: commitments.salt[i],
     }));
 

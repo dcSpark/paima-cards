@@ -1,18 +1,21 @@
-import type { ConciseResult, SerializedMove } from '@dice/game-logic';
+import type { CardDbId, ConciseResult, SerializedMove } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInputRaw =
   | NftMintInput
+  | TradeNftMintInput
   | CreatedLobbyInput
   | JoinedLobbyInput
   | ClosedLobbyInput
   | SubmittedMovesInput
   | PracticeMovesInput
   | ScheduledDataInput
-  | InvalidInput;
+  | InvalidInput
+  | SetTradeNftCardsInput;
 
 export type ParsedSubmittedInput =
   | NftMintInput
+  | TradeNftMintInput
   | GenericPaymentInput
   | CreatedLobbyInput
   | JoinedLobbyInput
@@ -20,7 +23,9 @@ export type ParsedSubmittedInput =
   | SubmittedMovesInput
   | PracticeMovesInput
   | ScheduledDataInput
-  | InvalidInput;
+  | InvalidInput
+  | SetTradeNftCardsInput
+  | TransferTradeNftInput;
 
 export interface InvalidInput {
   input: 'invalidString';
@@ -33,11 +38,25 @@ export interface NftMintInput {
   address: WalletAddress;
 }
 
+export interface TradeNftMintInput {
+  input: 'tradeNftMint';
+  tokenId: string;
+  // contract address
+  address: WalletAddress;
+}
+
 export interface GenericPaymentInput {
   input: 'genericPayment';
   message: string;
   payer: WalletAddress;
   amount: bigint;
+}
+
+export interface TransferTradeNftInput {
+  input: 'transferTradeNft';
+  from: WalletAddress;
+  to: WalletAddress;
+  tradeNftId: number;
 }
 
 export interface CreatedLobbyInput {
@@ -92,6 +111,12 @@ export interface UserStats extends ScheduledDataInput {
   effect: 'stats';
   nftId: number;
   result: ConciseResult;
+}
+
+export interface SetTradeNftCardsInput {
+  input: 'setTradeNftCards';
+  tradeNftId: number;
+  cards: CardDbId[];
 }
 
 export function isZombieRound(input: ScheduledDataInput): input is ZombieRound {

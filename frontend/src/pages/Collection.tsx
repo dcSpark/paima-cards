@@ -3,22 +3,29 @@ import { useGlobalStateContext } from "@src/GlobalStateContext";
 import Button from "@src/components/Button";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Card from "./CardGame/Card";
-import { DECK_LENGTH } from "@dice/game-logic";
+import { CardDbId, DECK_LENGTH } from "@dice/game-logic";
 
 export default function Collection(): React.ReactElement {
   const {
     collection,
     selectedDeckState: [selectedDeck, setSelectedDeck],
   } = useGlobalStateContext();
-  const [selectedCards, setSelectedCard] = useState<number[]>([]);
+  const sortedCards = useMemo(() => {
+    if (collection.cards == null) return [];
+    const result = Object.values(collection.cards).map((card) => card.id);
+    result.sort();
+    return result;
+  }, [collection.cards]);
+
+  const [selectedCards, setSelectedCard] = useState<CardDbId[]>([]);
 
   return (
     <>
       <Navbar />
       <Wrapper blurred={false}>
-        {selectedDeck != null && (
+        {collection.cards != null && selectedDeck != null && (
           <Box
             sx={{
               display: "flex",
@@ -29,7 +36,7 @@ export default function Collection(): React.ReactElement {
             {selectedDeck.map((cardId, i) => (
               <Card
                 key={i}
-                cardId={cardId}
+                cardRegistryId={collection.cards[cardId].registry_id}
                 selectedEffect="glow"
                 selectedState={[undefined, () => {}]}
               />
@@ -49,9 +56,7 @@ export default function Collection(): React.ReactElement {
             const sortedCards = [...selectedCards];
             sortedCards.sort();
 
-            setSelectedDeck(
-              sortedCards.map((index) => collection.cards[index])
-            );
+            setSelectedDeck(sortedCards);
           }}
         >
           save
@@ -63,21 +68,23 @@ export default function Collection(): React.ReactElement {
             gap: 1,
           }}
         >
-          {collection?.cards.map((cardId, i) => (
+          {sortedCards?.map((card) => (
             <Card
-              key={i}
-              cardId={cardId}
+              key={card}
+              cardRegistryId={collection.cards[card]?.registry_id}
               selectedEffect="glow"
               selectedState={[
-                selectedCards.includes(i),
+                selectedCards.includes(card),
                 () => {
                   setSelectedCard((oldSelectedCards) => {
-                    if (oldSelectedCards.includes(i)) {
-                      return oldSelectedCards.filter((card) => card !== i);
+                    if (oldSelectedCards.includes(card)) {
+                      return oldSelectedCards.filter(
+                        (selected) => selected !== card
+                      );
                     }
 
                     if (oldSelectedCards.length < DECK_LENGTH) {
-                      return [...oldSelectedCards, i];
+                      return [...oldSelectedCards, card];
                     }
                     return oldSelectedCards;
                   });

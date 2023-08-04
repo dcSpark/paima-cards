@@ -3,6 +3,8 @@ import Prando from 'paima-sdk/paima-prando';
 import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyPlayersResult, IGetRoundMovesResult } from '@dice/db';
 import { getLobbyById, getUserStats, getLobbyPlayers, getOwnedNft } from '@dice/db';
+import type { INewCardParams, INewTradeNftParams } from '@dice/db/src/insert.queries.js';
+import { newCard, newTradeNft } from '@dice/db/src/insert.queries.js';
 import type {
   LobbyWithStateProps,
   ConciseResult,
@@ -51,16 +53,35 @@ import type {
   NftMintInput,
   PracticeMovesInput,
   ScheduledDataInput,
+  SetTradeNftCardsInput,
   SubmittedMovesInput,
+  TradeNftMintInput,
+  TransferTradeNftInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
 import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import type { IGetRoundResult } from '@dice/db/src/select.queries';
-import { getMatch, getRound, getRoundMoves } from '@dice/db/src/select.queries';
+import {
+  checkOwnedCard,
+  getMatch,
+  getRound,
+  getRoundMoves,
+  getTradeNfts,
+} from '@dice/db/src/select.queries';
 import crypto from 'crypto';
 import { newCardPack, type INewCardPackParams } from '@dice/db/src/insert.queries';
+import type {
+  IDeleteTradeNftParams,
+  ISetTradeNftCardsParams,
+  ITransferCardParams,
+} from '@dice/db/src/update.queries';
+import {
+  deleteTradeNft,
+  setTradeNftCards as setTradeNftCardsQuery,
+  transferCard,
+} from '@dice/db/src/update.queries';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -68,6 +89,22 @@ export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
     return [blankStats(Number.parseInt(input.tokenId))];
   } catch (e) {
     console.log(`DISCARD: error in nft mint ${e}`);
+    return [];
+  }
+};
+
+// Create initial player entry after nft mint
+export const mintTradeNft = async (input: TradeNftMintInput): Promise<SQLUpdate[]> => {
+  try {
+    const tradeNft = Number.parseInt(input.tokenId);
+    const newTradeNftProps: INewTradeNftParams = {
+      nft_id: tradeNft,
+    };
+    const newTradeNftUpdates: SQLUpdate[] = [[newTradeNft, newTradeNftProps]];
+
+    return [...newTradeNftUpdates];
+  } catch (e) {
+    console.log(`DISCARD: error ${e}`);
     return [];
   }
 };
@@ -89,12 +126,21 @@ export const cardPackBuy = async (
   }
 
   const newPackProps: INewCardPackParams = {
-    owner_nft_id: nft,
-    cards: genCardPack(randomnessGenerator),
+    buyer_nft_id: nft,
+    card_registry_ids: genCardPack(randomnessGenerator),
   };
   const newPackUpdates: SQLUpdate[] = [[newCardPack, newPackProps]];
 
-  return [...newPackUpdates];
+  const newCardUpdates: SQLUpdate[] = newPackProps.card_registry_ids.map(registry_id => {
+    const newCardParams: INewCardParams = {
+      owner_nft_id: nft,
+      registry_id,
+    };
+
+    return [newCard, newCardParams];
+  });
+
+  return [...newPackUpdates, ...newCardUpdates];
 };
 
 // State transition when a create lobby input is processed
@@ -272,7 +318,9 @@ export const submittedMoves = async (
   }
 
   // If the submitted moves are usable/all validation passes, continue
-  if (!validateSubmittedMoves(lobby, players, round, input, new Prando(prandoSeed))) {
+  if (
+    !(await validateSubmittedMoves(lobby, players, round, input, dbConn, new Prando(prandoSeed)))
+  ) {
     console.log('DISCARD: invalid move');
     return [];
   }
@@ -343,13 +391,14 @@ export const practiceMoves = async (
 };
 
 // Validate submitted moves in relation to player/lobby/round state
-function validateSubmittedMoves(
+async function validateSubmittedMoves(
   lobby: LobbyWithStateProps,
   players: IGetLobbyPlayersResult[],
   round: IGetRoundResult,
   input: SubmittedMovesInput,
+  dbConn: Pool,
   randomnessGenerator: Prando
-): boolean {
+): Promise<boolean> {
   // If lobby not active or existing
   if (!lobby || lobby.lobby_state !== 'active') {
     console.log('INVALID MOVE: lobby not active');
@@ -387,18 +436,30 @@ function validateSubmittedMoves(
   let move: Move;
   try {
     move = deserializeMove(input.move);
-    if (
-      move.kind === MOVE_KIND.playCard &&
-      !checkCommitment(
-        crypto as any,
-        turnPlayer.starting_commitments,
-        move.cardIndex,
-        move.salt,
-        move.cardId
-      )
-    ) {
-      console.log('INVALID MOVE: invalid commitment/reveal');
-      return false;
+    if (move.kind === MOVE_KIND.playCard) {
+      if (
+        !checkCommitment(
+          crypto as any,
+          turnPlayer.starting_commitments,
+          move.cardIndex,
+          move.salt,
+          move.cardId
+        )
+      ) {
+        console.log('INVALID MOVE: invalid commitment/reveal');
+        return false;
+      }
+      const [ownedCard] = await checkOwnedCard.run(
+        {
+          owner_nft_id: turnPlayer.nft_id,
+          id: move.cardId,
+        },
+        dbConn
+      );
+      if (turnPlayer.nft_id !== PRACTICE_BOT_NFT_ID && ownedCard == null) {
+        console.log('INVALID MOVE: player does not own revealed card');
+        return false;
+      }
     }
   } catch (e) {
     console.log('INVALID MOVE: deserialize failed');
@@ -431,6 +492,96 @@ export const scheduledData = async (
   }
   return [];
 };
+
+export async function setTradeNftCards(
+  player: WalletAddress,
+  input: SetTradeNftCardsInput,
+  dbConn: Pool
+): Promise<SQLUpdate[]> {
+  const nftId = await getOwnedNft(dbConn, NFT_NAME, player);
+  if (nftId == null) {
+    console.log('DISCARD: user does not own any nft');
+    return [];
+  }
+
+  const [tradeNft] = await getTradeNfts.run({ nft_ids: [input.tradeNftId] }, dbConn);
+  if (tradeNft == null) {
+    console.log('DISCARD: trade nft not found');
+    return [];
+  }
+  if (tradeNft.cards != null) {
+    console.log('DISCARD: trade nft not empty');
+    return [];
+  }
+
+  const checkOwns = await Promise.all(
+    input.cards.map(card =>
+      checkOwnedCard.run(
+        {
+          owner_nft_id: nftId,
+          id: card,
+        },
+        dbConn
+      )
+    )
+  );
+  if (checkOwns.some(check => check.length === 0)) {
+    console.log('DISCARD: user does not own all cards');
+    return [];
+  }
+
+  const removeUserCardsUpdates: SQLUpdate[] = input.cards.map(card => {
+    const transferParams: ITransferCardParams = {
+      id: card,
+      owner_nft_id: null,
+    };
+    return [transferCard, transferParams];
+  });
+
+  const setTradeNftCardsParams: ISetTradeNftCardsParams = {
+    nft_id: input.tradeNftId,
+    cards: input.cards,
+  };
+  const setTradeNftCardsUpdates: SQLUpdate[] = [[setTradeNftCardsQuery, setTradeNftCardsParams]];
+
+  return [...removeUserCardsUpdates, ...setTradeNftCardsUpdates];
+}
+
+export async function claimTradeNftCards(
+  input: TransferTradeNftInput,
+  dbConn: Pool
+): Promise<SQLUpdate[]> {
+  const nftId = await getOwnedNft(dbConn, NFT_NAME, input.from);
+  if (nftId == null) {
+    console.log('DISCARD: user does not own any nft');
+    return [];
+  }
+
+  const [tradeNft] = await getTradeNfts.run({ nft_ids: [input.tradeNftId] }, dbConn);
+  if (tradeNft == null) {
+    console.log('DISCARD: trade nft not found');
+    return [];
+  }
+  if (tradeNft.cards == null || tradeNft.cards.length === 0) {
+    console.log('DISCARD: trade nft empty');
+    return [];
+  }
+
+  const addUserCardsUpdates: SQLUpdate[] = tradeNft.cards.map(card => {
+    const transferParams: ITransferCardParams = {
+      id: card,
+      owner_nft_id: nftId,
+    };
+    return [transferCard, transferParams];
+  });
+
+  const deleteTradeNftParams: IDeleteTradeNftParams = {
+    nft_id: input.tradeNftId,
+  };
+  const deleteTradeNftUpdates: SQLUpdate[] = [[deleteTradeNft, deleteTradeNftParams]];
+
+  return [...addUserCardsUpdates, ...deleteTradeNftUpdates];
+}
 
 // State transition when a zombie round input is processed
 export const zombieRound = async (

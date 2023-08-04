@@ -6,14 +6,13 @@ import {
   postConciselyEncodedData,
   getActiveAddress,
   PaimaMiddlewareErrorCode,
-  postConciseData,
 } from 'paima-sdk/paima-mw-core';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
-import type { Move } from '@dice/game-logic';
+import type { CardDbId, Move } from '@dice/game-logic';
 import { serializeMove } from '@dice/game-logic';
 
 const RETRY_PERIOD = 1000;
@@ -229,9 +228,30 @@ async function submitMoves(
   }
 }
 
+async function setTradeNftCards(tradeNftId: number, cards: CardDbId[]): Promise<OldResult> {
+  const errorFxn = buildEndpointErrorFxn('submitMoves');
+
+  const conciseBuilder = builder.initialize();
+  conciseBuilder.setPrefix('t');
+  conciseBuilder.addValue({ value: tradeNftId.toString(10) });
+  conciseBuilder.addValue({ value: cards.map(card => card.toString()).join(',') });
+
+  try {
+    const result = await postConciselyEncodedData(conciseBuilder.build());
+    if (result.success) {
+      return { success: true, message: '' };
+    } else {
+      return errorFxn(PaimaMiddlewareErrorCode.ERROR_POSTING_TO_CHAIN);
+    }
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_POSTING_TO_CHAIN, err);
+  }
+}
+
 export const writeEndpoints = {
   createLobby,
   joinLobby,
   closeLobby,
   submitMoves,
+  setTradeNftCards,
 };

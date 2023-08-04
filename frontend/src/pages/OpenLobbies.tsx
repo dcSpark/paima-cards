@@ -45,6 +45,7 @@ const OpenLobbies: React.FC = () => {
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
+    collection,
   } = useGlobalStateContext();
   const [lobbies, setLobbies] = useState<LobbyState[]>([]);
   const [page, setPage] = useState(0);
@@ -137,13 +138,19 @@ const OpenLobbies: React.FC = () => {
                           <TableCell key={column.id} align="left">
                             {column.id === "action" ? (
                               <Button
-                                onClick={() =>
+                                onClick={() => {
+                                  if (collection.cards == null) return;
+
                                   mainController.joinLobby(
                                     selectedNft.nft,
-                                    selectedDeck,
+                                    selectedDeck.map((card) => ({
+                                      id: card,
+                                      registryId:
+                                        collection.cards[card].registry_id,
+                                    })),
                                     lobby.lobby_id
-                                  )
-                                }
+                                  );
+                                }}
                               >
                                 Enter
                               </Button>

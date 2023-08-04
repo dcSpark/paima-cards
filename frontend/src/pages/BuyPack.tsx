@@ -1,5 +1,5 @@
-import { IGetOwnedPacksResult } from "@dice/db/build/select.queries";
-import { CardRegistryId } from "@dice/game-logic";
+import { IGetBoughtPacksResult } from "@dice/db/build/select.queries";
+import { CardDbId, CardRegistryId } from "@dice/game-logic";
 import { LoadingButton } from "@mui/lab";
 import { Box, Typography } from "@mui/material";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
@@ -20,19 +20,19 @@ export default function BuyPack(): React.ReactElement {
     undefined | CardRegistryId[]
   >();
   useEffect(() => {
-    if (collection == null || collection.packs.length === collectionCache)
+    if (collection == null || collection.boughtPacks.length === collectionCache)
       return;
-    setCollectionCache(collection.packs.length);
+    setCollectionCache(collection.boughtPacks.length);
 
     // first set
     if (collectionCache == null) return;
 
-    const lastPackRaw = collection.raw.reduce(
+    const lastPackRaw = collection.boughtPacks.reduce(
       (acc, next) => (acc == null || acc.id < next.id ? next : acc),
-      undefined as undefined | IGetOwnedPacksResult
+      undefined as undefined | IGetBoughtPacksResult
     );
 
-    setBoughtPack(lastPackRaw.cards);
+    setBoughtPack(lastPackRaw.card_registry_ids);
   }, [collection]);
 
   return (
@@ -68,11 +68,11 @@ export default function BuyPack(): React.ReactElement {
               gap: 1,
             }}
           >
-            {boughtPack.map((cardId) => (
+            {boughtPack.map((cardRegistryId) => (
               <Card
                 selectedEffect="glow"
                 selectedState={[false, () => {}]}
-                cardId={cardId}
+                cardRegistryId={cardRegistryId}
               />
             ))}
           </Box>
