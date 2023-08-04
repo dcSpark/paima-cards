@@ -186,6 +186,70 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IGetOwnedCardsResult": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "owner_nft_id": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
+            "registry_id": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetCardsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "cards": {"dataType":"array","array":{"dataType":"refObject","ref":"IGetOwnedCardsResult"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "numberArray": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"double"},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IGetBoughtPacksResult": {
+        "dataType": "refObject",
+        "properties": {
+            "buyer_nft_id": {"dataType":"double","required":true},
+            "card_registry_ids": {"ref":"numberArray","required":true},
+            "id": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetPacksResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "packs": {"dataType":"array","array":{"dataType":"refObject","ref":"IGetBoughtPacksResult"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IGetTradeNftsResult": {
+        "dataType": "refObject",
+        "properties": {
+            "cards": {"dataType":"union","subSchemas":[{"ref":"numberArray"},{"dataType":"enum","enums":[null]}],"required":true},
+            "nft_id": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Record_string.IGetCardsByIdsResult_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetTradeNftsResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "tradeNfts": {"dataType":"array","array":{"dataType":"refObject","ref":"IGetTradeNftsResult"},"required":true},
+            "cardLookup": {"ref":"Record_string.IGetCardsByIdsResult_","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const validationService = new ValidationService(models);
 
@@ -430,11 +494,11 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/user/packs',
+        app.get('/user/cards',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.get)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getCards)),
 
-            function UserController_get(request: any, response: any, next: any) {
+            function UserController_getCards(request: any, response: any, next: any) {
             const args = {
                     nftId: {"in":"query","name":"nftId","required":true,"dataType":"double"},
             };
@@ -448,7 +512,57 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new UserController();
 
 
-              const promise = controller.get.apply(controller, validatedArgs as any);
+              const promise = controller.getCards.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/user/packs',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getPacks)),
+
+            function UserController_getPacks(request: any, response: any, next: any) {
+            const args = {
+                    nftId: {"in":"query","name":"nftId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new UserController();
+
+
+              const promise = controller.getPacks.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/user/tradeNfts',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getTradeNfts)),
+
+            function UserController_getTradeNfts(request: any, response: any, next: any) {
+            const args = {
+                    nftId: {"in":"query","name":"nftId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new UserController();
+
+
+              const promise = controller.getTradeNfts.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

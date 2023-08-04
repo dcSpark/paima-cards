@@ -35,7 +35,8 @@ export class PracticeAI {
         kind: MOVE_KIND.playCard,
         handPosition: 0,
         cardIndex: me.currentHand[0].index,
-        cardId: me.botLocalDeck[me.currentHand[0].index].cardId,
+        cardId: me.botLocalDeck[me.currentHand[0].index].id,
+        cardRegistryId: me.botLocalDeck[me.currentHand[0].index].registryId,
         salt: me.botLocalDeck[me.currentHand[0].index].salt,
       };
     }

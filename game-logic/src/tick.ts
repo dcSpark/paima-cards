@@ -60,8 +60,9 @@ export function processTick(
             newBoard: [
               ...getTurnPlayer(matchState).currentBoard,
               {
+                id: move.cardId,
                 index: move.cardIndex,
-                cardId: move.cardId,
+                registryId: move.cardRegistryId,
               },
             ],
           },
@@ -77,12 +78,12 @@ export function processTick(
     if (move.kind !== MOVE_KIND.targetCardWithBoardCard) return [];
     const turnPlayer = getTurnPlayer(matchState);
     const nonTurnPlayer = getNonTurnPlayer(matchState);
-    const fromCardId = turnPlayer.currentBoard[move.fromBoardPosition]?.cardId;
-    const toCardId = nonTurnPlayer.currentBoard[move.toBoardPosition]?.cardId;
-    if (fromCardId == null || toCardId == null) return [];
-    const fromCard = CARD_REGISTRY[fromCardId];
+    const fromCardRegistryId = turnPlayer.currentBoard[move.fromBoardPosition]?.registryId;
+    const toCardRegistryId = nonTurnPlayer.currentBoard[move.toBoardPosition]?.registryId;
+    if (fromCardRegistryId == null || toCardRegistryId == null) return [];
+    const fromCard = CARD_REGISTRY[fromCardRegistryId];
     if (fromCard == null) return [];
-    if (fromCard.defeats !== toCardId) return [];
+    if (fromCard.defeats !== toCardRegistryId) return [];
     return [
       {
         kind: TICK_EVENT_KIND.destroyCard,

@@ -8,13 +8,13 @@ import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import NumericField from "@src/components/NumericField";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
-import { DECK_LENGTH } from "@dice/game-logic";
 
 const CreateLobby: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
+    collection,
   } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("5");
@@ -24,13 +24,18 @@ const CreateLobby: React.FC = () => {
   const [isPractice, setIsPractice] = useState(false);
 
   const handleCreateLobby = async () => {
+    if (collection.cards == null) return;
+
     const numberOfRoundsNum = parseInt(numberOfRounds);
     const roundLengthNum = parseInt(roundLength);
     const playersTimeNum = parseInt(playersTime);
 
     await mainController.createLobby(
       selectedNft.nft,
-      selectedDeck,
+      selectedDeck.map((card) => ({
+        id: card,
+        registryId: collection.cards[card].registry_id,
+      })),
       numberOfRoundsNum,
       roundLengthNum,
       playersTimeNum,

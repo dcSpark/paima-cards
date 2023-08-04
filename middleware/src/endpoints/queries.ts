@@ -23,9 +23,11 @@ import {
   backendQueryRoundExecutor,
   backendQueryRoundStatus,
   backendQuerySearchLobby,
+  backendQueryUserCards,
   backendQueryUserLobbies,
   backendQueryUserPacks,
   backendQueryUserStats,
+  backendQueryUserTradeNfts,
 } from '../helpers/query-constructors';
 import type {
   LobbyStates,
@@ -38,7 +40,12 @@ import type {
 } from '../types';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
-import type { IGetOwnedPacksResult } from '@dice/db/build/select.queries';
+import type {
+  IGetBoughtPacksResult,
+  IGetCardsByIdsResult,
+  IGetOwnedCardsResult,
+  IGetTradeNftsResult,
+} from '@dice/db/build/select.queries';
 
 async function getLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyRaw');
@@ -338,7 +345,29 @@ async function getNftForWallet(wallet: WalletAddress): Promise<Result<undefined 
   }
 }
 
-async function getUserPacks(nftId: number): Promise<Result<IGetOwnedPacksResult[]>> {
+async function getUserCards(nftId: number): Promise<Result<IGetOwnedCardsResult[]>> {
+  const errorFxn = buildEndpointErrorFxn('getUserCards');
+
+  let res: Response;
+  try {
+    const query = backendQueryUserCards(nftId);
+    res = await fetch(query);
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const cards = (await res.json()) as { cards: IGetOwnedCardsResult[] };
+    return {
+      success: true,
+      result: cards.cards,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
+async function getUserPacks(nftId: number): Promise<Result<IGetBoughtPacksResult[]>> {
   const errorFxn = buildEndpointErrorFxn('getUserPacks');
 
   let res: Response;
@@ -350,10 +379,40 @@ async function getUserPacks(nftId: number): Promise<Result<IGetOwnedPacksResult[
   }
 
   try {
-    const packs = (await res.json()) as { packs: IGetOwnedPacksResult[] };
+    const packs = (await res.json()) as { packs: IGetBoughtPacksResult[] };
     return {
       success: true,
       result: packs.packs,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
+async function getUserTradeNfts(nftId: number): Promise<
+  Result<{
+    tradeNfts: IGetTradeNftsResult[];
+    cardLookup: Record<string, IGetCardsByIdsResult>;
+  }>
+> {
+  const errorFxn = buildEndpointErrorFxn('getUserTradeNfts');
+
+  let res: Response;
+  try {
+    const query = backendQueryUserTradeNfts(nftId);
+    res = await fetch(query);
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const tradeNfts = (await res.json()) as {
+      tradeNfts: IGetTradeNftsResult[];
+      cardLookup: Record<string, IGetCardsByIdsResult>;
+    };
+    return {
+      success: true,
+      result: tradeNfts,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -372,5 +431,7 @@ export const queryEndpoints = {
   getRoundExecutor,
   getMatchExecutor,
   getNftForWallet,
+  getUserCards,
   getUserPacks,
+  getUserTradeNfts,
 };

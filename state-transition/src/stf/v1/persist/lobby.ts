@@ -71,8 +71,9 @@ export async function persistLobbyCreation(
         .map(async () => {
           const botDeck = genBotDeck(randomnessGenerator);
           const commitments = await genCommitments(crypto as any, botDeck);
-          const localDeck: LocalCard[] = botDeck.map((cardId, i) => ({
-            cardId,
+          const localDeck: LocalCard[] = botDeck.map((registryId, i) => ({
+            id: 0, // won't be checked for a bot
+            registryId,
             salt: commitments.salt[i],
           }));
 

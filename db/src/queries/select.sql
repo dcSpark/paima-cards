@@ -139,7 +139,35 @@ WHERE
   match_within_lobby = :match_within_lobby!
 ORDER BY match_round.round_within_match ASC;
 
-/* @name getOwnedPacks */
+/* @name getBoughtPacks */
 SELECT *
 FROM card_packs
+WHERE buyer_nft_id = :buyer_nft_id!;
+
+/* @name getOwnedCards */
+SELECT *
+FROM cards
 WHERE owner_nft_id = :owner_nft_id!;
+
+/* @name checkOwnedCard */
+SELECT *
+FROM cards
+WHERE 
+  owner_nft_id = :owner_nft_id! AND
+  id = :id!;
+
+/* 
+@name getTradeNfts 
+@param nft_ids -> (...)   
+*/
+SELECT *
+FROM card_trade_nft
+WHERE nft_id IN :nft_ids;
+
+/* 
+@name getCardsByIds
+@param ids -> (...)
+*/
+SELECT *
+FROM cards
+WHERE id IN :ids;

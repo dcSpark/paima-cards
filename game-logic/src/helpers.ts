@@ -1,6 +1,8 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type {
   BoardCard,
+  CardCommitmentIndex,
+  CardRegistryId,
   HandCard,
   LocalCard,
   Move,
@@ -26,21 +28,21 @@ export function genPermutation(size: number, randomnessGenerator: Prando): numbe
   return result;
 }
 
-export function initialCurrentDeck(): number[] {
+export function initialCurrentDeck(): CardCommitmentIndex[] {
   return Array.from(Array(DECK_LENGTH).keys());
 }
 
-export function genExistingCardId(randomnessGenerator: Prando): number {
+export function genExistingCardId(randomnessGenerator: Prando): CardRegistryId {
   return CARD_IDS[randomnessGenerator.nextInt(0, CARD_IDS.length - 1)];
 }
 
-export function genBotDeck(randomnessGenerator: Prando): number[] {
+export function genBotDeck(randomnessGenerator: Prando): CardRegistryId[] {
   return initialCurrentDeck().map(() => {
     return genExistingCardId(randomnessGenerator);
   });
 }
 
-export function genCardPack(randomnessGenerator: Prando): number[] {
+export function genCardPack(randomnessGenerator: Prando): CardRegistryId[] {
   return Array.from(Array(PACK_LENGTH).keys()).map(() => {
     return genExistingCardId(randomnessGenerator);
   });
@@ -65,26 +67,30 @@ export function deserializeHandCard(card: SerializedHandCard): HandCard {
 }
 
 export function serializeBoardCard(card: BoardCard): SerializedBoardCard {
-  return [card.index.toString(), card.cardId.toString()].join(dbStructPropDelimiter);
+  return [card.id.toString(), card.index.toString(), card.registryId.toString()].join(
+    dbStructPropDelimiter
+  );
 }
 
 export function deserializeBoardCard(card: SerializedBoardCard): BoardCard {
   const props = card.split(dbStructPropDelimiter);
   return {
-    index: Number.parseInt(props[0]),
-    cardId: Number.parseInt(props[1]),
+    id: Number.parseInt(props[0]),
+    index: Number.parseInt(props[1]),
+    registryId: Number.parseInt(props[2]),
   };
 }
 
 export function serializeLocalCard(card: LocalCard): SerializedLocalCard {
-  return [card.cardId.toString(), card.salt].join(dbStructPropDelimiter);
+  return [card.id.toString(), card.registryId.toString(), card.salt].join(dbStructPropDelimiter);
 }
 
 export function deserializeLocalCard(card: SerializedLocalCard): LocalCard {
   const props = card.split(dbStructPropDelimiter);
   return {
-    cardId: Number.parseInt(props[0]),
-    salt: props[1],
+    id: Number.parseInt(props[0]),
+    registryId: Number.parseInt(props[1]),
+    salt: props[2],
   };
 }
 
@@ -95,6 +101,7 @@ export function serializeMove(move: Move): SerializedMove {
     props.push(move.handPosition.toString());
     props.push(move.cardIndex.toString());
     props.push(move.cardId.toString());
+    props.push(move.cardRegistryId.toString());
     props.push(move.salt);
   }
 
@@ -115,7 +122,8 @@ export function deserializeMove(move: SerializedMove): Move {
       handPosition: Number.parseInt(parts[1]),
       cardIndex: Number.parseInt(parts[2]),
       cardId: Number.parseInt(parts[3]),
-      salt: parts[4],
+      cardRegistryId: Number.parseInt(parts[4]),
+      salt: parts[5],
     };
   }
 

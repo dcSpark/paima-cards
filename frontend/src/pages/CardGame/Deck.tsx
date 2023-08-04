@@ -26,7 +26,7 @@ export default function Deck({ size }: { size: number }): React.ReactElement {
             }}
           >
             <Card
-              cardId={undefined}
+              cardRegistryId={undefined}
               selectedEffect="glow"
               selectedState={[false, () => {}]}
             />

@@ -282,3 +282,85 @@ const addTieIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id"
 export const addTie = new PreparedQuery<IAddTieParams,IAddTieResult>(addTieIR);
 
 
+/** 'SetTradeNftCards' parameters type */
+export interface ISetTradeNftCardsParams {
+  cards: numberArray;
+  nft_id: number;
+}
+
+/** 'SetTradeNftCards' return type */
+export type ISetTradeNftCardsResult = void;
+
+/** 'SetTradeNftCards' query type */
+export interface ISetTradeNftCardsQuery {
+  params: ISetTradeNftCardsParams;
+  result: ISetTradeNftCardsResult;
+}
+
+const setTradeNftCardsIR: any = {"usedParamSet":{"cards":true,"nft_id":true},"params":[{"name":"cards","required":true,"transform":{"type":"scalar"},"locs":[{"a":34,"b":40}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":64}]}],"statement":"UPDATE card_trade_nft\nSET cards = :cards!\nWHERE nft_id = :nft_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE card_trade_nft
+ * SET cards = :cards!
+ * WHERE nft_id = :nft_id!
+ * ```
+ */
+export const setTradeNftCards = new PreparedQuery<ISetTradeNftCardsParams,ISetTradeNftCardsResult>(setTradeNftCardsIR);
+
+
+/** 'TransferCard' parameters type */
+export interface ITransferCardParams {
+  id: number;
+  owner_nft_id: number | null | void;
+}
+
+/** 'TransferCard' return type */
+export type ITransferCardResult = void;
+
+/** 'TransferCard' query type */
+export interface ITransferCardQuery {
+  params: ITransferCardParams;
+  result: ITransferCardResult;
+}
+
+const transferCardIR: any = {"usedParamSet":{"owner_nft_id":true,"id":true},"params":[{"name":"owner_nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":32,"b":44}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":60}]}],"statement":"UPDATE cards\nSET owner_nft_id = :owner_nft_id\nWHERE id = :id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE cards
+ * SET owner_nft_id = :owner_nft_id
+ * WHERE id = :id!
+ * ```
+ */
+export const transferCard = new PreparedQuery<ITransferCardParams,ITransferCardResult>(transferCardIR);
+
+
+/** 'DeleteTradeNft' parameters type */
+export interface IDeleteTradeNftParams {
+  nft_id: number;
+}
+
+/** 'DeleteTradeNft' return type */
+export type IDeleteTradeNftResult = void;
+
+/** 'DeleteTradeNft' query type */
+export interface IDeleteTradeNftQuery {
+  params: IDeleteTradeNftParams;
+  result: IDeleteTradeNftResult;
+}
+
+const deleteTradeNftIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":42,"b":49}]}],"statement":"DELETE FROM card_trade_nft\nWHERE nft_id = :nft_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM card_trade_nft
+ * WHERE nft_id = :nft_id!
+ * ```
+ */
+export const deleteTradeNft = new PreparedQuery<IDeleteTradeNftParams,IDeleteTradeNftResult>(deleteTradeNftIR);
+
+

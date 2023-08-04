@@ -811,34 +811,160 @@ const getMatchSeedsIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobb
 export const getMatchSeeds = new PreparedQuery<IGetMatchSeedsParams,IGetMatchSeedsResult>(getMatchSeedsIR);
 
 
-/** 'GetOwnedPacks' parameters type */
-export interface IGetOwnedPacksParams {
-  owner_nft_id: number;
+/** 'GetBoughtPacks' parameters type */
+export interface IGetBoughtPacksParams {
+  buyer_nft_id: number;
 }
 
-/** 'GetOwnedPacks' return type */
-export interface IGetOwnedPacksResult {
-  cards: numberArray;
+/** 'GetBoughtPacks' return type */
+export interface IGetBoughtPacksResult {
+  buyer_nft_id: number;
+  card_registry_ids: numberArray;
   id: number;
-  owner_nft_id: number;
 }
 
-/** 'GetOwnedPacks' query type */
-export interface IGetOwnedPacksQuery {
-  params: IGetOwnedPacksParams;
-  result: IGetOwnedPacksResult;
+/** 'GetBoughtPacks' query type */
+export interface IGetBoughtPacksQuery {
+  params: IGetBoughtPacksParams;
+  result: IGetBoughtPacksResult;
 }
 
-const getOwnedPacksIR: any = {"usedParamSet":{"owner_nft_id":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":59}]}],"statement":"SELECT *\nFROM card_packs\nWHERE owner_nft_id = :owner_nft_id!"};
+const getBoughtPacksIR: any = {"usedParamSet":{"buyer_nft_id":true},"params":[{"name":"buyer_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":59}]}],"statement":"SELECT *\nFROM card_packs\nWHERE buyer_nft_id = :buyer_nft_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT *
  * FROM card_packs
+ * WHERE buyer_nft_id = :buyer_nft_id!
+ * ```
+ */
+export const getBoughtPacks = new PreparedQuery<IGetBoughtPacksParams,IGetBoughtPacksResult>(getBoughtPacksIR);
+
+
+/** 'GetOwnedCards' parameters type */
+export interface IGetOwnedCardsParams {
+  owner_nft_id: number;
+}
+
+/** 'GetOwnedCards' return type */
+export interface IGetOwnedCardsResult {
+  id: number;
+  owner_nft_id: number | null;
+  registry_id: number;
+}
+
+/** 'GetOwnedCards' query type */
+export interface IGetOwnedCardsQuery {
+  params: IGetOwnedCardsParams;
+  result: IGetOwnedCardsResult;
+}
+
+const getOwnedCardsIR: any = {"usedParamSet":{"owner_nft_id":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":54}]}],"statement":"SELECT *\nFROM cards\nWHERE owner_nft_id = :owner_nft_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM cards
  * WHERE owner_nft_id = :owner_nft_id!
  * ```
  */
-export const getOwnedPacks = new PreparedQuery<IGetOwnedPacksParams,IGetOwnedPacksResult>(getOwnedPacksIR);
+export const getOwnedCards = new PreparedQuery<IGetOwnedCardsParams,IGetOwnedCardsResult>(getOwnedCardsIR);
+
+
+/** 'CheckOwnedCard' parameters type */
+export interface ICheckOwnedCardParams {
+  id: number;
+  owner_nft_id: number;
+}
+
+/** 'CheckOwnedCard' return type */
+export interface ICheckOwnedCardResult {
+  id: number;
+  owner_nft_id: number | null;
+  registry_id: number;
+}
+
+/** 'CheckOwnedCard' query type */
+export interface ICheckOwnedCardQuery {
+  params: ICheckOwnedCardParams;
+  result: ICheckOwnedCardResult;
+}
+
+const checkOwnedCardIR: any = {"usedParamSet":{"owner_nft_id":true,"id":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":44,"b":57}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":73}]}],"statement":"SELECT *\nFROM cards\nWHERE \n  owner_nft_id = :owner_nft_id! AND\n  id = :id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM cards
+ * WHERE 
+ *   owner_nft_id = :owner_nft_id! AND
+ *   id = :id!
+ * ```
+ */
+export const checkOwnedCard = new PreparedQuery<ICheckOwnedCardParams,ICheckOwnedCardResult>(checkOwnedCardIR);
+
+
+/** 'GetTradeNfts' parameters type */
+export interface IGetTradeNftsParams {
+  nft_ids: readonly (number | null | void)[];
+}
+
+/** 'GetTradeNfts' return type */
+export interface IGetTradeNftsResult {
+  cards: numberArray | null;
+  nft_id: number;
+}
+
+/** 'GetTradeNfts' query type */
+export interface IGetTradeNftsQuery {
+  params: IGetTradeNftsParams;
+  result: IGetTradeNftsResult;
+}
+
+const getTradeNftsIR: any = {"usedParamSet":{"nft_ids":true},"params":[{"name":"nft_ids","required":false,"transform":{"type":"array_spread"},"locs":[{"a":45,"b":52}]}],"statement":"SELECT *\nFROM card_trade_nft\nWHERE nft_id IN :nft_ids"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM card_trade_nft
+ * WHERE nft_id IN :nft_ids
+ * ```
+ */
+export const getTradeNfts = new PreparedQuery<IGetTradeNftsParams,IGetTradeNftsResult>(getTradeNftsIR);
+
+
+/** 'GetCardsByIds' parameters type */
+export interface IGetCardsByIdsParams {
+  ids: readonly (number | null | void)[];
+}
+
+/** 'GetCardsByIds' return type */
+export interface IGetCardsByIdsResult {
+  id: number;
+  owner_nft_id: number | null;
+  registry_id: number;
+}
+
+/** 'GetCardsByIds' query type */
+export interface IGetCardsByIdsQuery {
+  params: IGetCardsByIdsParams;
+  result: IGetCardsByIdsResult;
+}
+
+const getCardsByIdsIR: any = {"usedParamSet":{"ids":true},"params":[{"name":"ids","required":false,"transform":{"type":"array_spread"},"locs":[{"a":32,"b":35}]}],"statement":"SELECT *\nFROM cards\nWHERE id IN :ids"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM cards
+ * WHERE id IN :ids
+ * ```
+ */
+export const getCardsByIds = new PreparedQuery<IGetCardsByIdsParams,IGetCardsByIdsResult>(getCardsByIdsIR);
 
 

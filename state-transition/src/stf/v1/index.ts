@@ -12,9 +12,13 @@ import {
   practiceMoves,
   mintNft,
   cardPackBuy,
+  mintTradeNft,
+  setTradeNftCards,
+  claimTradeNftCards,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { GENERIC_PAYMENT_MESSAGES } from '@dice/game-logic';
+import { ZERO_ADDRESS } from '@dice/utils';
 
 export default async function (
   inputData: SubmittedChainData,
@@ -31,6 +35,8 @@ export default async function (
   switch (parsed.input) {
     case 'nftMint':
       return mintNft(parsed);
+    case 'tradeNftMint':
+      return mintTradeNft(parsed);
     case 'genericPayment': {
       if (inputData.userAddress !== SCHEDULED_DATA_ADDRESS) {
         console.log('DISCARD: scheduled data from regular address');
@@ -60,6 +66,21 @@ export default async function (
     case 'scheduledData': {
       if (!inputData.scheduled) return [];
       return scheduledData(blockHeight, parsed, dbConn, randomnessGenerator);
+    }
+    case 'setTradeNftCards': {
+      return setTradeNftCards(user, parsed, dbConn);
+    }
+    case 'transferTradeNft': {
+      if (inputData.userAddress !== SCHEDULED_DATA_ADDRESS) {
+        console.log('DISCARD: scheduled data from regular address');
+        return [];
+      }
+
+      if (parsed.to !== ZERO_ADDRESS) {
+        console.log('DISCARD: not a burt transfer, we only watch burn transfers');
+      }
+
+      return claimTradeNftCards(parsed, dbConn);
     }
     default:
       return [];

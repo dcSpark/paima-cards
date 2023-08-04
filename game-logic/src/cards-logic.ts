@@ -1,7 +1,8 @@
 import type { IGetLobbyPlayersResult } from '@dice/db';
 import type {
+  CardDbId,
   CardDraw,
-  CardIndex,
+  CardCommitmentIndex,
   ConciseResult,
   DrawIndex,
   LobbyPlayer,
@@ -39,7 +40,7 @@ export function matchResults(matchState: MatchState): MatchResult {
 
 export function genCardDraw(
   currentDraw: DrawIndex,
-  currentDeck: CardIndex[],
+  currentDeck: CardCommitmentIndex[],
   randomnessGenerator: Prando
 ): Omit<CardDraw, 'die'> {
   const seed = `${randomnessGenerator.seed}|drawCard|${currentDraw}`;
@@ -134,7 +135,7 @@ export function genPostTxEvents(
 async function buildCommitment(
   crypto: Crypto,
   salt: string,
-  cardId: CardIndex
+  cardId: CardCommitmentIndex
 ): Promise<Uint8Array> {
   // prepare input for hash function
   const cardIndex = cardId.toString(16).padStart(2, '0');
@@ -149,7 +150,7 @@ async function buildCommitment(
 
 export async function genCommitments(
   crypto: Crypto,
-  deck: CardIndex[]
+  deck: CardDbId[]
 ): Promise<{
   commitments: Uint8Array;
   salt: string[];
@@ -183,7 +184,7 @@ export async function checkCommitment(
   commitments: Uint8Array,
   index: number,
   salt: string,
-  cardId: number
+  cardId: CardDbId
 ): Promise<boolean> {
   const commitment = commitments.slice(index * COMMITMENT_LENGTH, (index + 1) * COMMITMENT_LENGTH);
   if (commitment.length !== COMMITMENT_LENGTH) return false;
