@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./Lobby.scss";
 import { Typography } from "@mui/material";
 import type { LobbyState } from "@dice/game-logic";
@@ -6,8 +6,8 @@ import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import CardGame from "./CardGame";
 import { IGetLobbyByIdResult } from "@dice/db";
-import { localDeckCache } from "@src/GlobalStateContext";
 import * as Paima from "@dice/middleware";
+import LocalStorage from "@src/LocalStorage";
 
 export function Lobby({
   initialLobbyRaw,
@@ -38,6 +38,11 @@ export function Lobby({
     };
   }, [lobbyState]);
 
+  const localDeck = useMemo(() => {
+    if (lobbyState == null) return undefined;
+    return LocalStorage.getLobbyDeck(lobbyState.lobby_id);
+  }, [lobbyState]);
+
   if (initialLobbyRaw == null) return <></>;
 
   return (
@@ -53,28 +58,20 @@ export function Lobby({
             </div>
           </>
         )}
-        {lobbyState != null &&
-          (() => {
-            const localDeck = localDeckCache.get(lobbyState.lobby_id);
-            if (localDeck == null) {
-              // TODO: local deck is not guaranteed to be in cache (e.g. reopen browser), handle this better
-              throw new Error(`Lobby: local deck not in cache`);
-            }
-            return (
-              <CardGame
-                lobbyState={lobbyState}
-                selectedNft={selectedNft}
-                refetchLobbyState={async () => {
-                  const response = await Paima.default.getLobbyState(
-                    initialLobbyRaw.lobby_id
-                  );
-                  if (!response.success) return;
-                  setLobbyState(response.lobby);
-                }}
-                localDeck={localDeck}
-              />
-            );
-          })()}
+        {lobbyState != null && localDeck != null && (
+          <CardGame
+            lobbyState={lobbyState}
+            selectedNft={selectedNft}
+            refetchLobbyState={async () => {
+              const response = await Paima.default.getLobbyState(
+                initialLobbyRaw.lobby_id
+              );
+              if (!response.success) return;
+              setLobbyState(response.lobby);
+            }}
+            localDeck={localDeck}
+          />
+        )}
       </Wrapper>
     </>
   );
