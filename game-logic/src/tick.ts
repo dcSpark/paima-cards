@@ -117,7 +117,10 @@ export function processTick(
     ? [
         {
           kind: TICK_EVENT_KIND.turnEnd,
-          damageDealt: getTurnPlayer(matchState).currentBoard.length,
+          damageDealt:
+            getNonTurnPlayer(matchState).currentBoard.length === 0
+              ? getTurnPlayer(matchState).currentBoard.length
+              : 0,
         },
       ]
     : [];
