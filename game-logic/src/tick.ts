@@ -63,6 +63,7 @@ export function processTick(
                 id: move.cardId,
                 index: move.cardIndex,
                 registryId: move.cardRegistryId,
+                hasAttack: false,
               },
             ],
           },
@@ -78,6 +79,7 @@ export function processTick(
     if (move.kind !== MOVE_KIND.targetCardWithBoardCard) return [];
     const turnPlayer = getTurnPlayer(matchState);
     const nonTurnPlayer = getNonTurnPlayer(matchState);
+    if (!turnPlayer.currentBoard[move.fromBoardPosition].hasAttack) return [];
     const fromCardRegistryId = turnPlayer.currentBoard[move.fromBoardPosition]?.registryId;
     const toCardRegistryId = nonTurnPlayer.currentBoard[move.toBoardPosition]?.registryId;
     if (fromCardRegistryId == null || toCardRegistryId == null) return [];
@@ -89,7 +91,15 @@ export function processTick(
         kind: TICK_EVENT_KIND.destroyCard,
         fromBoardPosition: move.fromBoardPosition,
         toBoardPosition: move.toBoardPosition,
-        newFromBoard: turnPlayer.currentBoard,
+        newFromBoard: turnPlayer.currentBoard.map((card, i) => {
+          if (i === move.fromBoardPosition)
+            return {
+              ...card,
+              hasAttack: false,
+            };
+
+          return card;
+        }),
         newToBoard: nonTurnPlayer.currentBoard.filter((_, i) => i !== move.toBoardPosition),
       },
     ];
@@ -107,7 +117,10 @@ export function processTick(
     ? [
         {
           kind: TICK_EVENT_KIND.turnEnd,
-          damageDealt: getTurnPlayer(matchState).currentBoard.length,
+          damageDealt:
+            getNonTurnPlayer(matchState).currentBoard.length === 0
+              ? getTurnPlayer(matchState).currentBoard.length
+              : 0,
         },
       ]
     : [];
@@ -148,7 +161,11 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].currentDraw++;
     matchState.players[turnPlayerIndex].currentDeck = event.draw.newDeck;
-    matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
+    if (event.draw.card == null) {
+      matchState.players[turnPlayerIndex].hitPoints -= 1;
+    } else {
+      matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
+    }
     matchState.txEventMove = undefined;
     return;
   }
@@ -173,6 +190,12 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
       player => player.turn !== matchState.turn
     );
     matchState.players[nonTurnPlayerIndex].hitPoints -= event.damageDealt;
+
+    for (const player of matchState.players.keys()) {
+      for (const boardCard of matchState.players[player].currentBoard.keys()) {
+        matchState.players[player].currentBoard[boardCard].hasAttack = true;
+      }
+    }
 
     matchState.turn = (matchState.turn + 1) % numPlayers;
     return;

@@ -8,6 +8,8 @@ import { imageRegistry } from "./imageMapping";
 export const cardHeight = "160px";
 export const cardWidth = "100px";
 
+export type CardGlow = "hasAttack" | "selected";
+
 function StaticCard({
   cardRegistryId,
   overlap,
@@ -21,7 +23,7 @@ function StaticCard({
   scale: number;
   onClick?: () => void;
   transparent?: boolean;
-  glow?: boolean;
+  glow?: CardGlow;
 }): React.ReactElement {
   return (
     <ButtonBase
@@ -43,7 +45,16 @@ function StaticCard({
             }
           : {},
         ...(transparent ? { opacity: 0 } : {}),
-        ...(glow ? { boxShadow: "0px 0px 15px 5px rgba(255,255,255,1)" } : {}),
+        ...(glow
+          ? {
+              boxShadow: (() => {
+                if (glow === "selected")
+                  return "0px 0px 15px 5px rgba(255,255,255,1)";
+                if (glow === "hasAttack")
+                  return "0px 0px 15px 0px rgba(255,255,0,1)";
+              })(),
+            }
+          : {}),
       }}
     >
       {cardRegistryId == null && (
@@ -67,12 +78,14 @@ export default function Card({
   selectedEffect = "glow",
   selectedState,
   onConfirm: onConfirm,
+  hasAttack,
 }: {
   onConfirm?: undefined | (() => void);
   cardRegistryId: undefined | CardRegistryId;
   overlap?: boolean;
   selectedState?: UseStateResponse<boolean>;
   selectedEffect?: "glow" | "closeup";
+  hasAttack?: boolean;
 }): React.ReactElement {
   const [selected, setSelected] = selectedState ?? [undefined, undefined];
   return (
@@ -90,7 +103,10 @@ export default function Card({
               }
         }
         transparent={selectedEffect === "closeup" && selected}
-        glow={selectedEffect === "glow" && selected}
+        glow={(() => {
+          if (selectedEffect === "glow" && selected) return "selected";
+          if (hasAttack) return "hasAttack";
+        })()}
       />
       <Modal
         open={selectedEffect === "closeup" && selected === true}
