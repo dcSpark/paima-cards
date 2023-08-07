@@ -45,10 +45,14 @@ export function genCardDraw(
 ): Omit<CardDraw, 'die'> {
   const seed = `${randomnessGenerator.seed}|drawCard|${currentDraw}`;
   const prando = new Prando(seed);
-  const cardNumber = prando.nextInt(0, currentDeck.length - 1);
+  const cardNumber =
+    currentDeck.length === 0 ? undefined : prando.nextInt(0, currentDeck.length - 1);
   return {
-    card: { index: currentDeck[cardNumber], draw: currentDraw },
-    newDeck: [...currentDeck.slice(0, cardNumber), ...currentDeck.slice(cardNumber + 1)],
+    card: cardNumber == null ? undefined : { index: currentDeck[cardNumber], draw: currentDraw },
+    newDeck:
+      cardNumber == null
+        ? []
+        : [...currentDeck.slice(0, cardNumber), ...currentDeck.slice(cardNumber + 1)],
   };
 }
 

@@ -161,7 +161,11 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].currentDraw++;
     matchState.players[turnPlayerIndex].currentDeck = event.draw.newDeck;
-    matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
+    if (event.draw.card == null) {
+      matchState.players[turnPlayerIndex].hitPoints -= 1;
+    } else {
+      matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
+    }
     matchState.txEventMove = undefined;
     return;
   }

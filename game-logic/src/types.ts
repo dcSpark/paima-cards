@@ -15,7 +15,7 @@ export enum RoundKind {
 }
 
 export type CardDraw = {
-  card: HandCard;
+  card: undefined | HandCard;
   newDeck: CardCommitmentIndex[];
 };
 

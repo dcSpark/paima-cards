@@ -132,10 +132,28 @@ const DiceGame: React.FC<CardGameProps> = ({
             matchState: newMatchState,
           };
         });
+
+        if (playedEvent.draw.card != null) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        if (playedEvent.draw.card == null) {
+          setCaption(
+            (() => {
+              const turnPlayer = getTurnPlayer(display.matchState);
+
+              return turnPlayer.nftId === selectedNft
+                ? "You overdraw a card and take 1 damage!"
+                : "Your opponent overdraws a card and takes 1 damage!";
+            })()
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          setCaption(undefined);
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setIsTickDisplaying(false);
       })(),
-    [isTickDisplaying, postTxEventQueue]
+    [display, isTickDisplaying, postTxEventQueue, selectedNft]
   );
 
   async function submit(move: Move) {
@@ -168,7 +186,7 @@ const DiceGame: React.FC<CardGameProps> = ({
         )
           continue;
 
-        // show animations before applying events to sate
+        // show animations before applying events to state
         // TODO: we don't have any at the moment
 
         // apply events to state
@@ -180,10 +198,28 @@ const DiceGame: React.FC<CardGameProps> = ({
 
         // show animations after applying events to sate
         if (
-          tickEvent.kind === TICK_EVENT_KIND.postTx ||
+          (tickEvent.kind === TICK_EVENT_KIND.postTx &&
+            tickEvent.draw.card != null) ||
           tickEvent.kind === TICK_EVENT_KIND.playCard
         ) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        if (
+          tickEvent.kind === TICK_EVENT_KIND.postTx &&
+          tickEvent.draw.card == null
+        ) {
+          setCaption(
+            (() => {
+              const turnPlayer = getTurnPlayer(display.matchState);
+
+              return turnPlayer.nftId === selectedNft
+                ? "You overdraw a card and take 1 damage!"
+                : "Your opponent overdraws a card and takes 1 damage!";
+            })()
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          setCaption(undefined);
         }
 
         if (tickEvent.kind === TICK_EVENT_KIND.turnEnd) {
