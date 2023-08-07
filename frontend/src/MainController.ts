@@ -1,14 +1,18 @@
-import {
+import { genCommitments, DECK_LENGTH } from "@dice/game-logic";
+import type {
+  CardDbId,
+  CardRegistryId,
+  LocalCard,
   MatchState,
   TickEvent,
   LobbyState,
-  genCommitments,
-  DECK_LENGTH,
 } from "@dice/game-logic";
-import type { CardDbId, CardRegistryId, LocalCard } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
-import { MatchExecutor } from "paima-sdk/paima-executors";
-import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
+import type { MatchExecutor } from "paima-sdk/paima-executors";
+import type {
+  IGetLobbyByIdResult,
+  IGetPaginatedUserLobbiesResult,
+} from "@dice/db";
 import LocalStorage from "./LocalStorage";
 
 // The MainController is a React component that will be used to control the state of the application
@@ -33,10 +37,10 @@ export enum Page {
 class MainController {
   userAddress: string | null = null;
 
-  callback: (
+  callback?: (
     page: Page | null,
     isLoading: boolean,
-    extraData: IGetLobbyByIdResult
+    extraData: null | IGetLobbyByIdResult
   ) => void;
 
   private checkCallback() {
@@ -48,7 +52,7 @@ class MainController {
   private async enforceWalletConnected() {
     this.checkCallback();
     if (!this.isWalletConnected()) {
-      this.callback(Page.Landing, false, null);
+      this.callback?.(Page.Landing, false, null);
     }
     if (!this.userAddress) {
       await this.silentConnectWallet();
@@ -68,14 +72,14 @@ class MainController {
   }
 
   async connectWallet() {
-    this.callback(Page.Landing, true, null);
+    this.callback?.(Page.Landing, true, null);
     const response = await Paima.default.userWalletLogin("metamask");
     console.log("connect wallet response: ", response);
     if (response.success === true) {
       this.userAddress = response.result.walletAddress;
-      this.callback(Page.MainMenu, false, null);
+      this.callback?.(Page.MainMenu, false, null);
     } else {
-      this.callback(Page.Landing, false, null);
+      this.callback?.(Page.Landing, false, null);
     }
   }
 
@@ -88,10 +92,10 @@ class MainController {
 
   async loadLobbyState(lobbyId: string): Promise<LobbyState> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getLobbyState(lobbyId);
     console.log("get lobby state response: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not get lobby state");
     }
@@ -100,10 +104,10 @@ class MainController {
 
   async loadLobbyRaw(lobbyId: string): Promise<IGetLobbyByIdResult> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getLobbyRaw(lobbyId);
     console.log("get lobby state response: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not get lobby state");
     }
@@ -116,10 +120,10 @@ class MainController {
     page: number
   ): Promise<LobbyState[]> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getLobbySearch(nftId, query, page, 1);
     console.log("search lobby response: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not search lobby");
     }
@@ -136,7 +140,7 @@ class MainController {
     isPractice = false
   ): Promise<void> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     console.log(
       "create lobby: ",
       creatorNftId,
@@ -174,12 +178,12 @@ class MainController {
     );
     console.log("create lobby response: ", response);
     if (!response.success) {
-      this.callback(null, false, null);
+      this.callback?.(null, false, null);
       throw new Error("Could not create lobby");
     }
     const lobbyRaw = await this.loadLobbyRaw(response.lobbyID);
     LocalStorage.setLobbyDeck(response.lobbyID, localDeck);
-    this.callback(Page.Game, false, lobbyRaw);
+    this.callback?.(Page.Game, false, lobbyRaw);
   }
 
   async joinLobby(
@@ -188,7 +192,7 @@ class MainController {
     lobbyId: string
   ): Promise<void> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
 
     if (deck?.length !== DECK_LENGTH) {
       // shouldn't happen
@@ -211,41 +215,41 @@ class MainController {
       commitments.commitments
     );
     if (!response.success) {
-      this.callback(null, false, null);
+      this.callback?.(null, false, null);
       throw new Error("Could not join lobby");
     }
     const resp = await Paima.default.getLobbyRaw(lobbyId);
     console.log("move to joined lobby response: ", response);
     if (!resp.success) {
-      this.callback(null, false, null);
+      this.callback?.(null, false, null);
       throw new Error("Could not download lobby state from join lobby");
     }
     LocalStorage.setLobbyDeck(resp.lobby.lobby_id, localDeck);
-    this.callback(Page.Game, false, resp.lobby);
+    this.callback?.(Page.Game, false, resp.lobby);
   }
 
   async moveToJoinedLobby(lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getLobbyState(lobbyId);
     console.log("move to joined lobby response: ", response);
     if (!response.success) {
-      this.callback(null, false, null);
+      this.callback?.(null, false, null);
       throw new Error("Could not join lobby");
     }
-    this.callback(Page.Game, false, response.lobby);
+    this.callback?.(Page.Game, false, response.lobby);
   }
 
   async closeLobby(nftId: number, lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.closeLobby(nftId, lobbyId);
     console.log("close lobby response: ", response);
     if (!response.success) {
-      this.callback(null, false, null);
+      this.callback?.(null, false, null);
       throw new Error("Could not close lobby");
     }
-    this.callback(Page.MainMenu, false, null);
+    this.callback?.(Page.MainMenu, false, null);
   }
 
   async getOpenLobbies(
@@ -254,10 +258,10 @@ class MainController {
     limit = 100
   ): Promise<LobbyState[]> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getOpenLobbies(nftId, page, limit);
     console.log("get open lobbies response: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not get open lobbies");
     }
@@ -270,14 +274,14 @@ class MainController {
     limit = 100
   ): Promise<IGetPaginatedUserLobbiesResult[]> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getUserLobbiesMatches(
       nftId,
       page,
       limit
     );
     console.log("get my games response: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not get open lobbies");
     }
@@ -289,13 +293,13 @@ class MainController {
     matchWithinLobby: number
   ): Promise<MatchExecutor<MatchState, TickEvent>> {
     await this.enforceWalletConnected();
-    this.callback(null, true, null);
+    this.callback?.(null, true, null);
     const response = await Paima.default.getMatchExecutor(
       lobbyId,
       matchWithinLobby
     );
     console.log("get match executor: ", response);
-    this.callback(null, false, null);
+    this.callback?.(null, false, null);
     if (!response.success) {
       throw new Error("Could not get match executor");
     }

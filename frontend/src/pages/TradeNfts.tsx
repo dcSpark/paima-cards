@@ -5,7 +5,8 @@ import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import React, { useMemo, useState } from "react";
 import Card from "./CardGame/Card";
-import { CardDbId, DECK_LENGTH } from "@dice/game-logic";
+import type { CardDbId } from "@dice/game-logic";
+import { DECK_LENGTH } from "@dice/game-logic";
 import { burnTradeNft, buyTradeNft } from "@src/services/contract";
 import * as Paima from "@dice/middleware";
 
@@ -22,6 +23,8 @@ export default function TradeNfts(): React.ReactElement {
     undefined | number
   >();
 
+  if (connectedWallet == null) return <></>;
+
   return (
     <>
       <Navbar />
@@ -36,6 +39,7 @@ export default function TradeNfts(): React.ReactElement {
           .filter((tradeNft) => tradeNft.cards != null)
           .map((tradeNft) => (
             <Box
+              key={tradeNft.nft_id}
               sx={{
                 padding: 2,
                 background: "rgba(119, 109, 104, 0.5)",
@@ -58,8 +62,6 @@ export default function TradeNfts(): React.ReactElement {
                   <Card
                     key={card}
                     cardRegistryId={tradeNfts.cardLookup[card].registry_id}
-                    selectedEffect="glow"
-                    selectedState={[false, () => {}]}
                   />
                 ))}
               </Box>
@@ -79,12 +81,16 @@ export default function TradeNfts(): React.ReactElement {
             {tradeNfts?.tradeNfts
               .filter((tradeNft) => tradeNft.cards == null)
               .map((tradeNft) => (
-                <MenuItem value={tradeNft.nft_id}>{tradeNft.nft_id}</MenuItem>
+                <MenuItem key={tradeNft.nft_id} value={tradeNft.nft_id}>
+                  {tradeNft.nft_id}
+                </MenuItem>
               ))}
           </Select>
           <Button
             disabled={selectedCards.length === 0 || selectedTradeNft == null}
             onClick={async () => {
+              if (selectedTradeNft == null) return;
+
               const sortedCards = [...selectedCards];
               sortedCards.sort();
               await Paima.default.setTradeNftCards(
@@ -106,7 +112,7 @@ export default function TradeNfts(): React.ReactElement {
           {sortedCards?.map((card) => (
             <Card
               key={card}
-              cardRegistryId={collection.cards[card]?.registry_id}
+              cardRegistryId={collection.cards?.[card]?.registry_id}
               selectedEffect="glow"
               selectedState={[
                 selectedCards.includes(card),

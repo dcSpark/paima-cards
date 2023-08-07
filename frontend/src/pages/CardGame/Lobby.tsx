@@ -5,17 +5,20 @@ import type { LobbyState } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import CardGame from "./CardGame";
-import { IGetLobbyByIdResult } from "@dice/db";
+import type { IGetLobbyByIdResult } from "@dice/db";
 import * as Paima from "@dice/middleware";
 import LocalStorage from "@src/LocalStorage";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 export function Lobby({
   initialLobbyRaw,
-  selectedNft,
 }: {
-  initialLobbyRaw: undefined | IGetLobbyByIdResult;
-  selectedNft: number;
+  initialLobbyRaw: null | IGetLobbyByIdResult;
 }): React.ReactElement {
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
+
   const [lobbyState, setLobbyState] = useState<LobbyState>();
 
   useEffect(() => {
@@ -36,14 +39,14 @@ export function Lobby({
     return () => {
       clearInterval(intervalIdLobby);
     };
-  }, [lobbyState]);
+  }, [initialLobbyRaw, lobbyState]);
 
   const localDeck = useMemo(() => {
     if (lobbyState == null) return undefined;
     return LocalStorage.getLobbyDeck(lobbyState.lobby_id);
   }, [lobbyState]);
 
-  if (initialLobbyRaw == null) return <></>;
+  if (initialLobbyRaw == null || selectedNft.nft == null) return <></>;
 
   return (
     <>
@@ -61,7 +64,7 @@ export function Lobby({
         {lobbyState != null && localDeck != null && (
           <CardGame
             lobbyState={lobbyState}
-            selectedNft={selectedNft}
+            selectedNft={selectedNft.nft}
             refetchLobbyState={async () => {
               const response = await Paima.default.getLobbyState(
                 initialLobbyRaw.lobby_id

@@ -9,8 +9,8 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import MainController from "@src/MainController";
-import { LobbyStatus } from "@dice/game-logic";
+import type MainController from "@src/MainController";
+import type { LobbyStatus } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -18,7 +18,7 @@ import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
-import { IGetPaginatedUserLobbiesResult } from "@dice/db";
+import type { IGetPaginatedUserLobbiesResult } from "@dice/db";
 
 type Column = {
   id: keyof IGetPaginatedUserLobbiesResult | "action";
@@ -44,7 +44,7 @@ const actionMap: Record<LobbyStatus, string[]> = {
 const ActionButton: React.FC<{ lobby: IGetPaginatedUserLobbiesResult }> = (
   props
 ) => {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
@@ -54,6 +54,8 @@ const ActionButton: React.FC<{ lobby: IGetPaginatedUserLobbiesResult }> = (
     status: LobbyStatus,
     lobbyId: string
   ) => {
+    if (selectedNft.nft == null) return;
+
     if (action === "Close") {
       mainController.closeLobby(selectedNft.nft, lobbyId);
     } else if (action === "Enter") {
@@ -90,7 +92,7 @@ const ActionButton: React.FC<{ lobby: IGetPaginatedUserLobbiesResult }> = (
 };
 
 const MyGames: React.FC = () => {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
@@ -101,10 +103,12 @@ const MyGames: React.FC = () => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
+    if (selectedNft.nft == null) return;
+
     mainController.getMyGames(selectedNft.nft).then((lobbies) => {
       setLobbies(lobbies);
     });
-  }, []);
+  }, [mainController, selectedNft]);
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -114,6 +118,8 @@ const MyGames: React.FC = () => {
   };
 
   const handleLobbiesRefresh = async () => {
+    if (selectedNft.nft == null) return;
+
     const lobbies = await mainController.getMyGames(selectedNft.nft);
 
     setPage(0);

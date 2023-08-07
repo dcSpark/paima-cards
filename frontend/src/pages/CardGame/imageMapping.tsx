@@ -1,7 +1,7 @@
 import rock from "@assets/images/rock.png";
 import paper from "@assets/images/paper.png";
 import scissors from "@assets/images/scissors.png";
-import { CardRegistryId } from "@dice/game-logic";
+import type { CardRegistryId } from "@dice/game-logic";
 
 export const imageRegistry: Record<CardRegistryId, string> = {
   0: `url(${rock})`,

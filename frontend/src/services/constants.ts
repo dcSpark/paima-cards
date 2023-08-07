@@ -1,10 +1,10 @@
-export const CHAIN_URI: string = process.env.CHAIN_URI;
-export const NATIVE_PROXY: string = process.env.NATIVE_PROXY;
-export const NFT: string = process.env.NFT;
-export const CARD_TRADE_NATIVE_PROXY: string =
-  process.env.CARD_TRADE_NATIVE_PROXY;
-export const CARD_TRADE_NFT: string = process.env.CARD_TRADE_NFT;
-export const GENERIC_PAYMENT: string = process.env.GENERIC_PAYMENT;
+export const CHAIN_URI = process.env.CHAIN_URI as string;
+export const NATIVE_PROXY = process.env.NATIVE_PROXY as string;
+export const NFT = process.env.NFT as string;
+export const CARD_TRADE_NATIVE_PROXY = process.env
+  .CARD_TRADE_NATIVE_PROXY as string;
+export const CARD_TRADE_NFT = process.env.CARD_TRADE_NFT as string;
+export const GENERIC_PAYMENT = process.env.GENERIC_PAYMENT as string;
 
 if (
   CHAIN_URI == null ||

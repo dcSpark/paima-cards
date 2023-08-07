@@ -8,8 +8,8 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import MainController from "@src/MainController";
-import { LobbyState } from "@dice/game-logic";
+import type MainController from "@src/MainController";
+import type { LobbyState } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -41,7 +41,7 @@ const expandValue = (id: keyof LobbyState, value: unknown) => {
 };
 
 const OpenLobbies: React.FC = () => {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
@@ -53,10 +53,12 @@ const OpenLobbies: React.FC = () => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
+    if (selectedNft.nft == null) return;
+
     mainController.getOpenLobbies(selectedNft.nft).then((lobbies) => {
       setLobbies(lobbies);
     });
-  }, []);
+  }, [mainController, selectedNft.nft]);
 
   const handleSearchTextChange = (query: string) => {
     setSearchText(query);
@@ -68,6 +70,8 @@ const OpenLobbies: React.FC = () => {
   };
 
   const searchForHiddenLobby = async (query: string) => {
+    if (selectedNft.nft == null) return;
+
     const results = await mainController.searchLobby(selectedNft.nft, query, 0);
     if (results == null || results.length === 0) return;
     const newLobbies = results.filter(
@@ -84,6 +88,8 @@ const OpenLobbies: React.FC = () => {
   };
 
   const handleLobbiesRefresh = async () => {
+    if (selectedNft.nft == null) return;
+
     const lobbies = await mainController.getOpenLobbies(selectedNft.nft);
 
     setPage(0);
@@ -139,15 +145,27 @@ const OpenLobbies: React.FC = () => {
                             {column.id === "action" ? (
                               <Button
                                 onClick={() => {
-                                  if (collection.cards == null) return;
+                                  if (
+                                    collection.cards == null ||
+                                    selectedNft.nft == null ||
+                                    selectedDeck == null
+                                  )
+                                    return;
 
                                   mainController.joinLobby(
                                     selectedNft.nft,
-                                    selectedDeck.map((card) => ({
-                                      id: card,
-                                      registryId:
-                                        collection.cards[card].registry_id,
-                                    })),
+                                    selectedDeck.map((card) => {
+                                      if (collection.cards?.[card] == null)
+                                        throw new Error(
+                                          `joinLobby: card not found in collection`
+                                        );
+
+                                      return {
+                                        id: card,
+                                        registryId:
+                                          collection.cards[card].registry_id,
+                                      };
+                                    }),
                                     lobby.lobby_id
                                   );
                                 }}

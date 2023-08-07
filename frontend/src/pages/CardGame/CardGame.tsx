@@ -79,15 +79,15 @@ const DiceGame: React.FC<CardGameProps> = ({
     const opponent = display.matchState.players.find(
       (player) => player.nftId !== selectedNft
     );
-    if (thisPlayer == null) throw new Error(`DiceGame: opponent not in lobby`);
+    if (opponent == null) throw new Error(`DiceGame: opponent not in lobby`);
     return { thisPlayer, opponent };
-  }, [lobbyState, selectedNft]);
+  }, [selectedNft, display]);
 
   // Note: we could just async play the post tx animations, but in some games you want a user interaction for it.
   // E.g. in blackjack dice we let the user click "roll" to roll their dice at the start of their turn.
-  const [postTxEventQueue, setPostTxEventQueue] = React.useState<
-    PostTxTickEvent[]
-  >([]);
+  const [postTxEventQueue, setPostTxEventQueue] = useState<PostTxTickEvent[]>(
+    []
+  );
 
   useEffect(() => {
     // Set post-tx event queue:
@@ -179,7 +179,10 @@ const DiceGame: React.FC<CardGameProps> = ({
         });
 
         // show animations after applying events to sate
-        if (tickEvent.kind === TICK_EVENT_KIND.postTx) {
+        if (
+          tickEvent.kind === TICK_EVENT_KIND.postTx ||
+          tickEvent.kind === TICK_EVENT_KIND.playCard
+        ) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
 
@@ -213,19 +216,19 @@ const DiceGame: React.FC<CardGameProps> = ({
         }
       }
 
-      setDisplay((oldDisplay) => ({
+      setDisplay({
         // intentionally set using the 'display' we started with instead of 'oldDisplay'
         round: display.round + 1,
         // round ended, which means a tx happened, calculate post-tx next render
         isPostTxDone: false,
         // resync with backend state in case we applied some events wrong (makes bugs less game-breaking)
         matchState: endState,
-      }));
+      });
 
       setIsTickDisplaying(false);
       setRoundExecutor(undefined);
     })();
-  }, [isTickDisplaying, roundExecutor]);
+  }, [display, isTickDisplaying, roundExecutor, selectedNft, thisPlayer]);
 
   const [isFetchingRound, setIsFetchingRound] = useState(false);
   const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
@@ -284,9 +287,10 @@ const DiceGame: React.FC<CardGameProps> = ({
       });
   }, [
     isFetchingRound,
-    lobbyState.current_round,
+    lobbyState,
     roundExecutor,
     nextFetchedRound,
+    fetchedEndState,
   ]);
 
   const disableInteraction =

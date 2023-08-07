@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, ButtonBase, Modal } from "@mui/material";
-import { CardRegistryId } from "@dice/game-logic";
+import type { CardRegistryId } from "@dice/game-logic";
 import PaimaLogo from "./PaimaLogo";
-import { UseStateResponse } from "@src/utils";
+import type { UseStateResponse } from "@src/utils";
 import { imageRegistry } from "./imageMapping";
 
 export const cardHeight = "160px";
@@ -64,16 +64,17 @@ function StaticCard({
 export default function Card({
   cardRegistryId,
   overlap,
-  selectedEffect,
-  selectedState: [selected, setSelected],
+  selectedEffect = "glow",
+  selectedState,
   onConfirm: onConfirm,
 }: {
   onConfirm?: undefined | (() => void);
   cardRegistryId: undefined | CardRegistryId;
   overlap?: boolean;
-  selectedState: UseStateResponse<boolean>;
-  selectedEffect: "glow" | "closeup";
+  selectedState?: UseStateResponse<boolean>;
+  selectedEffect?: "glow" | "closeup";
 }): React.ReactElement {
+  const [selected, setSelected] = selectedState ?? [undefined, undefined];
   return (
     <>
       <StaticCard
@@ -85,16 +86,16 @@ export default function Card({
           cardRegistryId == null
             ? undefined
             : () => {
-                setSelected(true);
+                setSelected?.(true);
               }
         }
         transparent={selectedEffect === "closeup" && selected}
         glow={selectedEffect === "glow" && selected}
       />
       <Modal
-        open={selectedEffect === "closeup" && selected}
+        open={selectedEffect === "closeup" && selected === true}
         onClose={() => {
-          setSelected(false);
+          setSelected?.(false);
         }}
       >
         <Box

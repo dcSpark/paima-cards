@@ -5,7 +5,8 @@ import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import React, { useMemo, useState } from "react";
 import Card from "./CardGame/Card";
-import { CardDbId, DECK_LENGTH } from "@dice/game-logic";
+import type { CardDbId } from "@dice/game-logic";
+import { DECK_LENGTH } from "@dice/game-logic";
 
 export default function Collection(): React.ReactElement {
   const {
@@ -36,9 +37,7 @@ export default function Collection(): React.ReactElement {
             {selectedDeck.map((cardId, i) => (
               <Card
                 key={i}
-                cardRegistryId={collection.cards[cardId].registry_id}
-                selectedEffect="glow"
-                selectedState={[undefined, () => {}]}
+                cardRegistryId={collection.cards?.[cardId].registry_id}
               />
             ))}
           </Box>
@@ -71,7 +70,7 @@ export default function Collection(): React.ReactElement {
           {sortedCards?.map((card) => (
             <Card
               key={card}
-              cardRegistryId={collection.cards[card]?.registry_id}
+              cardRegistryId={collection.cards?.[card]?.registry_id}
               selectedEffect="glow"
               selectedState={[
                 selectedCards.includes(card),

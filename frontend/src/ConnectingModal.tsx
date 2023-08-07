@@ -19,7 +19,7 @@ export default function ConnectingModal({ open }: { open: boolean }) {
         <DialogTitle color="white">Connecting to Metamask...</DialogTitle>
         <DialogContent>
           <DialogContentText color="white">
-            If a popup doesn't open, see if metamask made a silent notification.
+            {`If a popup doesn't open, see if metamask made a silent notification.`}
           </DialogContentText>
         </DialogContent>
       </Wrapper>

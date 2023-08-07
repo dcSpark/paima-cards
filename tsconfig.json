@@ -1,4 +1,7 @@
 {
+  "include": [
+    "./.eslintrc.js"
+  ],
   "exclude": [
     "test-bot",
     "test-frontend",

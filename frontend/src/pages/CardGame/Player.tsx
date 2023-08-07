@@ -1,10 +1,14 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import Button from "@src/components/Button";
 import Card, { cardHeight } from "./Card";
 import Deck from "./Deck";
-import { CardCommitmentIndex, LobbyPlayer, LocalCard } from "@dice/game-logic";
-import { UseStateResponse } from "@src/utils";
+import type {
+  CardCommitmentIndex,
+  LobbyPlayer,
+  LocalCard,
+} from "@dice/game-logic";
+import type { UseStateResponse } from "@src/utils";
+import Button from "@src/components/Button";
 
 export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
@@ -42,7 +46,7 @@ export default function Player({
           overlap
           onConfirm={() => onConfirmCard?.(card.index)}
           selectedState={[
-            isThisPlayer && selectedCard === card.index,
+            isThisPlayer === true && selectedCard === card.index,
             (val) => {
               if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
             },
@@ -61,13 +65,13 @@ export default function Player({
         gap: 1,
       }}
     >
-      {lobbyPlayer.currentBoard.map((card, i) => (
+      {lobbyPlayer.currentBoard.map((card) => (
         <Card
           key={card.index}
           cardRegistryId={card.registryId}
           selectedEffect="glow"
           selectedState={[
-            isThisPlayer && selectedCard === card.index,
+            isThisPlayer === true && selectedCard === card.index,
             (val) => {
               if (!isThisPlayer) onTargetCard?.(card.index);
               if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
