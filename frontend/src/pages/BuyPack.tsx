@@ -1,7 +1,7 @@
-import { IGetBoughtPacksResult } from "@dice/db/build/select.queries";
-import { CardDbId, CardRegistryId } from "@dice/game-logic";
+import type { IGetBoughtPacksResult } from "@dice/db/build/select.queries";
+import type { CardRegistryId } from "@dice/game-logic";
 import { LoadingButton } from "@mui/lab";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
@@ -11,16 +11,17 @@ import Card from "./CardGame/Card";
 
 export default function BuyPack(): React.ReactElement {
   const { connectedWallet, collection } = useGlobalStateContext();
-  const [isBuying, setIsBuying] = React.useState<boolean>(false);
+  const [isBuying, setIsBuying] = useState<boolean>(false);
 
   // Cache the length of collection.
   // When it changes, assume the last pack is the one we just bought.
   const [collectionCache, setCollectionCache] = useState<undefined | number>();
-  const [boughtPack, setBoughtPack] = React.useState<
-    undefined | CardRegistryId[]
-  >();
+  const [boughtPack, setBoughtPack] = useState<undefined | CardRegistryId[]>();
   useEffect(() => {
-    if (collection == null || collection.boughtPacks.length === collectionCache)
+    if (
+      collection.boughtPacks == null ||
+      collection.boughtPacks.length === collectionCache
+    )
       return;
     setCollectionCache(collection.boughtPacks.length);
 
@@ -32,8 +33,8 @@ export default function BuyPack(): React.ReactElement {
       undefined as undefined | IGetBoughtPacksResult
     );
 
-    setBoughtPack(lastPackRaw.card_registry_ids);
-  }, [collection]);
+    setBoughtPack(lastPackRaw?.card_registry_ids);
+  }, [collection, collectionCache]);
 
   return (
     <>
@@ -49,9 +50,12 @@ export default function BuyPack(): React.ReactElement {
           })}
           onClick={async () => {
             try {
+              if (connectedWallet == null) return;
+
               setIsBuying(true);
               await buyCardPack(connectedWallet);
             } catch (_e) {
+              //
             } finally {
               setIsBuying(false);
             }
@@ -68,12 +72,8 @@ export default function BuyPack(): React.ReactElement {
               gap: 1,
             }}
           >
-            {boughtPack.map((cardRegistryId) => (
-              <Card
-                selectedEffect="glow"
-                selectedState={[false, () => {}]}
-                cardRegistryId={cardRegistryId}
-              />
+            {boughtPack.map((cardRegistryId, i) => (
+              <Card key={i} cardRegistryId={cardRegistryId} />
             ))}
           </Box>
         )}

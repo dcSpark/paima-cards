@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import "./CreateLobby.scss";
 import { Box, Checkbox, FormControlLabel } from "@mui/material";
-import MainController from "@src/MainController";
+import type MainController from "@src/MainController";
 import Navbar from "@src/components/Navbar";
 import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
@@ -10,7 +10,7 @@ import NumericField from "@src/components/NumericField";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 const CreateLobby: React.FC = () => {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
@@ -24,7 +24,12 @@ const CreateLobby: React.FC = () => {
   const [isPractice, setIsPractice] = useState(false);
 
   const handleCreateLobby = async () => {
-    if (collection.cards == null) return;
+    if (
+      collection.cards == null ||
+      selectedNft.nft == null ||
+      selectedDeck == null
+    )
+      return;
 
     const numberOfRoundsNum = parseInt(numberOfRounds);
     const roundLengthNum = parseInt(roundLength);
@@ -32,10 +37,14 @@ const CreateLobby: React.FC = () => {
 
     await mainController.createLobby(
       selectedNft.nft,
-      selectedDeck.map((card) => ({
-        id: card,
-        registryId: collection.cards[card].registry_id,
-      })),
+      selectedDeck.map((card) => {
+        if (collection.cards?.[card] == null)
+          throw new Error(`createLobby: card not found in collection`);
+        return {
+          id: card,
+          registryId: collection.cards[card].registry_id,
+        };
+      }),
       numberOfRoundsNum,
       roundLengthNum,
       playersTimeNum,

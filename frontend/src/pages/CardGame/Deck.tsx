@@ -1,4 +1,4 @@
-import React, { Ref } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 import Card, { cardHeight, cardWidth } from "./Card";
 
@@ -25,11 +25,7 @@ export default function Deck({ size }: { size: number }): React.ReactElement {
               left: `${i * 8}px`,
             }}
           >
-            <Card
-              cardRegistryId={undefined}
-              selectedEffect="glow"
-              selectedState={[false, () => {}]}
-            />
+            <Card cardRegistryId={undefined} />
             {i === visualCards - 1 && (
               <Box
                 sx={{

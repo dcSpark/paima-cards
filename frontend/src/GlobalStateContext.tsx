@@ -1,3 +1,4 @@
+import type { SetStateAction } from "react";
 import React, {
   createContext,
   useCallback,
@@ -6,17 +7,16 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import MainController from "./MainController";
+import type MainController from "./MainController";
 import { AppContext } from "./main";
-import { UseStateResponse } from "./utils";
-import { WalletAddress } from "paima-sdk/paima-utils";
+import type { UseStateResponse } from "./utils";
+import type { WalletAddress } from "paima-sdk/paima-utils";
 import * as Paima from "@dice/middleware";
 import ConnectingModal from "./ConnectingModal";
-import { PaimaNotice } from "./components/PaimaNotice";
-import { OasysNotice } from "./components/PaimaNotice";
+import { PaimaNotice, OasysNotice } from "./components/PaimaNotice";
 import { Box } from "@mui/material";
-import { CardDbId, LocalCard } from "@dice/game-logic";
-import {
+import type { CardDbId, LocalCard } from "@dice/game-logic";
+import type {
   IGetBoughtPacksResult,
   IGetCardsByIdsResult,
   IGetOwnedCardsResult,
@@ -49,7 +49,7 @@ type GlobalState = {
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
-  null as GlobalState
+  null as any as GlobalState
 );
 
 export function GlobalStateProvider({
@@ -57,7 +57,7 @@ export function GlobalStateProvider({
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const [connectedWallet, setConnectedWallet] = useState<
     undefined | WalletAddress
   >();
@@ -83,18 +83,32 @@ export function GlobalStateProvider({
     const result = LocalStorage._getSelectedDeck();
     if (
       collection.cards != null &&
-      result?.some((card) => collection.cards[card] == null)
+      result?.some((card) => collection.cards?.[card] == null)
     ) {
       LocalStorage._setSelectedDeck(undefined);
       return undefined;
     }
 
+    // Make this hook depend on selectedDeckSubscription.
+    // Less likely to break stuff than ignoring the entire exhaustive hooks rule.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _ = selectedDeckSubscription;
+
     return result;
   }, [collection, selectedDeckSubscription]);
-  const setSelectedDeck = useCallback((cards: CardDbId[]) => {
-    LocalStorage._setSelectedDeck(cards);
-    setSelectedDeckSubscription((old) => old + 1);
-  }, []);
+  const setSelectedDeck = useCallback(
+    (cards: SetStateAction<undefined | CardDbId[]>) => {
+      if (typeof cards === "function") {
+        throw new Error(
+          `setSelectedDeck: function set state action not supported`
+        );
+      }
+
+      LocalStorage._setSelectedDeck(cards);
+      setSelectedDeckSubscription((old) => old + 1);
+    },
+    []
+  );
 
   useEffect(() => {
     // poll owned nfts
@@ -115,7 +129,7 @@ export function GlobalStateProvider({
     fetch();
     const interval = setInterval(fetch, 5000);
     return () => clearInterval(interval);
-  }, [mainController, connectedWallet]);
+  }, [mainController, connectedWallet, selectedNft]);
 
   useEffect(() => {
     // poll collection
@@ -124,6 +138,8 @@ export function GlobalStateProvider({
 
       Promise.all([
         (async () => {
+          if (selectedNft.nft == null) return;
+
           const result = await Paima.default.getUserPacks(selectedNft.nft);
           if (result.success) {
             setCollection((oldCollection) => ({
@@ -133,6 +149,8 @@ export function GlobalStateProvider({
           }
         })(),
         (async () => {
+          if (selectedNft.nft == null) return;
+
           const result = await Paima.default.getUserCards(selectedNft.nft);
           if (result.success) {
             const raw = result.result;
@@ -193,7 +211,7 @@ export function GlobalStateProvider({
     setLastConnectedWallet(connectedWallet);
   }, [connectedWallet]);
 
-  const value = React.useMemo<GlobalState>(
+  const value = useMemo<GlobalState>(
     () => ({
       connectedWallet: lastConnectedWallet,
       selectedNftState: [selectedNft, setSelectedNft],
@@ -201,7 +219,14 @@ export function GlobalStateProvider({
       selectedDeckState: [selectedDeck, setSelectedDeck],
       tradeNfts,
     }),
-    [lastConnectedWallet, selectedNft, setSelectedNft]
+    [
+      collection,
+      lastConnectedWallet,
+      selectedDeck,
+      selectedNft,
+      setSelectedDeck,
+      tradeNfts,
+    ]
   );
 
   return (
@@ -216,7 +241,7 @@ export function GlobalStateProvider({
 }
 
 export const useGlobalStateContext = (): GlobalState => {
-  const context = React.useContext(GlobalStateContext);
+  const context = useContext(GlobalStateContext);
   if (context == null) {
     throw new Error(
       "useGlobalStateContext must be used within an GlobalStateProvider"

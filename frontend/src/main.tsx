@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import PageCoordinator from "./pages/PageCoordinator";
 import MainController from "./MainController";
 import { BrowserRouter } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import { theme } from "./theme";
 import { GlobalStateProvider } from "./GlobalStateContext";
 
@@ -15,7 +15,7 @@ const mainController = new MainController();
 const app = (
   <ThemeProvider theme={theme}>
     <BrowserRouter>
-      <AppContext.Provider value={mainController}>
+      <AppContext.Provider value={mainController as any}>
         <GlobalStateProvider>
           <PageCoordinator />
         </GlobalStateProvider>
@@ -25,4 +25,4 @@ const app = (
 );
 
 // Render application in DOM
-createRoot(document.getElementById("app")).render(app);
+createRoot(document.getElementById("app") as any).render(app);

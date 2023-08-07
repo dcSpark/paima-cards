@@ -1,12 +1,15 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es6": true,
     "node": true
   },
   "extends": [
+    "../.eslintrc.js",
     "eslint:recommended",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/errors",
@@ -15,19 +18,20 @@
   "parser": "@typescript-eslint/parser",
   "settings": {
     "import/resolver": {
+      "typescript": {},
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       },
       "alias": {
         "map": [
-          ["@src", "./src"],
-          ["@assets", "./assets"]
+          ["@src", "./frontend/src"],
+          ["@assets", "./frontend/assets"]
         ],
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     },
     "react": {
-      "version": "latest"
+      "version": "detect"
     }
   },
   "rules": {

@@ -14,11 +14,9 @@ import {
   NativeNftSale__factory,
   Nft__factory,
 } from "@src/typechain";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "bignumber.js";
 import { GENERIC_PAYMENT_MESSAGES } from "@dice/game-logic";
 import { CARD_PACK_PRICE } from "@dice/utils";
-
-declare let window: any;
 
 export type SignerProvider = Signer | providers.Provider;
 
@@ -36,12 +34,6 @@ export const getSignerOrProvider = (account?: string): SignerProvider => {
   }
 
   return signerOrProvider;
-};
-
-export const NativeNftSaleProxyContract = (
-  signer: SignerProvider = getSignerOrProvider()
-) => {
-  return;
 };
 
 export async function fetchNftPrice(): Promise<BigNumber> {

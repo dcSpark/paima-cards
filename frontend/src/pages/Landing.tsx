@@ -1,12 +1,11 @@
 import { Button, Container } from "@mui/material";
 import { AppContext } from "@src/main";
-import MainController from "@src/MainController";
+import type MainController from "@src/MainController";
 import React, { useContext, useState } from "react";
-import * as Paima from "@dice/middleware";
 import "./Landing.scss";
 
 const LandingPage: React.FC = () => {
-  const mainController: MainController = useContext(AppContext);
+  const mainController: MainController = useContext(AppContext) as any;
   const [acceptTos, setAcceptTos] = useState(false);
 
   // These are for debugging purposes

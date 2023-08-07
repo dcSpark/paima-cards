@@ -1,7 +1,15 @@
 module.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
-  extends: ['prettier', 'plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
+  extends: [
+    'prettier',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'plugin:import/typescript',
+  ],
   parserOptions: {
+    project: ['./tsconfig.json', './*/tsconfig.json'],
+    tsconfigRootDir: './',
     ecmaVersion: 2019,
     sourceType: 'module',
   },
@@ -30,5 +38,10 @@ module.exports = {
     ],
     '@typescript-eslint/consistent-type-imports': 'error',
     'spaced-comment': 'warn',
+  },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
   },
 };

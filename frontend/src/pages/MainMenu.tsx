@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, CircularProgress } from "@mui/material";
 import { Page } from "@src/MainController";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
 import Wrapper from "@src/components/Wrapper";
 import Logo from "@src/components/Logo";
-import { burnTradeNft, buyNft, buyTradeNft } from "@src/services/contract";
+import { buyNft } from "@src/services/contract";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { LoadingButton } from "@mui/lab";
 
@@ -14,9 +14,9 @@ const NoNFTMenu = () => {
     connectedWallet,
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
-  const [isBuying, setIsBuying] = React.useState<boolean>(false);
+  const [isBuying, setIsBuying] = useState<boolean>(false);
   // if user successfully submitted a tx, keep loading until we fetch the nft
-  const [buyDone, setBuyDone] = React.useState<boolean>(false);
+  const [buyDone, setBuyDone] = useState<boolean>(false);
 
   if (!connectedWallet || selectedNft.loading)
     return (
@@ -42,6 +42,7 @@ const NoNFTMenu = () => {
             await buyNft(connectedWallet);
             setBuyDone(true);
           } catch (_e) {
+            //
           } finally {
             setIsBuying(false);
           }
@@ -70,7 +71,6 @@ const NoNFTMenu = () => {
 
 const HasNFTMenu = () => {
   const {
-    connectedWallet,
     selectedDeckState: [selectedDeck],
   } = useGlobalStateContext();
   const navigate = useNavigate();
