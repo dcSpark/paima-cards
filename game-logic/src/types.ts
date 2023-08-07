@@ -177,6 +177,9 @@ export type BoardCard = {
   id: CardDbId;
   index: CardCommitmentIndex;
   registryId: CardRegistryId;
+  // Note: If the game had something like health points on board cards, it should be implemented same as this.
+  // A card has a constant amount of hp in the registry + buffs/modifiers, and one of them is missing hp.
+  hasAttack: boolean;
 };
 export type SerializedBoardCard = string;
 

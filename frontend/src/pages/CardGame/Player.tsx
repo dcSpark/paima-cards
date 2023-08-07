@@ -69,6 +69,7 @@ export default function Player({
         <Card
           key={card.index}
           cardRegistryId={card.registryId}
+          hasAttack={card.hasAttack}
           selectedEffect="glow"
           selectedState={[
             isThisPlayer === true && selectedCard === card.index,

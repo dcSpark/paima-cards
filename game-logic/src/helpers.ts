@@ -67,9 +67,12 @@ export function deserializeHandCard(card: SerializedHandCard): HandCard {
 }
 
 export function serializeBoardCard(card: BoardCard): SerializedBoardCard {
-  return [card.id.toString(), card.index.toString(), card.registryId.toString()].join(
-    dbStructPropDelimiter
-  );
+  return [
+    card.id.toString(),
+    card.index.toString(),
+    card.registryId.toString(),
+    card.hasAttack ? '1' : '0',
+  ].join(dbStructPropDelimiter);
 }
 
 export function deserializeBoardCard(card: SerializedBoardCard): BoardCard {
@@ -78,6 +81,7 @@ export function deserializeBoardCard(card: SerializedBoardCard): BoardCard {
     id: Number.parseInt(props[0]),
     index: Number.parseInt(props[1]),
     registryId: Number.parseInt(props[2]),
+    hasAttack: props[3] === '1' ? true : false,
   };
 }
 

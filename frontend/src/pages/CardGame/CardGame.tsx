@@ -346,6 +346,9 @@ const DiceGame: React.FC<CardGameProps> = ({
                   );
                   if (toBoardPosition === -1) return;
 
+                  if (!thisPlayer.currentBoard[fromBoardPosition].hasAttack)
+                    return;
+
                   const fromCardRegistryId =
                     thisPlayer.currentBoard[fromBoardPosition].registryId;
                   const toCardRegistryId =
