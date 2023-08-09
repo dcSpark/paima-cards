@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, searchPaginatedOpenLobbies, getOpenLobbyById } from '@dice/db';
+import { requirePool, searchPaginatedOpenLobbies, getOpenLobbyById } from '@cards/db';
 import { psqlNum } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
-import type { IGetOpenLobbyByIdResult, ISearchPaginatedOpenLobbiesResult } from '@dice/db';
+import type { IGetOpenLobbyByIdResult, ISearchPaginatedOpenLobbiesResult } from '@cards/db';
 
 interface SearchOpenLobbiesResponse {
   lobbies: IGetOpenLobbyByIdResult[] | ISearchPaginatedOpenLobbiesResult[];

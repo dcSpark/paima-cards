@@ -10,7 +10,7 @@ import type {
   RoundExecutorBackendData,
   MatchState,
   TickEvent,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { auxGetLobbyRaw, auxGetLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
@@ -39,13 +39,13 @@ import type {
   PackedUserStats,
 } from '../types';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
+import type { IGetPaginatedUserLobbiesResult } from '@cards/db';
 import type {
   IGetBoughtPacksResult,
   IGetCardsByIdsResult,
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
-} from '@dice/db/build/select.queries';
+} from '@cards/db/build/select.queries';
 
 async function getLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyRaw');

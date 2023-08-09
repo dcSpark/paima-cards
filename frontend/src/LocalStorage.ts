@@ -1,4 +1,4 @@
-import type { CardDbId, LocalCard } from "@dice/game-logic";
+import type { CardDbId, LocalCard } from "@cards/game-logic";
 
 function setLobbyDeck(lobbyId: string, cards: LocalCard[]) {
   localStorage.setItem(`lobbyDeck_${lobbyId}`, JSON.stringify(cards));

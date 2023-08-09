@@ -17,8 +17,8 @@ import {
   claimTradeNftCards,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { GENERIC_PAYMENT_MESSAGES } from '@dice/game-logic';
-import { ZERO_ADDRESS } from '@dice/utils';
+import { GENERIC_PAYMENT_MESSAGES } from '@cards/game-logic';
+import { ZERO_ADDRESS } from '@cards/utils';
 
 export default async function (
   inputData: SubmittedChainData,
@@ -33,7 +33,7 @@ export default async function (
   console.log(`Input string parsed as: ${parsed.input}`);
 
   switch (parsed.input) {
-    case 'nftMint':
+    case 'accountMint':
       return mintNft(parsed);
     case 'tradeNftMint':
       return mintTradeNft(parsed);
@@ -77,7 +77,8 @@ export default async function (
       }
 
       if (parsed.to !== ZERO_ADDRESS) {
-        console.log('DISCARD: not a burt transfer, we only watch burn transfers');
+        console.log('DISCARD: not a burn transfer, we only watch burn transfers');
+        return [];
       }
 
       return claimTradeNftCards(parsed, dbConn);

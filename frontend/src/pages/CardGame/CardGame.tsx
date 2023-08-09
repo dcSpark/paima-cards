@@ -9,7 +9,7 @@ import type {
   Move,
   LocalCard,
   CardCommitmentIndex,
-} from "@dice/game-logic";
+} from "@cards/game-logic";
 import {
   applyEvent,
   CARD_REGISTRY,
@@ -17,8 +17,8 @@ import {
   getTurnPlayer,
   MOVE_KIND,
   TICK_EVENT_KIND,
-} from "@dice/game-logic";
-import * as Paima from "@dice/middleware";
+} from "@cards/game-logic";
+import * as Paima from "@cards/middleware";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
 
@@ -29,7 +29,7 @@ interface CardGameProps {
   localDeck: LocalCard[];
 }
 
-const DiceGame: React.FC<CardGameProps> = ({
+const CardsGame: React.FC<CardGameProps> = ({
   lobbyState,
   refetchLobbyState,
   selectedNft,
@@ -74,12 +74,12 @@ const DiceGame: React.FC<CardGameProps> = ({
     const thisPlayer = display.matchState.players.find(
       (player) => player.nftId === selectedNft
     );
-    if (thisPlayer == null) throw new Error(`DiceGame: nft not in lobby`);
+    if (thisPlayer == null) throw new Error(`CardsGame: nft not in lobby`);
 
     const opponent = display.matchState.players.find(
       (player) => player.nftId !== selectedNft
     );
-    if (opponent == null) throw new Error(`DiceGame: opponent not in lobby`);
+    if (opponent == null) throw new Error(`CardsGame: opponent not in lobby`);
     return { thisPlayer, opponent };
   }, [selectedNft, display]);
 
@@ -444,4 +444,4 @@ const DiceGame: React.FC<CardGameProps> = ({
   );
 };
 
-export default DiceGame;
+export default CardsGame;

@@ -12,9 +12,9 @@ interface LogoProps {
 const Logo: React.FC<LogoProps> = ({ width, height, mainMenu = false }) => {
   return (
     <img
-      className={clsx("dice-logo", mainMenu && "dice-logo--main")}
+      className={clsx("cards-logo", mainMenu && "cards-logo--main")}
       src={logo}
-      alt="Paima Dice"
+      alt="Paima Cards"
       width={width}
       height={height}
     />

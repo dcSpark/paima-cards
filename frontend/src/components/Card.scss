@@ -5,7 +5,6 @@
   
     border-radius: 8px;
   
-    /* Note: backdrop-filter doesn't work nicely with our Chessboard library so it's not used during play */
     &--blurred {
       background: rgba(50, 52, 72, 0.3);
       backdrop-filter: blur(24px);

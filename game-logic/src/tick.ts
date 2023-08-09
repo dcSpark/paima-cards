@@ -13,7 +13,7 @@ import type {
 } from './types';
 import { CARD_REGISTRY, MOVE_KIND, TICK_EVENT_KIND } from './constants';
 import { deserializeMove, getNonTurnPlayer, getTurnPlayer, matchResults } from '.';
-import type { IGetRoundMovesResult } from '@dice/db';
+import type { IGetRoundMovesResult } from '@cards/db';
 import { genPostTxEvents } from './cards-logic';
 
 // TODO: variable number of players

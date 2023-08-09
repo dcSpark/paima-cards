@@ -1,6 +1,6 @@
-import type { MatchState, Move } from '@dice/game-logic';
-import { MOVE_KIND, applyEvent, genPostTxEvents, getTurnPlayer } from '@dice/game-logic';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import type { MatchState, Move } from '@cards/game-logic';
+import { MOVE_KIND, applyEvent, genPostTxEvents, getTurnPlayer } from '@cards/game-logic';
+import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
 import type Prando from 'paima-sdk/paima-prando';
 
 //

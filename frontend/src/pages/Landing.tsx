@@ -26,7 +26,7 @@ const LandingPage: React.FC = () => {
   return (
     <Container>
       <div className="landing-page">
-        <h1 className="title">Dice</h1>
+        <h1 className="title">Cards</h1>
         {/* <button onClick={logMiddleware}>i</button>
         <button onClick={statusMiddleware}>s</button>
         <button onClick={connectMiddleware}>c</button> */}

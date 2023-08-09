@@ -12,8 +12,8 @@ import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
-import type { CardDbId, Move } from '@dice/game-logic';
-import { serializeMove } from '@dice/game-logic';
+import type { CardDbId, Move } from '@cards/game-logic';
+import { serializeMove } from '@cards/game-logic';
 
 const RETRY_PERIOD = 1000;
 const RETRIES_COUNT = 8;

@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool } from '@dice/db';
+import { requirePool } from '@cards/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
 import type {
@@ -7,15 +7,15 @@ import type {
   IGetCardsByIdsResult,
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
-} from '@dice/db/src/select.queries.js';
+} from '@cards/db/src/select.queries.js';
 import {
   getBoughtPacks,
   getCardsByIds,
   getOwnedCards,
   getTradeNfts,
-} from '@dice/db/src/select.queries.js';
+} from '@cards/db/src/select.queries.js';
 import { getNftOwner, getOwnedNfts } from 'paima-sdk/paima-utils-backend';
-import { NFT_NAME, TRADE_NFT_NAME } from '@dice/utils';
+import { NFT_NAME, CARD_TRADE_NFT_NAME } from '@cards/utils';
 
 interface GetCardsResponse {
   cards: IGetOwnedCardsResult[];
@@ -69,7 +69,7 @@ export class UserController extends Controller {
       throw new Error(`getTradeNfts: no owner`);
     }
 
-    const tradeNftIds = await getOwnedNfts(dbConn, TRADE_NFT_NAME, ownerAddress);
+    const tradeNftIds = await getOwnedNfts(dbConn, CARD_TRADE_NFT_NAME, ownerAddress);
     const tradeNfts =
       tradeNftIds.length === 0
         ? []

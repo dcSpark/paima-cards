@@ -1,4 +1,4 @@
-import type { IGetLobbyByIdResult } from '@dice/db';
+import type { IGetLobbyByIdResult } from '@cards/db';
 import type { LobbyWithStateProps } from './types';
 
 // Type inference is set up wrong. It can infer that individual properties are not null

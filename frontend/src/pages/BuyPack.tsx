@@ -1,5 +1,5 @@
-import type { IGetBoughtPacksResult } from "@dice/db/build/select.queries";
-import type { CardRegistryId } from "@dice/game-logic";
+import type { IGetBoughtPacksResult } from "@cards/db/build/select.queries";
+import type { CardRegistryId } from "@cards/game-logic";
 import { LoadingButton } from "@mui/lab";
 import { Box } from "@mui/material";
 import { useGlobalStateContext } from "@src/GlobalStateContext";

@@ -6,7 +6,7 @@ import type {
   CardCommitmentIndex,
   LobbyPlayer,
   LocalCard,
-} from "@dice/game-logic";
+} from "@cards/game-logic";
 import type { UseStateResponse } from "@src/utils";
 import Button from "@src/components/Button";
 

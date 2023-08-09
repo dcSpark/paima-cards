@@ -1,12 +1,12 @@
 import type { SubmittedMovesInput } from '../types.js';
-import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@dice/db';
-import { newRound, executedRound, updateLobbyPlayer } from '@dice/db';
+import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@cards/db';
+import { newRound, executedRound, updateLobbyPlayer } from '@cards/db';
 import type {
   LobbyPlayer,
   MatchEnvironment,
   LobbyWithStateProps,
   MatchState,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import {
   INITIAL_HIT_POINTS,
   genPermutation,
@@ -14,7 +14,7 @@ import {
   serializeBoardCard,
   serializeHandCard,
   serializeMove,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
@@ -22,20 +22,20 @@ import {
   updateLobbyCurrentRound,
   updateLobbyMatchState,
   updateLobbyState,
-} from '@dice/db/src/update.queries.js';
+} from '@cards/db/src/update.queries.js';
 import type {
   IUpdateLobbyCurrentMatchParams,
   IUpdateLobbyCurrentRoundParams,
   IUpdateLobbyMatchStateParams,
   IUpdateLobbyStateParams,
-} from '@dice/db/src/update.queries.js';
-import type { INewMatchParams, INewMoveParams } from '@dice/db/src/insert.queries.js';
-import { newMatch, newMove } from '@dice/db/src/insert.queries.js';
-import type { IGetRoundResult } from '@dice/db/src/select.queries.js';
+} from '@cards/db/src/update.queries.js';
+import type { INewMatchParams, INewMoveParams } from '@cards/db/src/insert.queries.js';
+import { newMatch, newMove } from '@cards/db/src/insert.queries.js';
+import type { IGetRoundResult } from '@cards/db/src/select.queries.js';
 import type Prando from 'paima-sdk/paima-prando';
 import { schedulePracticeMove } from './practice.js';
 import { scheduleStatsUpdate } from './stats.js';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
 
 export function persistStartMatch(
   lobbyId: string,

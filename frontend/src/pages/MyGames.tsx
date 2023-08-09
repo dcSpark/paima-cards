@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@mui/material";
 import type MainController from "@src/MainController";
-import type { LobbyStatus } from "@dice/game-logic";
+import type { LobbyStatus } from "@cards/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -18,7 +18,7 @@ import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
-import type { IGetPaginatedUserLobbiesResult } from "@dice/db";
+import type { IGetPaginatedUserLobbiesResult } from "@cards/db";
 
 type Column = {
   id: keyof IGetPaginatedUserLobbiesResult | "action";

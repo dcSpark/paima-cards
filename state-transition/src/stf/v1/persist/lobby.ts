@@ -1,20 +1,20 @@
 import type { CreatedLobbyInput } from '../types.js';
-import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
-import { createLobby, updateLobbyState } from '@dice/db';
+import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@cards/db';
+import { createLobby, updateLobbyState } from '@cards/db';
 import Prando from 'paima-sdk/paima-prando';
-import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@dice/game-logic';
+import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@cards/game-logic';
 import {
   INITIAL_HIT_POINTS,
   genBotDeck,
   genCommitments,
   initialCurrentDeck,
   serializeLocalCard,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import type { IJoinPlayerToLobbyParams } from '@dice/db/src/insert.queries.js';
-import { joinPlayerToLobby } from '@dice/db/src/insert.queries.js';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import type { IJoinPlayerToLobbyParams } from '@cards/db/src/insert.queries.js';
+import { joinPlayerToLobby } from '@cards/db/src/insert.queries.js';
+import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
 import crypto from 'crypto';
 
 // Persist creation of a lobby

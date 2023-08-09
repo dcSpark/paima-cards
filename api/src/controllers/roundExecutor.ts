@@ -1,10 +1,10 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
+import { requirePool, getLobbyById, getRoundMoves } from '@cards/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
-import type { RoundExecutorBackendData } from '@dice/game-logic';
+import type { RoundExecutorBackendData } from '@cards/game-logic';
 import { getBlockHeight } from 'paima-sdk/paima-db';
-import { getMatch, getRound } from '@dice/db/src/select.queries.js';
+import { getMatch, getRound } from '@cards/db/src/select.queries.js';
 
 type Response = RoundExecutorBackendData | Error;
 

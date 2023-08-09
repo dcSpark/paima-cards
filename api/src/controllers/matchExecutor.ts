@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice/db';
+import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@cards/db';
 import {
   deserializeBoardCard,
   deserializeHandCard,
@@ -7,10 +7,10 @@ import {
   isLobbyWithStateProps,
   type LobbyPlayer,
   type MatchExecutorData,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
-import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';
+import { getMatch, getMatchMoves } from '@cards/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 type Response = MatchExecutorData | null;

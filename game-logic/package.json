@@ -1,5 +1,5 @@
 {
-  "name": "@dice/game-logic",
+  "name": "@cards/game-logic",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",
@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chess.js": "^1.0.0-beta.3",
     "crypto-random-string": "^5.0.0",
     "utility-types": "3.10.0"
   }

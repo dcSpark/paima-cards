@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 export const CHAIN_URI = process.env.CHAIN_URI as string;
 export const NATIVE_PROXY = process.env.NATIVE_PROXY as string;
 export const NFT = process.env.NFT as string;
@@ -5,6 +7,15 @@ export const CARD_TRADE_NATIVE_PROXY = process.env
   .CARD_TRADE_NATIVE_PROXY as string;
 export const CARD_TRADE_NFT = process.env.CARD_TRADE_NFT as string;
 export const GENERIC_PAYMENT = process.env.GENERIC_PAYMENT as string;
+export const CHAIN_CURRENCY_DECIMALS = Number.parseInt(
+  process.env.CHAIN_CURRENCY_DECIMALS as string
+);
+const CARD_TRADE_NFT_PRICE_DEFAULT_DENOMINATION = BigNumber(
+  process.env.CARD_TRADE_NFT_PRICE_DEFAULT_DENOMINATION as string
+);
+export const CARD_PACK_PRICE = CARD_TRADE_NFT_PRICE_DEFAULT_DENOMINATION.times(
+  BigNumber(10).pow(CHAIN_CURRENCY_DECIMALS)
+);
 
 if (
   CHAIN_URI == null ||

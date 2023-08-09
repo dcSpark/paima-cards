@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getNewLobbiesByUserAndBlockHeight } from '@dice/db';
+import { requirePool, getNewLobbiesByUserAndBlockHeight } from '@cards/db';
 import { psqlNum } from '../validation.js';
 import { isLeft } from 'fp-ts/Either';
-import type { NewLobby } from '@dice/game-logic';
+import type { NewLobby } from '@cards/game-logic';
 
 interface Response {
   lobbies: NewLobby[];

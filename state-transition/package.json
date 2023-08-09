@@ -1,5 +1,5 @@
 {
-  "name": "@dice/state-transition",
+  "name": "@cards/state-transition",
   "version": "1.0.0",
   "description": "Module which includes all state transition logic.",
   "main": "build/index.js",
@@ -11,10 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@dice/db": "1.0.0",
-    "@dice/game-logic": "1.0.0",
-    "@dice/utils": "1.0.0",
-    "chess.js": "^1.0.0-beta.3",
+    "@cards/db": "1.0.0",
+    "@cards/game-logic": "1.0.0",
+    "@cards/utils": "1.0.0",
+    "bignumber.js": "9.1.1",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "node-fetch": "^3.2.4",

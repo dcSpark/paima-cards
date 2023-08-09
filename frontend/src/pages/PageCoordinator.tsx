@@ -10,7 +10,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./CardGame/Lobby";
-import type { IGetLobbyByIdResult } from "@dice/db";
+import type { IGetLobbyByIdResult } from "@cards/db";
 import BuyPack from "./BuyPack";
 import Collection from "./Collection";
 import TradeNfts from "./TradeNfts";
@@ -39,7 +39,7 @@ const PageCoordinator: React.FC = () => {
   }, [mainController, navigate]);
 
   return (
-    <div className="dice-app">
+    <div>
       <Routes>
         <Route path={Page.MainMenu} element={<MainMenu />} />
         <Route path={Page.OpenLobbies} element={<OpenLobbies />} />

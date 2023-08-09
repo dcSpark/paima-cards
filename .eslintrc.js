@@ -9,7 +9,7 @@ module.exports = {
   ],
   parserOptions: {
     project: ['./tsconfig.json', './*/tsconfig.json'],
-    tsconfigRootDir: './',
+    tsconfigRootDir: __dirname,
     ecmaVersion: 2019,
     sourceType: 'module',
   },

@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { requirePool, getUserStats } from '@dice/db';
-import type { UserStats } from '@dice/game-logic';
+import { requirePool, getUserStats } from '@cards/db';
+import type { UserStats } from '@cards/game-logic';
 
 interface Response {
   stats: UserStats;

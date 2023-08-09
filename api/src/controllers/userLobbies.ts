@@ -1,9 +1,9 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool } from '@dice/db';
+import { requirePool } from '@cards/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlNum } from '../validation.js';
-import { getAllPaginatedUserLobbies } from '@dice/db';
-import type { IGetAllPaginatedUserLobbiesResult } from '@dice/db/src/select.queries.js';
+import { getAllPaginatedUserLobbies } from '@cards/db';
+import type { IGetAllPaginatedUserLobbiesResult } from '@cards/db/src/select.queries.js';
 
 interface Response {
   lobbies: IGetAllPaginatedUserLobbiesResult[];

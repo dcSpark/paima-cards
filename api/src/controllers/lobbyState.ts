@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
+import { getLobbyById, getLobbyPlayers, requirePool } from '@cards/db';
 import {
   deserializeBoardCard,
   deserializeHandCard,
@@ -7,8 +7,8 @@ import {
   isLobbyWithStateProps,
   type LobbyPlayer,
   type LobbyState,
-} from '@dice/game-logic';
-import { getMatch, getRound } from '@dice/db/src/select.queries';
+} from '@cards/game-logic';
+import { getMatch, getRound } from '@cards/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {

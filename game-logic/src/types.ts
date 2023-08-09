@@ -5,9 +5,9 @@ import type {
   IGetLobbyByIdResult,
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
-} from '@dice/db';
-import type { IGetMatchMovesResult } from '@dice/db/build/select.queries';
-import type { PropertiesNonNullable } from '@dice/utils';
+} from '@cards/db';
+import type { IGetMatchMovesResult } from '@cards/db/build/select.queries';
+import type { PropertiesNonNullable } from '@cards/utils';
 
 export enum RoundKind {
   initial,

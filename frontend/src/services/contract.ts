@@ -7,6 +7,7 @@ import {
   GENERIC_PAYMENT,
   CARD_TRADE_NFT,
   CARD_TRADE_NATIVE_PROXY,
+  CARD_PACK_PRICE,
 } from "./constants";
 import { characterToNumberMap } from "./utils";
 import {
@@ -15,8 +16,7 @@ import {
   Nft__factory,
 } from "@src/typechain";
 import { BigNumber } from "bignumber.js";
-import { GENERIC_PAYMENT_MESSAGES } from "@dice/game-logic";
-import { CARD_PACK_PRICE } from "@dice/utils";
+import { GENERIC_PAYMENT_MESSAGES } from "@cards/game-logic";
 
 export type SignerProvider = Signer | providers.Provider;
 
@@ -105,7 +105,7 @@ export const buyCardPack = async (account: string) => {
     {
       gasPrice,
       gasLimit: 800000,
-      value: EthersBigNumber.from(CARD_PACK_PRICE),
+      value: EthersBigNumber.from(CARD_PACK_PRICE.toString()),
     }
   );
 

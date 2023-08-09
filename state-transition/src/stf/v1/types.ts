@@ -1,4 +1,4 @@
-import type { CardDbId, ConciseResult, SerializedMove } from '@dice/game-logic';
+import type { CardDbId, ConciseResult, SerializedMove } from '@cards/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInputRaw =
@@ -32,7 +32,7 @@ export interface InvalidInput {
 }
 
 export interface NftMintInput {
-  input: 'nftMint';
+  input: 'accountMint';
   tokenId: string;
   // contract address
   address: WalletAddress;

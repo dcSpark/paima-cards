@@ -1,4 +1,4 @@
-import { genCommitments, DECK_LENGTH } from "@dice/game-logic";
+import { genCommitments, DECK_LENGTH } from "@cards/game-logic";
 import type {
   CardDbId,
   CardRegistryId,
@@ -6,13 +6,13 @@ import type {
   MatchState,
   TickEvent,
   LobbyState,
-} from "@dice/game-logic";
-import * as Paima from "@dice/middleware";
+} from "@cards/game-logic";
+import * as Paima from "@cards/middleware";
 import type { MatchExecutor } from "paima-sdk/paima-executors";
 import type {
   IGetLobbyByIdResult,
   IGetPaginatedUserLobbiesResult,
-} from "@dice/db";
+} from "@cards/db";
 import LocalStorage from "./LocalStorage";
 
 // The MainController is a React component that will be used to control the state of the application

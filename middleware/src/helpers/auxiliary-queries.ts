@@ -5,8 +5,8 @@ import { buildEndpointErrorFxn } from '../errors';
 import type { NewLobbies, PackedLobbyRaw, PackedLobbyState } from '../types';
 import { userCreatedLobby, userJoinedLobby } from './utility-functions';
 import { backendQueryLobbyState, backendQueryUserLobbiesBlockheight } from './query-constructors';
-import type { LobbyState, NewLobby } from '@dice/game-logic';
-import type { IGetLobbyByIdResult } from '@dice/db';
+import type { LobbyState, NewLobby } from '@cards/game-logic';
+import type { IGetLobbyByIdResult } from '@cards/db';
 
 export async function auxGetLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRawLobbyState');

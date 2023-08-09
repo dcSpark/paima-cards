@@ -1,7 +1,7 @@
 {
-  "name": "@dice/middleware",
+  "name": "@cards/middleware",
   "version": "1.0.0",
-  "description": "Middleware for Dice game, to be imported into any frontend",
+  "description": "Middleware for the game, to be imported into any frontend",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "type": "module",
@@ -15,8 +15,8 @@
   "keywords": [],
   "author": "PaimaStudios",
   "dependencies": {
-    "@dice/game-logic": "1.0.0",
-    "@dice/utils": "1.0.0"
+    "@cards/game-logic": "1.0.0",
+    "@cards/utils": "1.0.0"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",

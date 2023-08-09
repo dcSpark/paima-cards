@@ -1,9 +1,9 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
+import { requirePool, getLobbyById, getRoundMoves } from '@cards/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
-import type { RoundStatusData } from '@dice/game-logic';
-import { getRound } from '@dice/db/src/select.queries.js';
+import type { RoundStatusData } from '@cards/game-logic';
+import { getRound } from '@cards/db/src/select.queries.js';
 
 type Response = RoundStatusData | Error;
 

@@ -11,17 +11,16 @@ import type MainController from "./MainController";
 import { AppContext } from "./main";
 import type { UseStateResponse } from "./utils";
 import type { WalletAddress } from "paima-sdk/paima-utils";
-import * as Paima from "@dice/middleware";
+import * as Paima from "@cards/middleware";
 import ConnectingModal from "./ConnectingModal";
-import { PaimaNotice, OasysNotice } from "./components/PaimaNotice";
-import { Box } from "@mui/material";
-import type { CardDbId, LocalCard } from "@dice/game-logic";
+import { PaimaNotice } from "./components/PaimaNotice";
+import type { CardDbId, LocalCard } from "@cards/game-logic";
 import type {
   IGetBoughtPacksResult,
   IGetCardsByIdsResult,
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
-} from "@dice/db/build/select.queries";
+} from "@cards/db/build/select.queries";
 import LocalStorage from "./LocalStorage";
 
 export const localDeckCache: Map<string, LocalCard[]> = new Map();
@@ -234,8 +233,6 @@ export function GlobalStateProvider({
       <ConnectingModal open={connectedWallet == null} />
       {children}
       <PaimaNotice />
-      <Box sx={{ marginRight: 1 }} />
-      <OasysNotice />
     </GlobalStateContext.Provider>
   );
 }

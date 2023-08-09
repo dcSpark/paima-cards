@@ -1,10 +1,10 @@
 import type { Pool } from 'pg';
 import Prando from 'paima-sdk/paima-prando';
 import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
-import type { IGetLobbyPlayersResult, IGetRoundMovesResult } from '@dice/db';
-import { getLobbyById, getUserStats, getLobbyPlayers, getOwnedNft } from '@dice/db';
-import type { INewCardParams, INewTradeNftParams } from '@dice/db/src/insert.queries.js';
-import { newCard, newTradeNft } from '@dice/db/src/insert.queries.js';
+import type { IGetLobbyPlayersResult, IGetRoundMovesResult } from '@cards/db';
+import { getLobbyById, getUserStats, getLobbyPlayers, getOwnedNft } from '@cards/db';
+import type { INewCardParams, INewTradeNftParams } from '@cards/db/src/insert.queries.js';
+import { newCard, newTradeNft } from '@cards/db/src/insert.queries.js';
 import type {
   LobbyWithStateProps,
   ConciseResult,
@@ -12,7 +12,7 @@ import type {
   MatchEnvironment,
   MatchState,
   Move,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import {
   initRoundExecutor,
   buildCurrentMatchState,
@@ -30,7 +30,7 @@ import {
   deserializeLocalCard,
   genCardPack,
   INITIAL_HIT_POINTS,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import {
   persistUpdateMatchState,
   persistLobbyState,
@@ -44,7 +44,7 @@ import {
   blankStats,
   persistStartMatch,
 } from './persist';
-import { isValidMove } from '@dice/game-logic';
+import { isValidMove } from '@cards/game-logic';
 import type {
   ClosedLobbyInput,
   CreatedLobbyInput,
@@ -59,29 +59,29 @@ import type {
   TransferTradeNftInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@cards/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
-import type { IGetRoundResult } from '@dice/db/src/select.queries';
+import type { IGetRoundResult } from '@cards/db/src/select.queries';
 import {
   checkOwnedCard,
   getMatch,
   getRound,
   getRoundMoves,
   getTradeNfts,
-} from '@dice/db/src/select.queries';
+} from '@cards/db/src/select.queries';
 import crypto from 'crypto';
-import { newCardPack, type INewCardPackParams } from '@dice/db/src/insert.queries';
+import { newCardPack, type INewCardPackParams } from '@cards/db/src/insert.queries';
 import type {
   IDeleteTradeNftParams,
   ISetTradeNftCardsParams,
   ITransferCardParams,
-} from '@dice/db/src/update.queries';
+} from '@cards/db/src/update.queries';
 import {
   deleteTradeNft,
   setTradeNftCards as setTradeNftCardsQuery,
   transferCard,
-} from '@dice/db/src/update.queries';
+} from '@cards/db/src/update.queries';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -114,7 +114,7 @@ export const cardPackBuy = async (
   dbConn: Pool,
   randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
-  if (input.amount < CARD_PACK_PRICE) {
+  if (CARD_PACK_PRICE.isGreaterThan(input.amount.toString())) {
     console.log('DISCARD: paid less than card pack price');
     return [];
   }
@@ -661,7 +661,6 @@ export function executeRound(
 ): { sqlUpdates: SQLUpdate[]; newMatchState: MatchState } {
   if (zombieRound) {
     // TODO: implement zombie round
-    // In blackjack dice, just move to next turn.
     throw new Error(`executeRound: not implemented`);
   }
 
@@ -707,9 +706,7 @@ export function executeRound(
 
 /**
  * We have to seed our own Prando, because we need to use randomness from
- * last round in the execution of current round.
- * Player throws dice, and then decides moves, i.e. dice throw has to be
- * decided before he decides and submits his moves.
+ * last round in the execution of current round (to calculate post-tx events).
  */
 async function fetchPrandoSeed(
   lobby: LobbyWithStateProps,

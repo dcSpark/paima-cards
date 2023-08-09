@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Lobby.scss";
 import { Typography } from "@mui/material";
-import type { LobbyState } from "@dice/game-logic";
+import type { LobbyState } from "@cards/game-logic";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import CardGame from "./CardGame";
-import type { IGetLobbyByIdResult } from "@dice/db";
-import * as Paima from "@dice/middleware";
+import type { IGetLobbyByIdResult } from "@cards/db";
+import * as Paima from "@cards/middleware";
 import LocalStorage from "@src/LocalStorage";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 

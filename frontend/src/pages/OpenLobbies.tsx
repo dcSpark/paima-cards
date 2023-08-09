@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import type MainController from "@src/MainController";
-import type { LobbyState } from "@dice/game-logic";
+import type { LobbyState } from "@cards/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";

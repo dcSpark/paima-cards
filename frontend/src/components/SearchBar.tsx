@@ -1,8 +1,7 @@
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
-import { IconButton } from "@mui/material";
+import { IconButton, InputBase } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 // inspired by https://mui.com/material-ui/react-app-bar/#app-bar-with-search-field
@@ -79,7 +78,7 @@ const SearchBar: React.FC<SearchAppBarProps> = ({
           value={value}
           placeholder="Search…"
           inputProps={{ "aria-label": "search" }}
-          onChange={(e) => onSearch(e.target.value)}
+          onChange={(e: any) => onSearch(e.target.value)}
         />
       </Search>
     </>

@@ -33,6 +33,7 @@ module.exports = [
           "CARD_TRADE_NATIVE_PROXY",
           "CARD_TRADE_NFT",
           "GENERIC_PAYMENT",
+          "CARD_TRADE_NFT_PRICE_DEFAULT_DENOMINATION",
         ].map((key) => [key, process.env[key]])
       )
     ),

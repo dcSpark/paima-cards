@@ -8,14 +8,14 @@ import {
   initRoundExecutor,
   initialCurrentDeck,
   processTick,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import {
   type MatchExecutorData,
   type RoundExecutorData,
   type MatchState,
   type TickEvent,
   genPermutation,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 
 export function buildRoundExecutor(data: RoundExecutorData): RoundExecutor<MatchState, TickEvent> {
   const seed = data.seed;

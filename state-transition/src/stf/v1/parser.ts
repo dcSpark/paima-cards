@@ -11,14 +11,15 @@ import type {
   PracticeMovesInput,
   SetTradeNftCardsInput,
   SubmittedMovesInput,
+  TradeNftMintInput,
   TransferTradeNftInput,
   UserStats,
   ZombieRound,
 } from './types';
-import { SAFE_NUMBER } from '@dice/utils';
+import { SAFE_NUMBER } from '@cards/utils';
 
 const myGrammar = `
-nftMint             = nftmint|address|tokenId
+accountMint         = accMint|address|tokenId
 tradeNftMint        = tradeMint|address|tokenId
 createdLobby        = c|creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID|commitments
@@ -30,11 +31,11 @@ userScheduledData   = u|*user|result
 setTradeNftCards    = t|tradeNftId|cards
 `;
 
-const nftMint: ParserRecord<NftMintInput> = {
+const accountMint: ParserRecord<NftMintInput> = {
   address: PaimaParser.WalletAddress(),
   tokenId: PaimaParser.NumberParser(),
 };
-const tradeNftMint: ParserRecord<NftMintInput> = {
+const tradeNftMint: ParserRecord<TradeNftMintInput> = {
   address: PaimaParser.WalletAddress(),
   tokenId: PaimaParser.NumberParser(),
 };
@@ -86,7 +87,7 @@ const setTradeNftCards: ParserRecord<SetTradeNftCardsInput> = {
 };
 
 const parserCommands: Record<string, ParserRecord<ParsedSubmittedInputRaw>> = {
-  nftMint,
+  accountMint,
   tradeNftMint,
   createdLobby,
   joinedLobby,

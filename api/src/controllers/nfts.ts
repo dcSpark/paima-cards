@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { getOwnedNft, requirePool } from '@dice/db';
-import { NFT_NAME } from '@dice/utils';
+import { getOwnedNft, requirePool } from '@cards/db';
+import { NFT_NAME } from '@cards/utils';
 
 interface Response {
   nft: undefined | number;

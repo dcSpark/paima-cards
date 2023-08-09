@@ -6,8 +6,8 @@ import type {
   LobbyStatus,
   NewLobby,
   UserStats,
-} from '@dice/game-logic';
-import type { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from '@dice/db';
+} from '@cards/game-logic';
+import type { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from '@cards/db';
 
 export interface RoundEnd {
   blocks: number;

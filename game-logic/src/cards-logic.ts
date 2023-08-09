@@ -1,4 +1,4 @@
-import type { IGetLobbyPlayersResult } from '@dice/db';
+import type { IGetLobbyPlayersResult } from '@cards/db';
 import type {
   CardDbId,
   CardDraw,
