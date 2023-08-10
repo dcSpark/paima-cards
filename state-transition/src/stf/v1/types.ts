@@ -66,8 +66,7 @@ export interface CreatedLobbyInput {
   creatorNftId: number;
   creatorCommitments: Uint8Array;
   numOfRounds: number;
-  roundLength: number;
-  playTimePerPlayer: number;
+  turnLength: number;
   isHidden: boolean;
   isPractice: boolean;
 }

@@ -33,8 +33,7 @@ export async function persistLobbyCreation(
     // note: can be adjusted, but we don't have frontend for more
     max_players: 2,
     num_of_rounds: inputData.numOfRounds,
-    round_length: inputData.roundLength,
-    play_time_per_player: inputData.playTimePerPlayer,
+    turn_length: inputData.turnLength,
     created_at: new Date(),
     creation_block_height: blockHeight,
     hidden: inputData.isHidden,
@@ -117,7 +116,6 @@ export async function persistLobbyCreation(
           matchEnvironment,
           lobbyPlayers,
           null,
-          lobbyParams.round_length,
           blockHeight,
           randomnessGenerator
         );

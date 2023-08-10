@@ -9,11 +9,6 @@ import type {
 import type { IGetMatchMovesResult } from '@cards/db/build/select.queries';
 import type { PropertiesNonNullable } from '@cards/utils';
 
-export enum RoundKind {
-  initial,
-  extra,
-}
-
 export type CardDraw = {
   card: undefined | HandCard;
   newDeck: CardCommitmentIndex[];
@@ -63,7 +58,6 @@ export type TickEvent =
   | RoundEndTickEvent
   | MatchEndTickEvent;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface MatchEnvironment {
   practice: boolean;
   numberOfRounds: number;
@@ -84,14 +78,8 @@ export interface MatchState {
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 
 export type ConciseResult = 'w' | 't' | 'l';
-export type ExpandedResult = 'win' | 'tie' | 'loss';
 
 export type MatchResult = ConciseResult[];
-
-export interface MatchWinnerResponse {
-  match_status?: LobbyStatus;
-  winner_nft_id?: undefined | number;
-}
 
 export interface RoundExecutorBackendData {
   lobby: IGetLobbyByIdResult;

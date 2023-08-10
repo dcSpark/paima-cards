@@ -17,8 +17,6 @@ import { RandomActiveLobbyController } from './../controllers/randomActiveLobby'
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { RoundExecutorController } from './../controllers/roundExecutor';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { RoundStatusController } from './../controllers/roundStatus';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SearchOpenLobbiesController } from './../controllers/searchOpenLobbies';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserController } from './../controllers/user';
@@ -55,9 +53,8 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "max_players": {"dataType":"double","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
-            "play_time_per_player": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
-            "round_length": {"dataType":"double","required":true},
+            "turn_length": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -86,9 +83,8 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "max_players": {"dataType":"double","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
-            "play_time_per_player": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
-            "round_length": {"dataType":"double","required":true},
+            "turn_length": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -117,9 +113,8 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "max_players": {"dataType":"double","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
-            "play_time_per_player": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
-            "round_length": {"dataType":"double","required":true},
+            "turn_length": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -148,9 +143,8 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "max_players": {"dataType":"double","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
-            "play_time_per_player": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
-            "round_length": {"dataType":"double","required":true},
+            "turn_length": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -171,9 +165,8 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "max_players": {"dataType":"double","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
-            "play_time_per_player": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
-            "round_length": {"dataType":"double","required":true},
+            "turn_length": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -430,33 +423,6 @@ export function RegisterRoutes(app: express.Router) {
                 validatedArgs = getValidatedArgs(args, request, response);
 
                 const controller = new RoundExecutorController();
-
-
-              const promise = controller.get.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/round_status',
-            ...(fetchMiddlewares<RequestHandler>(RoundStatusController)),
-            ...(fetchMiddlewares<RequestHandler>(RoundStatusController.prototype.get)),
-
-            function RoundStatusController_get(request: any, response: any, next: any) {
-            const args = {
-                    lobbyID: {"in":"query","name":"lobbyID","required":true,"dataType":"string"},
-                    matchWithinLobby: {"in":"query","name":"matchWithinLobby","required":true,"dataType":"double"},
-                    roundWithinMatch: {"in":"query","name":"roundWithinMatch","required":true,"dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new RoundStatusController();
 
 
               const promise = controller.get.apply(controller, validatedArgs as any);

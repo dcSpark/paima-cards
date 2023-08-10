@@ -237,7 +237,6 @@ export const joinedLobby = async (
         matchEnvironment,
         lobbyPlayers,
         lobby.current_match,
-        lobby.round_length,
         blockHeight,
         randomnessGenerator
       )
@@ -671,7 +670,6 @@ export function executeRound(
     lobby.lobby_id,
     lobby.current_match,
     lobby.current_round + 1,
-    lobby.round_length,
     blockHeight
   );
 

@@ -15,7 +15,6 @@ import {
   serializeHandCard,
   serializeMove,
 } from '@cards/game-logic';
-import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
   updateLobbyCurrentMatch,
@@ -42,7 +41,6 @@ export function persistStartMatch(
   matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   current_match: null | number,
-  roundLength: number,
   blockHeight: number,
   randomnessGenerator: Prando
 ): SQLUpdate[] {
@@ -59,7 +57,6 @@ export function persistStartMatch(
     matchEnvironment,
     players,
     matchWithinLobby,
-    roundLength,
     blockHeight,
     randomnessGenerator
   );
@@ -71,7 +68,6 @@ export function persistInitialMatchState(
   matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   matchWithinLobby: number,
-  roundLength: number,
   blockHeight: number,
   randomnessGenerator: Prando
 ): SQLUpdate[] {
@@ -114,7 +110,7 @@ export function persistInitialMatchState(
     blockHeight
   );
 
-  const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, roundLength, blockHeight);
+  const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, blockHeight);
 
   // If a bot goes first, schedule a bot move
   const botMoves = (() => {
@@ -146,7 +142,6 @@ export function persistNewRound(
   lobbyId: string,
   matchWithinLobby: number,
   roundWithinMatch: number,
-  roundLength: number,
   blockHeight: number
 ): SQLUpdate[] {
   // Creation of the next round
@@ -167,11 +162,12 @@ export function persistNewRound(
     [updateLobbyCurrentRound, updateCurrentRoundParams],
   ];
 
+  // TODO: Disabled at the moment. This comes from a point where a round was equivalent to a player's turn.
   // Scheduling of the zombie round execution in the future
-  const zombie_block_height = blockHeight + roundLength;
-  const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
+  // const zombie_block_height = blockHeight + roundLength;
+  // const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
 
-  return [...newRoundTuple, ...updateCurrentRoundTuple /* , zombieRoundUpdate TODO */];
+  return [...newRoundTuple, ...updateCurrentRoundTuple];
 }
 
 // Persist moves sent by player to an active match
@@ -212,8 +208,8 @@ export function persistExecutedRound(
 
   // TODO: zombie rounds are disabled ATM
   // We remove the scheduled zombie round input
-  // if (lobby.round_length) {
-  //   const block_height = roundData.starting_block_height + lobby.round_length;
+  // if (lobby.turn_length) {
+  //   const block_height = roundData.starting_block_height + lobby.turn_length;
   //   return [executedRoundTuple, deleteZombieRound(lobby.lobby_id, block_height)];
   // }
   return [executedRoundTuple];

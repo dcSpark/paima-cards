@@ -1,10 +1,9 @@
 import type { FailedResult, Result } from 'paima-sdk/paima-mw-core';
-import { PaimaMiddlewareErrorCode, getBlockNumber } from 'paima-sdk/paima-mw-core';
+import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
 import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 
 import type {
   MatchExecutorData,
-  RoundStatusData,
   UserStats,
   LobbyState,
   RoundExecutorBackendData,
@@ -14,14 +13,12 @@ import type {
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { auxGetLobbyRaw, auxGetLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
-import { calculateRoundEnd } from '../helpers/utility-functions';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import {
   backendQueryMatchExecutor,
   backendQueryNftsForWallet,
   backendQueryOpenLobbies,
   backendQueryRoundExecutor,
-  backendQueryRoundStatus,
   backendQuerySearchLobby,
   backendQueryUserCards,
   backendQueryUserLobbies,
@@ -34,7 +31,6 @@ import type {
   NewLobbies,
   PackedLobbyRaw,
   PackedLobbyState,
-  PackedRoundExecutionState,
   PackedUserLobbies,
   PackedUserStats,
 } from '../types';
@@ -122,42 +118,6 @@ async function getLobbySearch(
     return {
       success: true,
       lobbies: j.lobbies,
-    };
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
-  }
-}
-
-async function getRoundExecutionState(
-  lobbyID: string,
-  matchWithinLobby: number,
-  roundWithinMatch: number
-): Promise<PackedRoundExecutionState | FailedResult> {
-  const errorFxn = buildEndpointErrorFxn('getRoundExecutionState');
-
-  let res: Response;
-  let latestBlockHeight: number;
-
-  try {
-    const query = backendQueryRoundStatus(lobbyID, matchWithinLobby, roundWithinMatch);
-    [res, latestBlockHeight] = await Promise.all([fetch(query), getBlockNumber()]);
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
-  }
-
-  try {
-    const roundStatus = (await res.json()) as RoundStatusData;
-
-    const { roundStarted: start, roundLength: length } = roundStatus;
-    const end = calculateRoundEnd(start, length, latestBlockHeight);
-    return {
-      success: true,
-      round: {
-        executed: roundStatus.executed,
-        usersWhoSubmittedMoves: roundStatus.usersWhoSubmittedMoves,
-        roundEndsInBlocks: end.blocks,
-        roundEndsInSeconds: end.seconds,
-      },
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -424,7 +384,6 @@ export const queryEndpoints = {
   getLobbyRaw,
   getLobbyState,
   getLobbySearch,
-  getRoundExecutionState,
   getOpenLobbies,
   getUserLobbiesMatches,
   getNewLobbies,

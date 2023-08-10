@@ -30,7 +30,7 @@ ${pref(PARSER_KEYS.accountMint)}address|tokenId
 ${pref(PARSER_KEYS.tradeNftMint)}address|tokenId
 ${pref(
   PARSER_KEYS.createdLobby
-)}creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
+)}creatorNftId|creatorCommitments|numOfRounds|turnLength|isHidden?|isPractice?
 ${pref(PARSER_KEYS.joinedLobby)}nftId|*lobbyID|commitments
 ${pref(PARSER_KEYS.closedLobby)}*lobbyID
 ${pref(PARSER_KEYS.submittedMoves)}nftId|*lobbyID|matchWithinLobby|roundWithinMatch|move
@@ -52,8 +52,7 @@ const createdLobby: ParserRecord<CreatedLobbyInput> = {
   creatorNftId: PaimaParser.NumberParser(),
   creatorCommitments: PaimaParser.NCharsParser(0, 1000),
   numOfRounds: PaimaParser.NumberParser(0, 1000),
-  roundLength: PaimaParser.DefaultRoundLength(),
-  playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
+  turnLength: PaimaParser.NumberParser(1, 10000),
   isHidden: PaimaParser.TrueFalseParser(false),
   isPractice: PaimaParser.TrueFalseParser(false),
 };

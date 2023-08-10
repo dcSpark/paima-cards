@@ -18,8 +18,7 @@ const CreateLobby: React.FC = () => {
   } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("5");
-  const [roundLength, setRoundLength] = useState("100");
-  const [playersTime, setPlayersTime] = useState("100");
+  const [turnLength, setTurnLength] = useState("100");
   const [isHidden, setIsHidden] = useState(false);
   const [isPractice, setIsPractice] = useState(false);
 
@@ -32,8 +31,7 @@ const CreateLobby: React.FC = () => {
       return;
 
     const numberOfRoundsNum = parseInt(numberOfRounds);
-    const roundLengthNum = parseInt(roundLength);
-    const playersTimeNum = parseInt(playersTime);
+    const turnLengthNum = parseInt(turnLength);
 
     await mainController.createLobby(
       selectedNft.nft,
@@ -46,8 +44,7 @@ const CreateLobby: React.FC = () => {
         };
       }),
       numberOfRoundsNum,
-      roundLengthNum,
-      playersTimeNum,
+      turnLengthNum,
       isHidden,
       isPractice
     );
@@ -66,16 +63,11 @@ const CreateLobby: React.FC = () => {
                 onChange={setNumberOfRounds}
               />
               {
-                // TODO: disabled - need to be properly implemented on the backend:
+                // TODO: disabled - time limit (zombie round) needs to be properly implemented on the backend
                 /* <NumericField
                 label="Player's Time"
-                value={playersTime}
-                onChange={setPlayersTime}
-              />
-              <NumericField
-                label="Round Length"
-                value={roundLength}
-                onChange={setRoundLength}
+                value={turnLength}
+                onChange={setTurnLength}
               /> */
               }
             </Box>

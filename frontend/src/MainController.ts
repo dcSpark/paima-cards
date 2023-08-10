@@ -134,7 +134,6 @@ class MainController {
     creatorNftId: number,
     creatorDeck: { id: CardDbId; registryId: CardRegistryId }[],
     numOfRounds: number,
-    roundLength: number,
     timePerPlayer: number,
     isHidden = false,
     isPractice = false
@@ -146,7 +145,6 @@ class MainController {
       creatorNftId,
       creatorDeck,
       numOfRounds,
-      roundLength,
       timePerPlayer,
       isHidden,
       isPractice
@@ -171,7 +169,6 @@ class MainController {
       creatorNftId,
       commitments.commitments,
       numOfRounds,
-      roundLength,
       timePerPlayer,
       isHidden,
       isPractice

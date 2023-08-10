@@ -34,8 +34,7 @@ async function createLobby(
   creatorNftId: number,
   commitments: Uint8Array,
   numberOfRounds: number,
-  roundLength: number,
-  playTimePerPlayer: number,
+  turnLength: number,
   isHidden = false,
   isPractice = false
 ): Promise<CreateLobbySuccessfulResponse | FailedResult> {
@@ -47,8 +46,7 @@ async function createLobby(
     { value: creatorNftId.toString(10) },
     { value: Buffer.from(commitments).toString('base64') },
     { value: numberOfRounds.toString(10) },
-    { value: roundLength.toString(10) },
-    { value: playTimePerPlayer.toString(10) },
+    { value: turnLength.toString(10) },
     { value: isHidden ? 'T' : '' },
     { value: isPractice ? 'T' : '' },
   ]);
