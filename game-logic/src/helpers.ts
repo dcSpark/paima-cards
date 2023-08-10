@@ -5,13 +5,12 @@ import type {
   CardRegistryId,
   HandCard,
   LocalCard,
-  Move,
   SerializedBoardCard,
   SerializedHandCard,
   SerializedLocalCard,
-  SerializedMove,
 } from './types';
 import { CARD_IDS, DECK_LENGTH, MOVE_KIND, PACK_LENGTH } from './constants';
+import type { Move, SerializedMove } from './types/move';
 
 /**
  * Generate Fisher-Yates shuffle of range 0 to size.
