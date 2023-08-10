@@ -1,3 +1,4 @@
+import { PARSER_KEYS, PARSER_PREFIXES } from '@cards/game-logic';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData, deleteScheduledData } from 'paima-sdk/paima-db';
 
@@ -13,5 +14,5 @@ export function deleteZombieRound(lobbyId: string, block_height: number): SQLUpd
 
 // Create the zombie round input
 function createZombieInput(lobbyId: string): string {
-  return `z|*${lobbyId}`;
+  return `${PARSER_PREFIXES[PARSER_KEYS.zombieScheduledData]}|*${lobbyId}`;
 }

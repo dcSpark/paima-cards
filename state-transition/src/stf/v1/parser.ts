@@ -13,22 +13,31 @@ import type {
   SubmittedMovesInput,
   TradeNftMintInput,
   TransferTradeNftInput,
-  UserStats,
-  ZombieRound,
+  UserStatsInput,
+  ZombieRoundInput,
 } from './types';
 import { SAFE_NUMBER } from '@cards/utils';
+import { PARSER_KEYS, PARSER_PREFIXES } from '@cards/game-logic';
+import type { ValuesType } from 'utility-types';
+
+/** Grammar entry prefix */
+function pref(key: ValuesType<typeof PARSER_KEYS>): string {
+  return `${key} = ${PARSER_PREFIXES[key]}|`;
+}
 
 const myGrammar = `
-accountMint         = accMint|address|tokenId
-tradeNftMint        = tradeMint|address|tokenId
-createdLobby        = c|creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
-joinedLobby         = j|nftId|*lobbyID|commitments
-closedLobby         = cs|*lobbyID
-submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|move
-practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
-zombieScheduledData = z|*lobbyID
-userScheduledData   = u|*user|result
-setTradeNftCards    = t|tradeNftId|cards
+${pref(PARSER_KEYS.accountMint)}address|tokenId
+${pref(PARSER_KEYS.tradeNftMint)}address|tokenId
+${pref(
+  PARSER_KEYS.createdLobby
+)}creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
+${pref(PARSER_KEYS.joinedLobby)}nftId|*lobbyID|commitments
+${pref(PARSER_KEYS.closedLobby)}*lobbyID
+${pref(PARSER_KEYS.submittedMoves)}nftId|*lobbyID|matchWithinLobby|roundWithinMatch|move
+${pref(PARSER_KEYS.practiceMoves)}*lobbyID|matchWithinLobby|roundWithinMatch
+${pref(PARSER_KEYS.zombieScheduledData)}*lobbyID
+${pref(PARSER_KEYS.userScheduledData)}*user|result
+${pref(PARSER_KEYS.setTradeNftCards)}tradeNftId|cards
 `;
 
 const accountMint: ParserRecord<NftMintInput> = {
@@ -68,14 +77,10 @@ const practiceMoves: ParserRecord<PracticeMovesInput> = {
   matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
   roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
 };
-const zombieScheduledData: ParserRecord<ZombieRound> = {
-  renameCommand: 'scheduledData',
-  effect: 'zombie',
+const zombieScheduledData: ParserRecord<ZombieRoundInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
 };
-const userScheduledData: ParserRecord<UserStats> = {
-  renameCommand: 'scheduledData',
-  effect: 'stats',
+const userScheduledData: ParserRecord<UserStatsInput> = {
   nftId: PaimaParser.NumberParser(),
   result: PaimaParser.RegexParser(/^[w|t|l]$/),
 };
@@ -86,17 +91,19 @@ const setTradeNftCards: ParserRecord<SetTradeNftCardsInput> = {
   }),
 };
 
-const parserCommands: Record<string, ParserRecord<ParsedSubmittedInputRaw>> = {
-  accountMint,
-  tradeNftMint,
-  createdLobby,
-  joinedLobby,
-  closedLobby,
-  submittedMoves,
-  practiceMoves,
-  zombieScheduledData,
-  userScheduledData,
-  setTradeNftCards,
+const parserCommands: Partial<
+  Record<ValuesType<typeof PARSER_KEYS>, ParserRecord<ParsedSubmittedInputRaw>>
+> = {
+  [PARSER_KEYS.accountMint]: accountMint,
+  [PARSER_KEYS.tradeNftMint]: tradeNftMint,
+  [PARSER_KEYS.createdLobby]: createdLobby,
+  [PARSER_KEYS.joinedLobby]: joinedLobby,
+  [PARSER_KEYS.closedLobby]: closedLobby,
+  [PARSER_KEYS.submittedMoves]: submittedMoves,
+  [PARSER_KEYS.practiceMoves]: practiceMoves,
+  [PARSER_KEYS.zombieScheduledData]: zombieScheduledData,
+  [PARSER_KEYS.userScheduledData]: userScheduledData,
+  [PARSER_KEYS.setTradeNftCards]: setTradeNftCards,
 };
 
 /**
@@ -108,12 +115,16 @@ function manualParse(input: string): undefined | GenericPaymentInput | TransferT
 
   if (parts.length !== 2) return;
 
-  if (!['generic', 'tradeTransfer'].includes(parts[0])) return;
+  const manuallyParsedPrefixes: string[] = [
+    PARSER_PREFIXES[PARSER_KEYS.genericPayment],
+    PARSER_PREFIXES[PARSER_KEYS.transferTradeNft],
+  ];
+  if (!manuallyParsedPrefixes.includes(parts[0])) return;
 
   try {
     const parsed = JSON.parse(parts[1]);
 
-    if (parts[0] === 'generic') {
+    if (parts[0] === PARSER_PREFIXES[PARSER_KEYS.genericPayment]) {
       if (
         !Object.hasOwn(parsed, 'message') ||
         !Object.hasOwn(parsed, 'payer') ||
@@ -127,14 +138,14 @@ function manualParse(input: string): undefined | GenericPaymentInput | TransferT
       const amount = BigInt(parsed.amount);
 
       return {
-        input: 'genericPayment',
+        input: PARSER_KEYS.genericPayment,
         message: parsed.message,
         payer: parsed.payer,
         amount,
       };
     }
 
-    if (parts[0] === 'tradeTransfer') {
+    if (parts[0] === PARSER_PREFIXES[PARSER_KEYS.transferTradeNft]) {
       if (
         !Object.hasOwn(parsed, 'from') ||
         !Object.hasOwn(parsed, 'to') ||
@@ -148,7 +159,7 @@ function manualParse(input: string): undefined | GenericPaymentInput | TransferT
       const tradeNftId = Number.parseInt(parsed.tokenId);
 
       return {
-        input: 'transferTradeNft',
+        input: PARSER_KEYS.transferTradeNft,
         from: parsed.from,
         to: parsed.to,
         tradeNftId,
@@ -167,7 +178,7 @@ function parse(s: string): ParsedSubmittedInput {
 
   try {
     const parsed = myParser.start(s);
-    if (parsed.command === 'createdLobby') {
+    if (parsed.command === PARSER_KEYS.createdLobby) {
       const { creatorCommitments, ...rest } = parsed.args;
       return {
         input: parsed.command,
@@ -176,7 +187,7 @@ function parse(s: string): ParsedSubmittedInput {
       };
     }
 
-    if (parsed.command === 'joinedLobby') {
+    if (parsed.command === PARSER_KEYS.joinedLobby) {
       const { commitments, ...rest } = parsed.args;
 
       return {

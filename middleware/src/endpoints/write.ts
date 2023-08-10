@@ -13,7 +13,7 @@ import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxilia
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
 import type { CardDbId, Move } from '@cards/game-logic';
-import { serializeMove } from '@cards/game-logic';
+import { PARSER_PREFIXES, serializeMove } from '@cards/game-logic';
 
 const RETRY_PERIOD = 1000;
 const RETRIES_COUNT = 8;
@@ -42,7 +42,7 @@ async function createLobby(
   const errorFxn = buildEndpointErrorFxn('createLobby');
 
   const conciseBuilder = builder.initialize();
-  conciseBuilder.setPrefix('c');
+  conciseBuilder.setPrefix(PARSER_PREFIXES.createdLobby);
   conciseBuilder.addValues([
     { value: creatorNftId.toString(10) },
     { value: Buffer.from(commitments).toString('base64') },
@@ -106,7 +106,7 @@ async function joinLobby(
   const errorFxn = buildEndpointErrorFxn('joinLobby');
 
   const conciseBuilder = builder.initialize();
-  conciseBuilder.setPrefix('j');
+  conciseBuilder.setPrefix(PARSER_PREFIXES.joinedLobby);
   conciseBuilder.addValues([
     { value: nftId.toString(10) },
     { value: lobbyID, isStateIdentifier: true },
@@ -158,7 +158,7 @@ async function closeLobby(nftId: number, lobbyID: string): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('closeLobby');
 
   const conciseBuilder = builder.initialize();
-  conciseBuilder.setPrefix('cs');
+  conciseBuilder.setPrefix(PARSER_PREFIXES.closedLobby);
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
 
   let currentBlockVar: number;
@@ -209,7 +209,7 @@ async function submitMoves(
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
   const conciseBuilder = builder.initialize();
-  conciseBuilder.setPrefix('s');
+  conciseBuilder.setPrefix(PARSER_PREFIXES.submittedMoves);
   conciseBuilder.addValue({ value: nftId.toString(10) });
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
   conciseBuilder.addValue({ value: matchWithinLobby.toString(10) });
@@ -232,7 +232,7 @@ async function setTradeNftCards(tradeNftId: number, cards: CardDbId[]): Promise<
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
   const conciseBuilder = builder.initialize();
-  conciseBuilder.setPrefix('t');
+  conciseBuilder.setPrefix(PARSER_PREFIXES.setTradeNftCards);
   conciseBuilder.addValue({ value: tradeNftId.toString(10) });
   conciseBuilder.addValue({ value: cards.map(card => card.toString()).join(',') });
 

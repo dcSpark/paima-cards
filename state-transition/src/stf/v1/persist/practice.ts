@@ -1,3 +1,4 @@
+import { PARSER_KEYS, PARSER_PREFIXES } from '@cards/game-logic';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData } from 'paima-sdk/paima-db';
 
@@ -15,5 +16,7 @@ export function schedulePracticeMove(
 }
 
 function createPracticeInput(lobbyId: string, matchWithinLobby: number, roundWithinMatch: number) {
-  return `p|*${lobbyId}|${matchWithinLobby}|${roundWithinMatch}`;
+  return `${
+    PARSER_PREFIXES[PARSER_KEYS.practiceMoves]
+  }|*${lobbyId}|${matchWithinLobby}|${roundWithinMatch}`;
 }

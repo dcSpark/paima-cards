@@ -7,7 +7,6 @@ import type { INewCardParams, INewTradeNftParams } from '@cards/db/src/insert.qu
 import { newCard, newTradeNft } from '@cards/db/src/insert.queries.js';
 import type {
   LobbyWithStateProps,
-  ConciseResult,
   LobbyPlayer,
   MatchEnvironment,
   MatchState,
@@ -52,13 +51,13 @@ import type {
   JoinedLobbyInput,
   NftMintInput,
   PracticeMovesInput,
-  ScheduledDataInput,
   SetTradeNftCardsInput,
   SubmittedMovesInput,
   TradeNftMintInput,
   TransferTradeNftInput,
+  UserStatsInput,
+  ZombieRoundInput,
 } from './types.js';
-import { isUserStats, isZombieRound } from './types.js';
 import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@cards/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
@@ -475,24 +474,6 @@ async function validateSubmittedMoves(
   return true;
 }
 
-// State transition when scheduled data is processed
-export const scheduledData = async (
-  blockHeight: number,
-  input: ScheduledDataInput,
-  dbConn: Pool,
-  randomnessGenerator: Prando
-): Promise<SQLUpdate[]> => {
-  // This executes 'zombie rounds', rounds which have reached the specified timeout time per round.
-  if (isZombieRound(input)) {
-    return zombieRound(blockHeight, input.lobbyID, dbConn, randomnessGenerator);
-  }
-  // Update the users stats
-  if (isUserStats(input)) {
-    return updateStats(input.nftId, input.result, dbConn);
-  }
-  return [];
-};
-
 export async function setTradeNftCards(
   player: WalletAddress,
   input: SetTradeNftCardsInput,
@@ -586,18 +567,18 @@ export async function claimTradeNftCards(
 // State transition when a zombie round input is processed
 export const zombieRound = async (
   blockHeight: number,
-  lobbyId: string,
+  input: ZombieRoundInput,
   dbConn: Pool,
   randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
-  const [lobby] = await getLobbyById.run({ lobby_id: lobbyId }, dbConn);
+  const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (!lobby) return [];
   if (!isLobbyWithStateProps(lobby)) {
     console.log('DISCARD: lobby not active');
     return [];
   }
 
-  const players = await getLobbyPlayers.run({ lobby_id: lobbyId }, dbConn);
+  const players = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
   const [round] = await getRound.run(
     {
       lobby_id: lobby.lobby_id,
@@ -612,7 +593,7 @@ export const zombieRound = async (
   // We're keeping it in case we add distinction between rounds and moves in the future.
   const moves = await getRoundMoves.run(
     {
-      lobby_id: lobbyId,
+      lobby_id: input.lobbyID,
       match_within_lobby: lobby.current_match,
       round_within_match: lobby.current_round,
     },
@@ -634,16 +615,12 @@ export const zombieRound = async (
 };
 
 // State transition when an update stats input is processed
-export const updateStats = async (
-  nftId: number,
-  result: ConciseResult,
-  dbConn: Pool
-): Promise<SQLUpdate[]> => {
-  const [stats] = await getUserStats.run({ nft_id: nftId }, dbConn);
+export const updateStats = async (input: UserStatsInput, dbConn: Pool): Promise<SQLUpdate[]> => {
+  const [stats] = await getUserStats.run({ nft_id: input.nftId }, dbConn);
   // Verify coherency that the user has existing stats which can be updated
   if (stats) {
-    const query = persistStatsUpdate(nftId, result, stats);
-    console.log(query[1], `Updating stats of ${nftId}`);
+    const query = persistStatsUpdate(input.nftId, input.result, stats);
+    console.log(query[1], `Updating stats of ${input.nftId}`);
     return [query];
   }
   return [];
