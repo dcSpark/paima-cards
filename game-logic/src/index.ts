@@ -7,7 +7,7 @@ import type { IGetLobbyByIdResult, IGetRoundMovesResult } from '@cards/db';
 
 export * from './tick';
 export * from './cards-logic';
-export * from './types';
+export * from './types/index';
 export * from './constants';
 export * from './helpers';
 export * from './typecheck';

@@ -30,3 +30,4 @@ export function isLobbyWithStateProps(lobby: IGetLobbyByIdResult): lobby is Lobb
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _parser_keys_type_check: Record<ValuesType<typeof PARSER_KEYS>, string> = PARSER_PREFIXES;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars

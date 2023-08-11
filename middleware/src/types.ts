@@ -27,12 +27,12 @@ export interface NewLobbies {
 
 export interface PackedLobbyRaw {
   success: true;
-  lobby: IGetLobbyByIdResult;
+  lobby: null | IGetLobbyByIdResult;
 }
 
 export interface PackedLobbyState {
   success: true;
-  lobby: LobbyState;
+  lobby: null | LobbyState;
 }
 
 export interface RoundExecutionState extends BaseRoundStatus {

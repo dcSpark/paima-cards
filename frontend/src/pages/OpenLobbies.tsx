@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@mui/material";
 import type MainController from "@src/MainController";
-import type { LobbyState } from "@cards/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -17,9 +16,10 @@ import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import type { IGetLobbyByIdResult } from "@cards/db";
 
 type Column = {
-  id: keyof LobbyState | "action";
+  id: keyof IGetLobbyByIdResult | "action";
   label: string;
   minWidth: number;
 };
@@ -30,7 +30,7 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-const expandValue = (id: keyof LobbyState, value: unknown) => {
+const expandValue = (id: keyof IGetLobbyByIdResult, value: unknown) => {
   if (id === "created_at" && typeof value === "string") {
     return formatDate(value);
   }
@@ -47,7 +47,7 @@ const OpenLobbies: React.FC = () => {
     selectedDeckState: [selectedDeck],
     collection,
   } = useGlobalStateContext();
-  const [lobbies, setLobbies] = useState<LobbyState[]>([]);
+  const [lobbies, setLobbies] = useState<IGetLobbyByIdResult[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");

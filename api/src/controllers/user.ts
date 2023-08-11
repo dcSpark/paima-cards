@@ -1,37 +1,32 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool } from '@cards/db';
+import { getOwnedNft, requirePool } from '@cards/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
-import type {
-  IGetBoughtPacksResult,
-  IGetCardsByIdsResult,
-  IGetOwnedCardsResult,
-  IGetTradeNftsResult,
-} from '@cards/db/src/select.queries.js';
 import {
   getBoughtPacks,
   getCardsByIds,
   getOwnedCards,
   getTradeNfts,
+  getUserStats,
 } from '@cards/db/src/select.queries.js';
 import { getNftOwner, getOwnedNfts } from 'paima-sdk/paima-utils-backend';
 import { NFT_NAME, CARD_TRADE_NFT_NAME } from '@cards/utils';
-
-interface GetCardsResponse {
-  cards: IGetOwnedCardsResult[];
-}
-
-interface GetPacksResponse {
-  packs: IGetBoughtPacksResult[];
-}
-
-interface GetTradeNftsResponse {
-  tradeNfts: IGetTradeNftsResult[];
-  cardLookup: Record<string, IGetCardsByIdsResult>;
-}
+import type { AccountNftResponse, UserStatsResponse } from '@cards/game-logic';
+import {
+  type GetCardsResponse,
+  type GetPacksResponse,
+  type GetTradeNftsResponse,
+} from '@cards/game-logic';
 
 @Route('user')
 export class UserController extends Controller {
+  @Get('accountNft')
+  public async getWalletNFT(@Query() wallet: string): Promise<AccountNftResponse> {
+    const pool = requirePool();
+    const result = await getOwnedNft(pool, NFT_NAME, wallet);
+    return { nft: result };
+  }
+
   @Get('cards')
   public async getCards(@Query() nftId: number): Promise<GetCardsResponse> {
     const dbConn = requirePool();
@@ -79,5 +74,12 @@ export class UserController extends Controller {
     const cardLookup = Object.fromEntries(cards.map(card => [card.id, card]));
 
     return { tradeNfts, cardLookup };
+  }
+
+  @Get('stats')
+  public async stats(@Query() nftId: number): Promise<UserStatsResponse> {
+    const pool = requirePool();
+    const [stats] = await getUserStats.run({ nft_id: nftId }, pool);
+    return { stats };
   }
 }

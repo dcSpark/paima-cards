@@ -1,24 +1,24 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@cards/db';
+import type { MatchExecutorResponse, LobbyPlayer, RoundExecutorResponse } from '@cards/game-logic';
 import {
   deserializeBoardCard,
   deserializeHandCard,
   deserializeMove,
   isLobbyWithStateProps,
-  type LobbyPlayer,
-  type MatchExecutorData,
 } from '@cards/game-logic';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
-import { getMatch, getMatchMoves } from '@cards/db/src/select.queries';
+import { getMatch, getMatchMoves, getRound, getRoundMoves } from '@cards/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
-type Response = MatchExecutorData | null;
-
-@Route('match_executor')
-export class MatchExecutorController extends Controller {
-  @Get()
-  public async get(@Query() lobbyID: string, @Query() matchWithinLobby: number): Promise<Response> {
+@Route('executor')
+export class ExecutorController extends Controller {
+  @Get('match')
+  public async match(
+    @Query() lobbyID: string,
+    @Query() matchWithinLobby: number
+  ): Promise<MatchExecutorResponse> {
     const valMatch = psqlInt.decode(matchWithinLobby);
     if (isLeft(valMatch)) {
       throw new ValidateError({ round: { message: 'invalid number' } }, '');
@@ -79,6 +79,71 @@ export class MatchExecutorController extends Controller {
       },
       seeds,
       moves,
+    };
+  }
+
+  @Get('round')
+  public async round(
+    @Query() lobbyID: string,
+    @Query() matchWithinLobby: number,
+    @Query() roundWithinMatch: number
+  ): Promise<RoundExecutorResponse> {
+    const valMatch = psqlInt.decode(matchWithinLobby);
+    if (isLeft(valMatch)) {
+      throw new ValidateError({ matchWithinLobby: { message: 'invalid number' } }, '');
+    }
+    const valRound = psqlInt.decode(roundWithinMatch);
+    if (isLeft(valRound)) {
+      throw new ValidateError({ roundWithinMatch: { message: 'invalid number' } }, '');
+    }
+
+    const pool = requirePool();
+    const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const [match] = await getMatch.run(
+      { lobby_id: lobbyID, match_within_lobby: matchWithinLobby },
+      pool
+    );
+    if (!lobby) {
+      return { error: 'lobby not found' };
+    }
+    if (match == null) {
+      return { error: 'match not found' };
+    }
+
+    const [last_round_data] =
+      roundWithinMatch === 0
+        ? [undefined]
+        : await getRound.run(
+            {
+              lobby_id: lobbyID,
+              match_within_lobby: matchWithinLobby,
+              round_within_match: roundWithinMatch - 1,
+            },
+            pool
+          );
+
+    const seedBlockHeight =
+      roundWithinMatch === 0
+        ? match.starting_block_height
+        : last_round_data?.execution_block_height;
+    if (seedBlockHeight == null) {
+      return { error: 'internal error' };
+    }
+
+    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const seed = seedBlockRow.seed;
+    const moves = await getRoundMoves.run(
+      {
+        lobby_id: lobbyID,
+        match_within_lobby: matchWithinLobby,
+        round_within_match: roundWithinMatch,
+      },
+      pool
+    );
+    return {
+      lobby,
+      moves,
+      seed,
     };
   }
 }

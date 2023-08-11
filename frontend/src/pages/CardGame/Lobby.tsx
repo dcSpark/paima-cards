@@ -28,8 +28,8 @@ export function Lobby({
       const newLobbyState = await Paima.default.getLobbyState(
         initialLobbyRaw.lobby_id
       );
-      if (!newLobbyState.success) return;
-      setLobbyState(newLobbyState.lobby);
+      if (!newLobbyState.success || newLobbyState.result.lobby == null) return;
+      setLobbyState(newLobbyState.result.lobby);
     };
 
     // Fetch data every 5 seconds
@@ -69,8 +69,8 @@ export function Lobby({
               const response = await Paima.default.getLobbyState(
                 initialLobbyRaw.lobby_id
               );
-              if (!response.success) return;
-              setLobbyState(response.lobby);
+              if (!response.success || response.result.lobby == null) return;
+              setLobbyState(response.result.lobby);
             }}
             localDeck={localDeck}
           />

@@ -117,11 +117,11 @@ export function GlobalStateProvider({
       const result = await Paima.default.getNftForWallet(connectedWallet);
       if (
         result.success &&
-        (result.result == null || result.result !== selectedNft.nft)
+        (result.result == null || result.result.nft !== selectedNft.nft)
       ) {
         setSelectedNft({
           loading: false,
-          nft: result.result,
+          nft: result.result.nft,
         });
       }
     };
@@ -143,7 +143,7 @@ export function GlobalStateProvider({
           if (result.success) {
             setCollection((oldCollection) => ({
               ...oldCollection,
-              boughtPacks: result.result,
+              boughtPacks: result.result.packs,
             }));
           }
         })(),
@@ -154,7 +154,7 @@ export function GlobalStateProvider({
           if (result.success) {
             const raw = result.result;
             const cards = Object.fromEntries(
-              raw.map((entry) => [entry.id, entry])
+              raw.cards.map((entry) => [entry.id, entry])
             );
 
             setCollection((oldCollection) => ({

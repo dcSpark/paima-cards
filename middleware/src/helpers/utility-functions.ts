@@ -8,7 +8,7 @@ export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean
     return false;
   }
   const lobbyState = lobby.lobby;
-  const lobbyPlayer = lobbyState.players.find(player => player.nftId === nftId);
+  const lobbyPlayer = lobbyState?.players.find(player => player.nftId === nftId);
   return lobbyPlayer != null;
 }
 
@@ -17,6 +17,8 @@ export function userCreatedLobby(nftId: number, lobby: PackedLobbyState): boolea
     return false;
   }
   const lobbyState = lobby.lobby;
+
+  if (lobbyState == null) return false;
 
   if (!lobbyState.hasOwnProperty('lobby_creator')) {
     return false;

@@ -1,29 +1,28 @@
-import type { FailedResult } from 'paima-sdk/paima-mw-core';
+import type { EndpointErrorFxn, FailedResult, Result } from 'paima-sdk/paima-mw-core';
 import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
 
 import { buildEndpointErrorFxn } from '../errors';
-import type { NewLobbies, PackedLobbyRaw, PackedLobbyState } from '../types';
+import type { NewLobbies, PackedLobbyState } from '../types';
 import { userCreatedLobby, userJoinedLobby } from './utility-functions';
 import { backendQueryLobbyState, backendQueryUserLobbiesBlockheight } from './query-constructors';
-import type { LobbyState, NewLobby } from '@cards/game-logic';
-import type { IGetLobbyByIdResult } from '@cards/db';
+import type { LobbyStateResponse, UserLobbiesBlockHeightResponse } from '@cards/game-logic';
 
-export async function auxGetLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
-  const errorFxn = buildEndpointErrorFxn('getRawLobbyState');
-
-  let res: Response;
+export async function auxGet<R>(
+  builtQuery: string,
+  errorFxn: EndpointErrorFxn
+): Promise<Result<R>> {
+  let response: Response;
   try {
-    const query = backendQueryLobbyState(lobbyID);
-    res = await fetch(query);
+    response = await fetch(builtQuery);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
   }
 
   try {
-    const j = (await res.json()) as { lobby: IGetLobbyByIdResult };
+    const result = (await response.json()) as R;
     return {
       success: true,
-      lobby: j.lobby,
+      result,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -42,7 +41,7 @@ export async function auxGetLobbyState(lobbyID: string): Promise<PackedLobbyStat
   }
 
   try {
-    const j = (await res.json()) as { lobby: LobbyState };
+    const j = (await res.json()) as LobbyStateResponse;
     return {
       success: true,
       lobby: j.lobby,
@@ -67,7 +66,7 @@ export async function getRawNewLobbies(
   }
 
   try {
-    const j = (await res.json()) as { lobbies: NewLobby[] };
+    const j = (await res.json()) as UserLobbiesBlockHeightResponse;
     return {
       success: true,
       lobbies: j.lobbies,
