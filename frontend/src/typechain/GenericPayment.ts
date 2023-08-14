@@ -29,8 +29,6 @@ import type {
 export interface GenericPaymentInterface extends utils.Interface {
   functions: {
     "initialized()": FunctionFragment;
-    "nftAddress()": FunctionFragment;
-    "nftPrice()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
@@ -43,8 +41,6 @@ export interface GenericPaymentInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "initialized"
-      | "nftAddress"
-      | "nftPrice"
       | "owner"
       | "renounceOwnership"
       | "transferOwnership"
@@ -58,11 +54,6 @@ export interface GenericPaymentInterface extends utils.Interface {
     functionFragment: "initialized",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "nftAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "nftPrice", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -84,8 +75,6 @@ export interface GenericPaymentInterface extends utils.Interface {
     functionFragment: "initialized",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nftAddress", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nftPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -171,10 +160,6 @@ export interface GenericPayment extends BaseContract {
   functions: {
     initialized(overrides?: CallOverrides): Promise<[boolean]>;
 
-    nftAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    nftPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     /**
      * Returns the address of the current owner.
      */
@@ -218,10 +203,6 @@ export interface GenericPayment extends BaseContract {
 
   initialized(overrides?: CallOverrides): Promise<boolean>;
 
-  nftAddress(overrides?: CallOverrides): Promise<string>;
-
-  nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
   /**
    * Returns the address of the current owner.
    */
@@ -264,10 +245,6 @@ export interface GenericPayment extends BaseContract {
 
   callStatic: {
     initialized(overrides?: CallOverrides): Promise<boolean>;
-
-    nftAddress(overrides?: CallOverrides): Promise<string>;
-
-    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     /**
      * Returns the address of the current owner.
@@ -323,10 +300,6 @@ export interface GenericPayment extends BaseContract {
   estimateGas: {
     initialized(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nftAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
     /**
      * Returns the address of the current owner.
      */
@@ -370,10 +343,6 @@ export interface GenericPayment extends BaseContract {
 
   populateTransaction: {
     initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nftAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nftPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     /**
      * Returns the address of the current owner.
