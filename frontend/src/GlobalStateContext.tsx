@@ -7,8 +7,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import type MainController from "./MainController";
-import { AppContext } from "./main";
 import type { UseStateResponse } from "./utils";
 import type { WalletAddress } from "paima-sdk/paima-utils";
 import * as Paima from "@cards/middleware";
@@ -18,6 +16,7 @@ import type { CardDbId, LocalCard } from "@cards/game-logic";
 import type {
   IGetBoughtPacksResult,
   IGetCardsByIdsResult,
+  IGetLobbyByIdResult,
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
 } from "@cards/db/build/select.queries";
@@ -45,9 +44,11 @@ type GlobalState = {
         tradeNfts: IGetTradeNftsResult[];
         cardLookup: Record<string, IGetCardsByIdsResult>;
       };
+  joinedLobbyRawState: UseStateResponse<undefined | IGetLobbyByIdResult>;
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   null as any as GlobalState
 );
 
@@ -56,7 +57,6 @@ export function GlobalStateProvider({
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const mainController: MainController = useContext(AppContext) as any;
   const [connectedWallet, setConnectedWallet] = useState<
     undefined | WalletAddress
   >();
@@ -75,6 +75,7 @@ export function GlobalStateProvider({
         cardLookup: Record<string, IGetCardsByIdsResult>;
       }
   >();
+  const joinedLobbyRawState = useState<undefined | IGetLobbyByIdResult>();
 
   const [selectedDeckSubscription, setSelectedDeckSubscription] =
     useState<number>(0);
@@ -128,7 +129,7 @@ export function GlobalStateProvider({
     fetch();
     const interval = setInterval(fetch, 5000);
     return () => clearInterval(interval);
-  }, [mainController, connectedWallet, selectedNft]);
+  }, [connectedWallet, selectedNft]);
 
   useEffect(() => {
     // poll collection
@@ -170,7 +171,7 @@ export function GlobalStateProvider({
     return () => {
       clearInterval(interval);
     };
-  }, [mainController, selectedNft]);
+  }, [selectedNft]);
 
   useEffect(() => {
     // poll connection to wallet
@@ -184,7 +185,7 @@ export function GlobalStateProvider({
     fetch();
     const interval = setInterval(fetch, 2000);
     return () => clearInterval(interval);
-  }, [connectedWallet, mainController]);
+  }, [connectedWallet]);
 
   useEffect(() => {
     // poll trade nfts
@@ -217,6 +218,7 @@ export function GlobalStateProvider({
       collection,
       selectedDeckState: [selectedDeck, setSelectedDeck],
       tradeNfts,
+      joinedLobbyRawState,
     }),
     [
       collection,
@@ -225,6 +227,7 @@ export function GlobalStateProvider({
       selectedNft,
       setSelectedDeck,
       tradeNfts,
+      joinedLobbyRawState,
     ]
   );
 
