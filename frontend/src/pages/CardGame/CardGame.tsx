@@ -38,7 +38,6 @@ const CardsGame: React.FC<CardGameProps> = ({
   const [selectedCard, setSelectedCard] = useState<
     undefined | CardCommitmentIndex
   >();
-  const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
   // Game data for what is being currently shown to user.
@@ -59,6 +58,10 @@ const CardsGame: React.FC<CardGameProps> = ({
     },
     isPostTxDone: false,
   });
+  const matchOver = useMemo(() => {
+    return display.matchState.result != null;
+  }, [display.matchState.result]);
+
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
   const [roundExecutor, setRoundExecutor] = useState<
@@ -96,6 +99,7 @@ const CardsGame: React.FC<CardGameProps> = ({
     // In cards this can mean they chose to draw a card and are waiting for it to happen.
 
     if (
+      matchOver ||
       // not displaying current round
       display.round < lobbyState.current_round ||
       // not interactive round
@@ -113,7 +117,7 @@ const CardsGame: React.FC<CardGameProps> = ({
       ...oldDisplay,
       isPostTxDone: true,
     }));
-  }, [display, lobbyState, thisPlayer, postTxEventQueue]);
+  }, [display, lobbyState, thisPlayer, postTxEventQueue, matchOver]);
 
   useEffect(
     () =>
@@ -248,7 +252,6 @@ const CardsGame: React.FC<CardGameProps> = ({
             if (thisPlayerResult === "l") return "You lose!";
             return "It's a tie!";
           });
-          setMatchOver(true);
         }
       }
 
@@ -329,6 +332,13 @@ const CardsGame: React.FC<CardGameProps> = ({
     fetchedEndState,
   ]);
 
+  useEffect(() => {
+    // assertion: no card is selected if match is over
+    if (!matchOver || selectedCard == null) return;
+
+    setSelectedCard(undefined);
+  }, [matchOver, selectedCard]);
+
   const disableInteraction =
     matchOver ||
     display.round !== lobbyState.current_round ||
@@ -346,14 +356,24 @@ const CardsGame: React.FC<CardGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        {matchOver
-          ? "Match over"
-          : `Round: ${display.matchState.properRound + 1}`}
-        {" | "}
-        {caption ??
-          (thisPlayer.turn === display.matchState.turn
-            ? "Your turn"
-            : "Opponent's turn")}
+        {display.matchState.result != null
+          ? `Match over | ${(() => {
+              const thisPlayerIndex = display.matchState.players.findIndex(
+                (player) => player.nftId === selectedNft
+              );
+              const thisPlayerResult =
+                display.matchState.result[thisPlayerIndex];
+
+              if (thisPlayerResult === "w") return "You win!";
+              if (thisPlayerResult === "l") return "You lose!";
+              return "It's a tie!";
+            })()}`
+          : `Round: ${display.matchState.properRound + 1} | ${
+              caption ??
+              (thisPlayer.turn === display.matchState.turn
+                ? "Your turn"
+                : "Opponent's turn")
+            }`}
       </Typography>
       <Box
         sx={{
@@ -411,6 +431,7 @@ const CardsGame: React.FC<CardGameProps> = ({
           localDeck={localDeck}
           turn={display.matchState.turn}
           selectedCardState={[selectedCard, setSelectedCard]}
+          disableInteraction={disableInteraction}
           onEndTurn={
             canPass
               ? () => {

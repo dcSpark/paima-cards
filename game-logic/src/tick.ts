@@ -111,7 +111,6 @@ export function processTick(
 
   const turnEnds = move.kind === MOVE_KIND.endTurn;
   const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
-  const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
   const turnEndEvents: TurnEndTickEvent[] = turnEnds
     ? [
@@ -135,6 +134,7 @@ export function processTick(
     events.push(event);
   }
 
+  const matchEnds = matchState.players.some(player => player.hitPoints <= 0);
   const matchEndEvents: MatchEndTickEvent[] = matchEnds
     ? [{ kind: TICK_EVENT_KIND.matchEnd, result: matchResults(matchState) }]
     : [];
