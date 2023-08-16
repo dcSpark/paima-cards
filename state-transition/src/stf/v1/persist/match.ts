@@ -1,12 +1,12 @@
 import type { SubmittedMovesInput } from '../types.js';
-import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@dice/db';
-import { newRound, executedRound, updateLobbyPlayer } from '@dice/db';
+import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@cards/db';
+import { newRound, executedRound, updateLobbyPlayer } from '@cards/db';
 import type {
   LobbyPlayer,
   MatchEnvironment,
   LobbyWithStateProps,
   MatchState,
-} from '@dice/game-logic';
+} from '@cards/game-logic';
 import {
   INITIAL_HIT_POINTS,
   genPermutation,
@@ -14,35 +14,33 @@ import {
   serializeBoardCard,
   serializeHandCard,
   serializeMove,
-} from '@dice/game-logic';
-import { scheduleZombieRound } from './zombie.js';
+} from '@cards/game-logic';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
   updateLobbyCurrentMatch,
   updateLobbyCurrentRound,
   updateLobbyMatchState,
   updateLobbyState,
-} from '@dice/db/src/update.queries.js';
+} from '@cards/db/src/update.queries.js';
 import type {
   IUpdateLobbyCurrentMatchParams,
   IUpdateLobbyCurrentRoundParams,
   IUpdateLobbyMatchStateParams,
   IUpdateLobbyStateParams,
-} from '@dice/db/src/update.queries.js';
-import type { INewMatchParams, INewMoveParams } from '@dice/db/src/insert.queries.js';
-import { newMatch, newMove } from '@dice/db/src/insert.queries.js';
-import type { IGetRoundResult } from '@dice/db/src/select.queries.js';
+} from '@cards/db/src/update.queries.js';
+import type { INewMatchParams, INewMoveParams } from '@cards/db/src/insert.queries.js';
+import { newMatch, newMove } from '@cards/db/src/insert.queries.js';
+import type { IGetRoundResult } from '@cards/db/src/select.queries.js';
 import type Prando from 'paima-sdk/paima-prando';
 import { schedulePracticeMove } from './practice.js';
 import { scheduleStatsUpdate } from './stats.js';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
 
 export function persistStartMatch(
   lobbyId: string,
   matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   current_match: null | number,
-  roundLength: number,
   blockHeight: number,
   randomnessGenerator: Prando
 ): SQLUpdate[] {
@@ -59,7 +57,6 @@ export function persistStartMatch(
     matchEnvironment,
     players,
     matchWithinLobby,
-    roundLength,
     blockHeight,
     randomnessGenerator
   );
@@ -71,7 +68,6 @@ export function persistInitialMatchState(
   matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   matchWithinLobby: number,
-  roundLength: number,
   blockHeight: number,
   randomnessGenerator: Prando
 ): SQLUpdate[] {
@@ -114,7 +110,7 @@ export function persistInitialMatchState(
     blockHeight
   );
 
-  const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, roundLength, blockHeight);
+  const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, blockHeight);
 
   // If a bot goes first, schedule a bot move
   const botMoves = (() => {
@@ -146,7 +142,6 @@ export function persistNewRound(
   lobbyId: string,
   matchWithinLobby: number,
   roundWithinMatch: number,
-  roundLength: number,
   blockHeight: number
 ): SQLUpdate[] {
   // Creation of the next round
@@ -167,11 +162,12 @@ export function persistNewRound(
     [updateLobbyCurrentRound, updateCurrentRoundParams],
   ];
 
+  // TODO: Disabled at the moment. This comes from a point where a round was equivalent to a player's turn.
   // Scheduling of the zombie round execution in the future
-  const zombie_block_height = blockHeight + roundLength;
-  const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
+  // const zombie_block_height = blockHeight + roundLength;
+  // const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
 
-  return [...newRoundTuple, ...updateCurrentRoundTuple /* , zombieRoundUpdate TODO */];
+  return [...newRoundTuple, ...updateCurrentRoundTuple];
 }
 
 // Persist moves sent by player to an active match
@@ -212,8 +208,8 @@ export function persistExecutedRound(
 
   // TODO: zombie rounds are disabled ATM
   // We remove the scheduled zombie round input
-  // if (lobby.round_length) {
-  //   const block_height = roundData.starting_block_height + lobby.round_length;
+  // if (lobby.turn_length) {
+  //   const block_height = roundData.starting_block_height + lobby.turn_length;
   //   return [executedRoundTuple, deleteZombieRound(lobby.lobby_id, block_height)];
   // }
   return [executedRoundTuple];

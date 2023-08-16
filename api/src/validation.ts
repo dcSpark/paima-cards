@@ -1,4 +1,4 @@
-import { SAFE_NUMBER } from '@dice/utils';
+import { SAFE_NUMBER } from '@cards/utils';
 import * as D from 'io-ts/Decoder';
 
 // io-ts Decoders take two type arguments, input and output type.

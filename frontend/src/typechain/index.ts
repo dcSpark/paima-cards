@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { GenericPayment } from "./GenericPayment";
+export type { GenericPaymentProxy } from "./GenericPaymentProxy";
 export type { NativeNftSale } from "./NativeNftSale";
 export type { NativeProxy } from "./NativeProxy";
 export type { Nft } from "./Nft";
@@ -9,6 +10,7 @@ export type { NftSale } from "./NftSale";
 export type { Proxy } from "./Proxy";
 export * as factories from "./factories";
 export { GenericPayment__factory } from "./factories/GenericPayment__factory";
+export { GenericPaymentProxy__factory } from "./factories/GenericPaymentProxy__factory";
 export { NativeNftSale__factory } from "./factories/NativeNftSale__factory";
 export { NativeProxy__factory } from "./factories/NativeProxy__factory";
 export { Nft__factory } from "./factories/Nft__factory";

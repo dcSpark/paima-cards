@@ -1,5 +1,8 @@
-import type { IGetLobbyByIdResult } from '@dice/db';
+import type { IGetLobbyByIdResult } from '@cards/db';
 import type { LobbyWithStateProps } from './types';
+import type { ValuesType } from 'utility-types';
+import type { PARSER_KEYS } from './constants';
+import { PARSER_PREFIXES } from './constants';
 
 // Type inference is set up wrong. It can infer that individual properties are not null
 // but not that object type does not include the null property.
@@ -24,3 +27,7 @@ export function isLobbyWithStateProps(lobby: IGetLobbyByIdResult): lobby is Lobb
 
   return true;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _parser_keys_type_check: Record<ValuesType<typeof PARSER_KEYS>, string> = PARSER_PREFIXES;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars

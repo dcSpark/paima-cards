@@ -1,35 +1,31 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Lobby.scss";
 import { Typography } from "@mui/material";
-import type { LobbyState } from "@dice/game-logic";
+import type { LobbyState } from "@cards/game-logic";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import CardGame from "./CardGame";
-import type { IGetLobbyByIdResult } from "@dice/db";
-import * as Paima from "@dice/middleware";
+import * as Paima from "@cards/middleware";
 import LocalStorage from "@src/LocalStorage";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 
-export function Lobby({
-  initialLobbyRaw,
-}: {
-  initialLobbyRaw: null | IGetLobbyByIdResult;
-}): React.ReactElement {
+export function Lobby(): React.ReactElement {
   const {
     selectedNftState: [selectedNft],
+    joinedLobbyRawState: [joinedLobbyRaw],
   } = useGlobalStateContext();
 
   const [lobbyState, setLobbyState] = useState<LobbyState>();
 
   useEffect(() => {
     const fetchLobbyData = async () => {
-      if (initialLobbyRaw == null) return;
+      if (joinedLobbyRaw == null) return;
 
       const newLobbyState = await Paima.default.getLobbyState(
-        initialLobbyRaw.lobby_id
+        joinedLobbyRaw.lobby_id
       );
-      if (!newLobbyState.success) return;
-      setLobbyState(newLobbyState.lobby);
+      if (!newLobbyState.success || newLobbyState.result.lobby == null) return;
+      setLobbyState(newLobbyState.result.lobby);
     };
 
     // Fetch data every 5 seconds
@@ -39,20 +35,20 @@ export function Lobby({
     return () => {
       clearInterval(intervalIdLobby);
     };
-  }, [initialLobbyRaw, lobbyState]);
+  }, [joinedLobbyRaw, lobbyState]);
 
   const localDeck = useMemo(() => {
     if (lobbyState == null) return undefined;
     return LocalStorage.getLobbyDeck(lobbyState.lobby_id);
   }, [lobbyState]);
 
-  if (initialLobbyRaw == null || selectedNft.nft == null) return <></>;
+  if (joinedLobbyRaw == null || selectedNft.nft == null) return <></>;
 
   return (
     <>
       <Navbar />
       <Wrapper blurred={false}>
-        <Typography variant="h1">Lobby {initialLobbyRaw.lobby_id}</Typography>
+        <Typography variant="h1">Lobby {joinedLobbyRaw.lobby_id}</Typography>
         {lobbyState == null && (
           <>
             <div>
@@ -67,10 +63,10 @@ export function Lobby({
             selectedNft={selectedNft.nft}
             refetchLobbyState={async () => {
               const response = await Paima.default.getLobbyState(
-                initialLobbyRaw.lobby_id
+                joinedLobbyRaw.lobby_id
               );
-              if (!response.success) return;
-              setLobbyState(response.lobby);
+              if (!response.success || response.result.lobby == null) return;
+              setLobbyState(response.result.lobby);
             }}
             localDeck={localDeck}
           />

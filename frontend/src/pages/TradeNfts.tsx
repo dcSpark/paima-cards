@@ -5,10 +5,10 @@ import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import React, { useMemo, useState } from "react";
 import Card from "./CardGame/Card";
-import type { CardDbId } from "@dice/game-logic";
-import { DECK_LENGTH } from "@dice/game-logic";
+import type { CardDbId } from "@cards/game-logic";
+import { DECK_LENGTH } from "@cards/game-logic";
 import { burnTradeNft, buyTradeNft } from "@src/services/contract";
-import * as Paima from "@dice/middleware";
+import * as Paima from "@cards/middleware";
 
 export default function TradeNfts(): React.ReactElement {
   const { connectedWallet, collection, tradeNfts } = useGlobalStateContext();

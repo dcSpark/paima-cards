@@ -1,7 +1,7 @@
 {
-  "name": "dice-web",
+  "name": "@cards/frontend",
   "version": "1.0.0",
-  "description": "Dice Web using Paima Engine",
+  "description": "Cards Game Web using Paima Engine",
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve --config tools/webpack/webpack.config.dev.js",
@@ -12,7 +12,6 @@
   "devDependencies": {
     "@marshallofsound/webpack-asset-relocator-loader": "0.5.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.8",
-    "@types/chessboardjs": "0.3.2",
     "@types/node": "18.11.5",
     "@types/react": "18.0.23",
     "@types/react-dom": "18.0.7",
@@ -25,6 +24,7 @@
     "esbuild": "0.17.5",
     "eslint": "8.26.0",
     "eslint-import-resolver-alias": "1.1.2",
+    "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-react": "7.31.10",
     "eslint-plugin-react-hooks": "4.6.0",
@@ -47,17 +47,16 @@
     "webpack-dev-server": "4.11.1"
   },
   "dependencies": {
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.11.9",
-    "@mui/lab": "^5.0.0-alpha.135",
-    "@mui/material": "^5.11.7",
+    "@mui/lab": "5.0.0-alpha.135",
+    "@mui/material": "5.14.4",
     "@typechain/ethers-v5": "11.0.0",
-    "bignumber.js": "4.0.4",
-    "chess.js": "1.0.0-beta.3",
+    "bignumber.js": "9.1.1",
     "clsx": "1.2.1",
     "date-fns": "2.29.3",
     "react": "18.2.0",
-    "react-chessboard": "2.0.8",
-    "react-dice-complete": "2.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.9.0"
   }

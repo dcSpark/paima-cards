@@ -1,7 +1,8 @@
-import type { CardDbId, ConciseResult, SerializedMove } from '@dice/game-logic';
+import type { CardDbId, ConciseResult, PARSER_KEYS, SerializedMove } from '@cards/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInputRaw =
+  | InvalidInput
   | NftMintInput
   | TradeNftMintInput
   | CreatedLobbyInput
@@ -9,11 +10,12 @@ export type ParsedSubmittedInputRaw =
   | ClosedLobbyInput
   | SubmittedMovesInput
   | PracticeMovesInput
-  | ScheduledDataInput
-  | InvalidInput
+  | ZombieRoundInput
+  | UserStatsInput
   | SetTradeNftCardsInput;
 
 export type ParsedSubmittedInput =
+  | InvalidInput
   | NftMintInput
   | TradeNftMintInput
   | GenericPaymentInput
@@ -22,8 +24,8 @@ export type ParsedSubmittedInput =
   | ClosedLobbyInput
   | SubmittedMovesInput
   | PracticeMovesInput
-  | ScheduledDataInput
-  | InvalidInput
+  | ZombieRoundInput
+  | UserStatsInput
   | SetTradeNftCardsInput
   | TransferTradeNftInput;
 
@@ -32,58 +34,57 @@ export interface InvalidInput {
 }
 
 export interface NftMintInput {
-  input: 'nftMint';
+  input: typeof PARSER_KEYS.accountMint;
   tokenId: string;
   // contract address
   address: WalletAddress;
 }
 
 export interface TradeNftMintInput {
-  input: 'tradeNftMint';
+  input: typeof PARSER_KEYS.tradeNftMint;
   tokenId: string;
   // contract address
   address: WalletAddress;
 }
 
 export interface GenericPaymentInput {
-  input: 'genericPayment';
+  input: typeof PARSER_KEYS.genericPayment;
   message: string;
   payer: WalletAddress;
   amount: bigint;
 }
 
 export interface TransferTradeNftInput {
-  input: 'transferTradeNft';
+  input: typeof PARSER_KEYS.transferTradeNft;
   from: WalletAddress;
   to: WalletAddress;
   tradeNftId: number;
 }
 
 export interface CreatedLobbyInput {
-  input: 'createdLobby';
+  input: typeof PARSER_KEYS.createdLobby;
   creatorNftId: number;
   creatorCommitments: Uint8Array;
   numOfRounds: number;
-  roundLength: number;
-  playTimePerPlayer: number;
+  turnLength: number;
   isHidden: boolean;
   isPractice: boolean;
 }
 
 export interface JoinedLobbyInput {
-  input: 'joinedLobby';
+  input: typeof PARSER_KEYS.joinedLobby;
   nftId: number;
   commitments: Uint8Array;
   lobbyID: string;
 }
 
 export interface ClosedLobbyInput {
-  input: 'closedLobby';
+  input: typeof PARSER_KEYS.closedLobby;
   lobbyID: string;
 }
 
 export interface SubmittedMovesInput {
-  input: 'submittedMoves';
+  input: typeof PARSER_KEYS.submittedMoves;
   nftId: number;
   lobbyID: string;
   matchWithinLobby: number;
@@ -92,37 +93,25 @@ export interface SubmittedMovesInput {
 }
 
 export interface PracticeMovesInput {
-  input: 'practiceMoves';
+  input: typeof PARSER_KEYS.practiceMoves;
   lobbyID: string;
   matchWithinLobby: number;
   roundWithinMatch: number;
 }
 
-export interface ScheduledDataInput {
-  input: 'scheduledData';
-}
-
-export interface ZombieRound extends ScheduledDataInput {
-  effect: 'zombie';
+export interface ZombieRoundInput {
+  input: typeof PARSER_KEYS.zombieScheduledData;
   lobbyID: string;
 }
 
-export interface UserStats extends ScheduledDataInput {
-  effect: 'stats';
+export interface UserStatsInput {
+  input: typeof PARSER_KEYS.userScheduledData;
   nftId: number;
   result: ConciseResult;
 }
 
 export interface SetTradeNftCardsInput {
-  input: 'setTradeNftCards';
+  input: typeof PARSER_KEYS.setTradeNftCards;
   tradeNftId: number;
   cards: CardDbId[];
-}
-
-export function isZombieRound(input: ScheduledDataInput): input is ZombieRound {
-  return (input as ZombieRound).effect === 'zombie';
-}
-
-export function isUserStats(input: ScheduledDataInput): input is UserStats {
-  return (input as UserStats).effect === 'stats';
 }

@@ -1,8 +1,8 @@
-import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@dice/db';
-import { newStats, updateStats } from '@dice/db';
+import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@cards/db';
+import { newStats, updateStats } from '@cards/db';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData } from 'paima-sdk/paima-db';
-import type { ConciseResult } from '@dice/game-logic';
+import { PARSER_PREFIXES, type ConciseResult, PARSER_KEYS } from '@cards/game-logic';
 
 // Generate blank/empty user stats
 export function blankStats(nftId: number): SQLUpdate {
@@ -46,5 +46,5 @@ export function scheduleStatsUpdate(
 
 // Create stats update input
 function createStatsUpdateInput(nftId: number, result: ConciseResult): string {
-  return `u|*${nftId.toString(10)}|${result}`;
+  return `${PARSER_PREFIXES[PARSER_KEYS.userScheduledData]}|*${nftId.toString(10)}|${result}`;
 }

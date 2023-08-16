@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import { Page } from "@src/MainController";
+import { Page } from "@src/pages/PageCoordinator";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
 import Wrapper from "@src/components/Wrapper";

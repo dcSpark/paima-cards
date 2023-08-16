@@ -6,7 +6,7 @@ import type {
   CardCommitmentIndex,
   LobbyPlayer,
   LocalCard,
-} from "@dice/game-logic";
+} from "@cards/game-logic";
 import type { UseStateResponse } from "@src/utils";
 import Button from "@src/components/Button";
 
@@ -16,6 +16,7 @@ export type PlayerProps = {
   localDeck?: LocalCard[];
   turn: number;
   selectedCardState: UseStateResponse<undefined | CardCommitmentIndex>;
+  disableInteraction?: boolean;
   onEndTurn?: () => void;
   onTargetCard?: (index: CardCommitmentIndex) => void;
   onConfirmCard?: (index: CardCommitmentIndex) => void;
@@ -27,6 +28,7 @@ export default function Player({
   localDeck,
   turn,
   selectedCardState: [selectedCard, setSelectedCard],
+  disableInteraction,
   onEndTurn,
   onTargetCard,
   onConfirmCard,
@@ -44,13 +46,20 @@ export default function Player({
           key={card.index}
           cardRegistryId={localDeck?.[card.index].registryId}
           overlap
-          onConfirm={() => onConfirmCard?.(card.index)}
-          selectedState={[
-            isThisPlayer === true && selectedCard === card.index,
-            (val) => {
-              if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
-            },
-          ]}
+          onConfirm={
+            disableInteraction ? undefined : () => onConfirmCard?.(card.index)
+          }
+          selectedState={
+            disableInteraction
+              ? undefined
+              : [
+                  isThisPlayer === true && selectedCard === card.index,
+                  (val) => {
+                    if (isThisPlayer)
+                      setSelectedCard(val ? card.index : undefined);
+                  },
+                ]
+          }
           selectedEffect="closeup"
         />
       ))}
@@ -71,13 +80,18 @@ export default function Player({
           cardRegistryId={card.registryId}
           hasAttack={card.hasAttack}
           selectedEffect="glow"
-          selectedState={[
-            isThisPlayer === true && selectedCard === card.index,
-            (val) => {
-              if (!isThisPlayer) onTargetCard?.(card.index);
-              if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
-            },
-          ]}
+          selectedState={
+            disableInteraction
+              ? undefined
+              : [
+                  isThisPlayer === true && selectedCard === card.index,
+                  (val) => {
+                    if (!isThisPlayer) onTargetCard?.(card.index);
+                    if (isThisPlayer)
+                      setSelectedCard(val ? card.index : undefined);
+                  },
+                ]
+          }
         />
       ))}
     </Box>

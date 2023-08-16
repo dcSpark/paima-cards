@@ -1,12 +1,4 @@
-# Dice Game Node Template
-
-![image](https://github.com/dcSpark/paima-dice/assets/2608559/92e03aee-6d70-4608-8619-6a26d1fe719c)
-
-You can play a version of this game hosted on the [Oasys](https://oasys.games) testnet.
-- Game link [here](https://dice-testnet.paimastudios.com/)
-- Faucet [here](https://faucet.sandverse.oasys.games/)
-- Demo video (Japanese)  [here](https://youtu.be/WXxX3vq5umQ)
-- Blackjack dice rules [here](https://www.youtube.com/watch?v=zcVz-wXYeK8)
+# Cards Game Node Template
 
 This documentation provides a basic overview of the template. Each module has its own `README` file with more detailed information.
 

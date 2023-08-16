@@ -29,9 +29,8 @@ export interface IGetPaginatedOpenLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetPaginatedOpenLobbies' query type */
@@ -79,9 +78,8 @@ export interface ISearchPaginatedOpenLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'SearchPaginatedOpenLobbies' query type */
@@ -127,9 +125,8 @@ export interface IGetOpenLobbyByIdResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetOpenLobbyById' query type */
@@ -208,9 +205,8 @@ export interface IGetRandomLobbyResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetRandomLobby' query type */
@@ -252,9 +248,8 @@ export interface IGetRandomActiveLobbyResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetRandomActiveLobby' query type */
@@ -297,9 +292,8 @@ export interface IGetUserLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetUserLobbies' query type */
@@ -347,9 +341,8 @@ export interface IGetPaginatedUserLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetPaginatedUserLobbies' query type */
@@ -401,9 +394,8 @@ export interface IGetAllPaginatedUserLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetAllPaginatedUserLobbies' query type */
@@ -453,9 +445,8 @@ export interface IGetActiveLobbiesResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetActiveLobbies' query type */
@@ -496,9 +487,8 @@ export interface IGetLobbyByIdResult {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'GetLobbyById' query type */

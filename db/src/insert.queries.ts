@@ -17,9 +17,8 @@ export interface ICreateLobbyParams {
   lobby_state: lobby_status;
   max_players: number;
   num_of_rounds: number;
-  play_time_per_player: number;
   practice: boolean;
-  round_length: number;
+  turn_length: number;
 }
 
 /** 'CreateLobby' return type */
@@ -31,7 +30,7 @@ export interface ICreateLobbyQuery {
   result: ICreateLobbyResult;
 }
 
-const createLobbyIR: any = {"usedParamSet":{"lobby_id":true,"max_players":true,"num_of_rounds":true,"round_length":true,"play_time_per_player":true,"creation_block_height":true,"created_at":true,"hidden":true,"practice":true,"lobby_creator":true,"lobby_state":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":209,"b":218}]},{"name":"max_players","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":235}]},{"name":"num_of_rounds","required":true,"transform":{"type":"scalar"},"locs":[{"a":240,"b":254}]},{"name":"round_length","required":true,"transform":{"type":"scalar"},"locs":[{"a":259,"b":272}]},{"name":"play_time_per_player","required":true,"transform":{"type":"scalar"},"locs":[{"a":277,"b":298}]},{"name":"creation_block_height","required":true,"transform":{"type":"scalar"},"locs":[{"a":303,"b":325}]},{"name":"created_at","required":true,"transform":{"type":"scalar"},"locs":[{"a":330,"b":341}]},{"name":"hidden","required":true,"transform":{"type":"scalar"},"locs":[{"a":346,"b":353}]},{"name":"practice","required":true,"transform":{"type":"scalar"},"locs":[{"a":358,"b":367}]},{"name":"lobby_creator","required":true,"transform":{"type":"scalar"},"locs":[{"a":372,"b":386}]},{"name":"lobby_state","required":true,"transform":{"type":"scalar"},"locs":[{"a":391,"b":403}]}],"statement":"INSERT INTO lobbies(\n  lobby_id,\n  max_players,\n  num_of_rounds,\n  round_length,\n  play_time_per_player,\n  creation_block_height,\n  created_at,\n  hidden,\n  practice,\n  lobby_creator,\n  lobby_state\n)\nVALUES(\n  :lobby_id!,\n  :max_players!,\n  :num_of_rounds!,\n  :round_length!,\n  :play_time_per_player!,\n  :creation_block_height!,\n  :created_at!,\n  :hidden!,\n  :practice!,\n  :lobby_creator!,\n  :lobby_state!\n)"};
+const createLobbyIR: any = {"usedParamSet":{"lobby_id":true,"max_players":true,"num_of_rounds":true,"turn_length":true,"creation_block_height":true,"created_at":true,"hidden":true,"practice":true,"lobby_creator":true,"lobby_state":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":193}]},{"name":"max_players","required":true,"transform":{"type":"scalar"},"locs":[{"a":198,"b":210}]},{"name":"num_of_rounds","required":true,"transform":{"type":"scalar"},"locs":[{"a":215,"b":229}]},{"name":"turn_length","required":true,"transform":{"type":"scalar"},"locs":[{"a":234,"b":246}]},{"name":"creation_block_height","required":true,"transform":{"type":"scalar"},"locs":[{"a":251,"b":273}]},{"name":"created_at","required":true,"transform":{"type":"scalar"},"locs":[{"a":278,"b":289}]},{"name":"hidden","required":true,"transform":{"type":"scalar"},"locs":[{"a":294,"b":301}]},{"name":"practice","required":true,"transform":{"type":"scalar"},"locs":[{"a":306,"b":315}]},{"name":"lobby_creator","required":true,"transform":{"type":"scalar"},"locs":[{"a":320,"b":334}]},{"name":"lobby_state","required":true,"transform":{"type":"scalar"},"locs":[{"a":339,"b":351}]}],"statement":"INSERT INTO lobbies(\n  lobby_id,\n  max_players,\n  num_of_rounds,\n  turn_length,\n  creation_block_height,\n  created_at,\n  hidden,\n  practice,\n  lobby_creator,\n  lobby_state\n)\nVALUES(\n  :lobby_id!,\n  :max_players!,\n  :num_of_rounds!,\n  :turn_length!,\n  :creation_block_height!,\n  :created_at!,\n  :hidden!,\n  :practice!,\n  :lobby_creator!,\n  :lobby_state!\n)"};
 
 /**
  * Query generated from SQL:
@@ -40,8 +39,7 @@ const createLobbyIR: any = {"usedParamSet":{"lobby_id":true,"max_players":true,"
  *   lobby_id,
  *   max_players,
  *   num_of_rounds,
- *   round_length,
- *   play_time_per_player,
+ *   turn_length,
  *   creation_block_height,
  *   created_at,
  *   hidden,
@@ -53,8 +51,7 @@ const createLobbyIR: any = {"usedParamSet":{"lobby_id":true,"max_players":true,"
  *   :lobby_id!,
  *   :max_players!,
  *   :num_of_rounds!,
- *   :round_length!,
- *   :play_time_per_player!,
+ *   :turn_length!,
  *   :creation_block_height!,
  *   :created_at!,
  *   :hidden!,

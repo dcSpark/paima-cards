@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -8,18 +8,19 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import type MainController from "@src/MainController";
-import type { LobbyState } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
-import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import type { IGetLobbyByIdResult } from "@cards/db";
+import { useNavigate } from "react-router-dom";
+import { Page } from "@src/pages/PageCoordinator";
+import { getOpenLobbies, joinLobby, searchLobby } from "@src/services/utils";
 
 type Column = {
-  id: keyof LobbyState | "action";
+  id: keyof IGetLobbyByIdResult | "action";
   label: string;
   minWidth: number;
 };
@@ -30,7 +31,7 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-const expandValue = (id: keyof LobbyState, value: unknown) => {
+const expandValue = (id: keyof IGetLobbyByIdResult, value: unknown) => {
   if (id === "created_at" && typeof value === "string") {
     return formatDate(value);
   }
@@ -41,13 +42,14 @@ const expandValue = (id: keyof LobbyState, value: unknown) => {
 };
 
 const OpenLobbies: React.FC = () => {
-  const mainController: MainController = useContext(AppContext) as any;
+  const navigate = useNavigate();
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
     collection,
+    joinedLobbyRawState: [, setJoinedLobbyRaw],
   } = useGlobalStateContext();
-  const [lobbies, setLobbies] = useState<LobbyState[]>([]);
+  const [lobbies, setLobbies] = useState<IGetLobbyByIdResult[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");
@@ -55,10 +57,10 @@ const OpenLobbies: React.FC = () => {
   useEffect(() => {
     if (selectedNft.nft == null) return;
 
-    mainController.getOpenLobbies(selectedNft.nft).then((lobbies) => {
+    getOpenLobbies(selectedNft.nft).then((lobbies) => {
       setLobbies(lobbies);
     });
-  }, [mainController, selectedNft.nft]);
+  }, [selectedNft.nft]);
 
   const handleSearchTextChange = (query: string) => {
     setSearchText(query);
@@ -72,7 +74,7 @@ const OpenLobbies: React.FC = () => {
   const searchForHiddenLobby = async (query: string) => {
     if (selectedNft.nft == null) return;
 
-    const results = await mainController.searchLobby(selectedNft.nft, query, 0);
+    const results = await searchLobby(selectedNft.nft, query, 0);
     if (results == null || results.length === 0) return;
     const newLobbies = results.filter(
       (result) => !lobbies.some((lobby) => lobby.lobby_id === result.lobby_id)
@@ -90,7 +92,7 @@ const OpenLobbies: React.FC = () => {
   const handleLobbiesRefresh = async () => {
     if (selectedNft.nft == null) return;
 
-    const lobbies = await mainController.getOpenLobbies(selectedNft.nft);
+    const lobbies = await getOpenLobbies(selectedNft.nft);
 
     setPage(0);
     setSearchText("");
@@ -144,7 +146,7 @@ const OpenLobbies: React.FC = () => {
                           <TableCell key={column.id} align="left">
                             {column.id === "action" ? (
                               <Button
-                                onClick={() => {
+                                onClick={async () => {
                                   if (
                                     collection.cards == null ||
                                     selectedNft.nft == null ||
@@ -152,7 +154,7 @@ const OpenLobbies: React.FC = () => {
                                   )
                                     return;
 
-                                  mainController.joinLobby(
+                                  const joinedLobby = await joinLobby(
                                     selectedNft.nft,
                                     selectedDeck.map((card) => {
                                       if (collection.cards?.[card] == null)
@@ -168,6 +170,9 @@ const OpenLobbies: React.FC = () => {
                                     }),
                                     lobby.lobby_id
                                   );
+
+                                  setJoinedLobbyRaw(joinedLobby);
+                                  navigate(Page.Game);
                                 }}
                               >
                                 Enter

@@ -1,25 +1,25 @@
 extensions:
-  - name: "Dice NFT contract"
+  - name: "Account NFT"
     type: erc721
     contractAddress: "0x9373764E38DCbC035B8FE2281Cb8c3C9C34F284C"
-    startBlockHeight: 16160156
-    scheduledPrefix: nftmint
+    startBlockHeight: 16418957
+    scheduledPrefix: accMint
   - name: "Trade NFT mint"
     type: erc721
     contractAddress: "0x85e2849490c29A9863e4aBdB222B5D1f5FD1609b"
-    startBlockHeight: 16160156
+    startBlockHeight: 16418957
     scheduledPrefix: tradeMint
   - name: "Trade NFT transfer"
     type: generic
     contractAddress: "0x85e2849490c29A9863e4aBdB222B5D1f5FD1609b"
-    startBlockHeight: 16160156
+    startBlockHeight: 16418957
     abiPath: "./abis/ERC721.json"
     eventSignature: "Transfer(address,address,uint256)"
     scheduledPrefix: tradeTransfer
-  - name: "Generic Payment"
+  - name: "Generic Payment Proxy"
     type: generic
-    contractAddress: "0x35390c41200DD56Ac3A679a0c1EeA369444f3b60"
-    startBlockHeight: 16160156
+    contractAddress: "0x175e451823B999a657Ef5F2060115a381b8eceDA"
+    startBlockHeight: 16418957
     abiPath: "./abis/GenericPayment.json"
     eventSignature: "Pay(uint256,address,string)"
     scheduledPrefix: "generic"

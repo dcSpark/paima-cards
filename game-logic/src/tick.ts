@@ -13,7 +13,7 @@ import type {
 } from './types';
 import { CARD_REGISTRY, MOVE_KIND, TICK_EVENT_KIND } from './constants';
 import { deserializeMove, getNonTurnPlayer, getTurnPlayer, matchResults } from '.';
-import type { IGetRoundMovesResult } from '@dice/db';
+import type { IGetRoundMovesResult } from '@cards/db';
 import { genPostTxEvents } from './cards-logic';
 
 // TODO: variable number of players
@@ -111,7 +111,6 @@ export function processTick(
 
   const turnEnds = move.kind === MOVE_KIND.endTurn;
   const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
-  const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
   const turnEndEvents: TurnEndTickEvent[] = turnEnds
     ? [
@@ -135,6 +134,7 @@ export function processTick(
     events.push(event);
   }
 
+  const matchEnds = matchState.players.some(player => player.hitPoints <= 0);
   const matchEndEvents: MatchEndTickEvent[] = matchEnds
     ? [{ kind: TICK_EVENT_KIND.matchEnd, result: matchResults(matchState) }]
     : [];

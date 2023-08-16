@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import "./CardGame.scss";
 import type {
   MatchState,
@@ -9,7 +9,7 @@ import type {
   Move,
   LocalCard,
   CardCommitmentIndex,
-} from "@dice/game-logic";
+} from "@cards/game-logic";
 import {
   applyEvent,
   CARD_REGISTRY,
@@ -17,8 +17,8 @@ import {
   getTurnPlayer,
   MOVE_KIND,
   TICK_EVENT_KIND,
-} from "@dice/game-logic";
-import * as Paima from "@dice/middleware";
+} from "@cards/game-logic";
+import * as Paima from "@cards/middleware";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
 
@@ -29,16 +29,28 @@ interface CardGameProps {
   localDeck: LocalCard[];
 }
 
-const DiceGame: React.FC<CardGameProps> = ({
+const CardsGame: React.FC<CardGameProps> = ({
   lobbyState,
   refetchLobbyState,
   selectedNft,
   localDeck,
 }) => {
+  // waiting for a tx to be accepted and processed by the backend
+  const [awaitingTxEffect, rawSetAwaitingTxEffect] = useState(false);
+  const setAwaitingTxEffect = useCallback((value: boolean) => {
+    // We want to disable interaction after a successful tx while we wait for the backend to process it.
+    // But, if it takes too long (10s), something might have gone wrong, so we let the user try again.
+
+    rawSetAwaitingTxEffect(value);
+    if (value) {
+      setTimeout(() => {
+        rawSetAwaitingTxEffect(false);
+      }, 10_000);
+    }
+  }, []);
   const [selectedCard, setSelectedCard] = useState<
     undefined | CardCommitmentIndex
   >();
-  const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
   // Game data for what is being currently shown to user.
@@ -59,6 +71,10 @@ const DiceGame: React.FC<CardGameProps> = ({
     },
     isPostTxDone: false,
   });
+  const matchOver = useMemo(() => {
+    return display.matchState.result != null;
+  }, [display.matchState.result]);
+
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
   const [roundExecutor, setRoundExecutor] = useState<
@@ -74,12 +90,12 @@ const DiceGame: React.FC<CardGameProps> = ({
     const thisPlayer = display.matchState.players.find(
       (player) => player.nftId === selectedNft
     );
-    if (thisPlayer == null) throw new Error(`DiceGame: nft not in lobby`);
+    if (thisPlayer == null) throw new Error(`CardsGame: nft not in lobby`);
 
     const opponent = display.matchState.players.find(
       (player) => player.nftId !== selectedNft
     );
-    if (opponent == null) throw new Error(`DiceGame: opponent not in lobby`);
+    if (opponent == null) throw new Error(`CardsGame: opponent not in lobby`);
     return { thisPlayer, opponent };
   }, [selectedNft, display]);
 
@@ -96,6 +112,7 @@ const DiceGame: React.FC<CardGameProps> = ({
     // In cards this can mean they chose to draw a card and are waiting for it to happen.
 
     if (
+      matchOver ||
       // not displaying current round
       display.round < lobbyState.current_round ||
       // not interactive round
@@ -113,7 +130,15 @@ const DiceGame: React.FC<CardGameProps> = ({
       ...oldDisplay,
       isPostTxDone: true,
     }));
-  }, [display, lobbyState, thisPlayer, postTxEventQueue]);
+    setAwaitingTxEffect(false);
+  }, [
+    display,
+    lobbyState,
+    thisPlayer,
+    postTxEventQueue,
+    matchOver,
+    setAwaitingTxEffect,
+  ]);
 
   useEffect(
     () =>
@@ -164,6 +189,9 @@ const DiceGame: React.FC<CardGameProps> = ({
       lobbyState.current_round,
       move
     );
+    if (moveResult.success) {
+      setAwaitingTxEffect(true);
+    }
     console.log("Move result:", moveResult);
     await refetchLobbyState();
   }
@@ -248,7 +276,6 @@ const DiceGame: React.FC<CardGameProps> = ({
             if (thisPlayerResult === "l") return "You lose!";
             return "It's a tie!";
           });
-          setMatchOver(true);
         }
       }
 
@@ -329,7 +356,15 @@ const DiceGame: React.FC<CardGameProps> = ({
     fetchedEndState,
   ]);
 
+  useEffect(() => {
+    // assertion: no card is selected if match is over
+    if (!matchOver || selectedCard == null) return;
+
+    setSelectedCard(undefined);
+  }, [matchOver, selectedCard]);
+
   const disableInteraction =
+    awaitingTxEffect ||
     matchOver ||
     display.round !== lobbyState.current_round ||
     thisPlayer.turn !== display.matchState.turn ||
@@ -344,16 +379,61 @@ const DiceGame: React.FC<CardGameProps> = ({
     <>
       <Typography
         variant="caption"
-        sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
+        sx={{ fontSize: "1.75rem", lineHeight: "2.25rem" }}
       >
-        {matchOver
-          ? "Match over"
-          : `Round: ${display.matchState.properRound + 1}`}
-        {" | "}
-        {caption ??
-          (thisPlayer.turn === display.matchState.turn
-            ? "Your turn"
-            : "Opponent's turn")}
+        {(() => {
+          if (display.matchState.result != null) {
+            const result = (() => {
+              const thisPlayerIndex = display.matchState.players.findIndex(
+                (player) => player.nftId === selectedNft
+              );
+
+              const thisPlayerResult =
+                display.matchState.result[thisPlayerIndex];
+
+              if (thisPlayerResult === "w") return "You win!";
+              if (thisPlayerResult === "l") return "You lose!";
+              return "It's a tie!";
+            })();
+
+            return (
+              <>
+                <span>Match over</span>
+                <span> | </span>
+                <span>{result}</span>
+              </>
+            );
+          }
+
+          const finalCaption: JSX.Element = (() => {
+            if (caption != null) return <span>{caption}</span>;
+            if (awaitingTxEffect)
+              return (
+                <span>
+                  <span>Processing tx </span>
+                  <CircularProgress
+                    size="1em"
+                    sx={{ display: "inline-block", verticalAlign: "middle" }}
+                  />
+                </span>
+              );
+            return (
+              <span>
+                {thisPlayer.turn === display.matchState.turn
+                  ? "Your turn"
+                  : "Opponent's turn"}
+              </span>
+            );
+          })();
+
+          return (
+            <>
+              <span>Round:</span>
+              <span> | </span>
+              {finalCaption}
+            </>
+          );
+        })()}
       </Typography>
       <Box
         sx={{
@@ -411,6 +491,7 @@ const DiceGame: React.FC<CardGameProps> = ({
           localDeck={localDeck}
           turn={display.matchState.turn}
           selectedCardState={[selectedCard, setSelectedCard]}
+          disableInteraction={disableInteraction}
           onEndTurn={
             canPass
               ? () => {
@@ -444,4 +525,4 @@ const DiceGame: React.FC<CardGameProps> = ({
   );
 };
 
-export default DiceGame;
+export default CardsGame;

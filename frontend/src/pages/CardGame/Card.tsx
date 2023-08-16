@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, ButtonBase, Modal } from "@mui/material";
-import type { CardRegistryId } from "@dice/game-logic";
+import type { CardRegistryId } from "@cards/game-logic";
 import PaimaLogo from "./PaimaLogo";
 import type { UseStateResponse } from "@src/utils";
 import { imageRegistry } from "./imageMapping";

@@ -1,6 +1,13 @@
-import type { MatchState, Move } from '@dice/game-logic';
-import { MOVE_KIND, applyEvent, genPostTxEvents, getTurnPlayer } from '@dice/game-logic';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import type { MatchState, Move } from '@cards/game-logic';
+import {
+  CARD_REGISTRY,
+  MOVE_KIND,
+  applyEvent,
+  genPostTxEvents,
+  getNonTurnPlayer,
+  getTurnPlayer,
+} from '@cards/game-logic';
+import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
 import type Prando from 'paima-sdk/paima-prando';
 
 //
@@ -26,6 +33,8 @@ export class PracticeAI {
   // Return null to not send next move.
   public getNextMove(): Move {
     const me = getTurnPlayer(this.matchState);
+    const them = getNonTurnPlayer(this.matchState);
+
     if (me.nftId !== PRACTICE_BOT_NFT_ID)
       throw new Error(`getNextMove: bot move for non-bot player`);
     if (me.botLocalDeck == null) throw new Error(`getNextMove: bot does not have a deck saved`);
@@ -39,6 +48,20 @@ export class PracticeAI {
         cardRegistryId: me.botLocalDeck[me.currentHand[0].index].registryId,
         salt: me.botLocalDeck[me.currentHand[0].index].salt,
       };
+    }
+
+    for (const [myCardPos, myCard] of me.currentBoard.entries()) {
+      if (myCard.hasAttack) {
+        for (const [theirCardPos, theirCard] of them.currentBoard.entries()) {
+          if (CARD_REGISTRY[myCard.registryId]?.defeats === theirCard.registryId) {
+            return {
+              kind: MOVE_KIND.targetCardWithBoardCard,
+              fromBoardPosition: myCardPos,
+              toBoardPosition: theirCardPos,
+            };
+          }
+        }
+      }
     }
 
     return { kind: MOVE_KIND.endTurn };

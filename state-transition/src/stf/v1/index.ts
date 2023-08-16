@@ -8,17 +8,18 @@ import {
   joinedLobby,
   closedLobby,
   submittedMoves,
-  scheduledData,
   practiceMoves,
   mintNft,
   cardPackBuy,
   mintTradeNft,
   setTradeNftCards,
   claimTradeNftCards,
+  zombieRound,
+  updateStats,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { GENERIC_PAYMENT_MESSAGES } from '@dice/game-logic';
-import { ZERO_ADDRESS } from '@dice/utils';
+import { GENERIC_PAYMENT_MESSAGES, PARSER_KEYS } from '@cards/game-logic';
+import { ZERO_ADDRESS } from '@cards/utils';
 
 export default async function (
   inputData: SubmittedChainData,
@@ -33,11 +34,11 @@ export default async function (
   console.log(`Input string parsed as: ${parsed.input}`);
 
   switch (parsed.input) {
-    case 'nftMint':
+    case PARSER_KEYS.accountMint:
       return mintNft(parsed);
-    case 'tradeNftMint':
+    case PARSER_KEYS.tradeNftMint:
       return mintTradeNft(parsed);
-    case 'genericPayment': {
+    case PARSER_KEYS.genericPayment: {
       if (inputData.userAddress !== SCHEDULED_DATA_ADDRESS) {
         console.log('DISCARD: scheduled data from regular address');
         return [];
@@ -53,31 +54,32 @@ export default async function (
         }
       }
     }
-    case 'createdLobby':
+    case PARSER_KEYS.createdLobby:
       return createdLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
-    case 'joinedLobby':
+    case PARSER_KEYS.joinedLobby:
       return joinedLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
-    case 'closedLobby':
+    case PARSER_KEYS.closedLobby:
       return closedLobby(user, parsed, dbConn);
-    case 'submittedMoves':
+    case PARSER_KEYS.submittedMoves:
       return submittedMoves(user, blockHeight, parsed, dbConn);
-    case 'practiceMoves':
+    case PARSER_KEYS.practiceMoves:
       return practiceMoves(user, blockHeight, parsed, dbConn);
-    case 'scheduledData': {
-      if (!inputData.scheduled) return [];
-      return scheduledData(blockHeight, parsed, dbConn, randomnessGenerator);
-    }
-    case 'setTradeNftCards': {
+    case PARSER_KEYS.zombieScheduledData:
+      return zombieRound(blockHeight, parsed, dbConn, randomnessGenerator);
+    case PARSER_KEYS.userScheduledData:
+      return updateStats(parsed, dbConn);
+    case PARSER_KEYS.setTradeNftCards: {
       return setTradeNftCards(user, parsed, dbConn);
     }
-    case 'transferTradeNft': {
+    case PARSER_KEYS.transferTradeNft: {
       if (inputData.userAddress !== SCHEDULED_DATA_ADDRESS) {
         console.log('DISCARD: scheduled data from regular address');
         return [];
       }
 
       if (parsed.to !== ZERO_ADDRESS) {
-        console.log('DISCARD: not a burt transfer, we only watch burn transfers');
+        console.log('DISCARD: not a burn transfer, we only watch burn transfers');
+        return [];
       }
 
       return claimTradeNftCards(parsed, dbConn);

@@ -1,25 +1,26 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import "./CreateLobby.scss";
 import { Box, Checkbox, FormControlLabel } from "@mui/material";
-import type MainController from "@src/MainController";
 import Navbar from "@src/components/Navbar";
-import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import NumericField from "@src/components/NumericField";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import { useNavigate } from "react-router-dom";
+import { Page } from "@src/pages/PageCoordinator";
+import { createLobby } from "@src/services/utils";
 
 const CreateLobby: React.FC = () => {
-  const mainController: MainController = useContext(AppContext) as any;
+  const navigate = useNavigate();
   const {
     selectedNftState: [selectedNft],
     selectedDeckState: [selectedDeck],
     collection,
+    joinedLobbyRawState: [, setJoinedLobbyRaw],
   } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("5");
-  const [roundLength, setRoundLength] = useState("100");
-  const [playersTime, setPlayersTime] = useState("100");
+  const [turnLength, setTurnLength] = useState("100");
   const [isHidden, setIsHidden] = useState(false);
   const [isPractice, setIsPractice] = useState(false);
 
@@ -32,10 +33,9 @@ const CreateLobby: React.FC = () => {
       return;
 
     const numberOfRoundsNum = parseInt(numberOfRounds);
-    const roundLengthNum = parseInt(roundLength);
-    const playersTimeNum = parseInt(playersTime);
+    const turnLengthNum = parseInt(turnLength);
 
-    await mainController.createLobby(
+    const createdLobby = await createLobby(
       selectedNft.nft,
       selectedDeck.map((card) => {
         if (collection.cards?.[card] == null)
@@ -46,11 +46,12 @@ const CreateLobby: React.FC = () => {
         };
       }),
       numberOfRoundsNum,
-      roundLengthNum,
-      playersTimeNum,
+      turnLengthNum,
       isHidden,
       isPractice
     );
+    setJoinedLobbyRaw(createdLobby);
+    navigate(Page.Game);
   };
 
   return (
@@ -66,16 +67,11 @@ const CreateLobby: React.FC = () => {
                 onChange={setNumberOfRounds}
               />
               {
-                // TODO: disabled - need to be properly implemented on the backend:
+                // TODO: disabled - time limit (zombie round) needs to be properly implemented on the backend
                 /* <NumericField
                 label="Player's Time"
-                value={playersTime}
-                onChange={setPlayersTime}
-              />
-              <NumericField
-                label="Round Length"
-                value={roundLength}
-                onChange={setRoundLength}
+                value={turnLength}
+                onChange={setTurnLength}
               /> */
               }
             </Box>

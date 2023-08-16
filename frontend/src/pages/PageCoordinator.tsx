@@ -1,52 +1,35 @@
-import React, { useState, useEffect, useContext } from "react";
-import type MainController from "@src/MainController";
-import { Page } from "@src/MainController";
-import LandingPage from "./Landing";
+import React from "react";
 import MainMenu from "./MainMenu";
 import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
 import CreateLobby from "./CreateLobby";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "./PageCoordinator.scss";
-import { AppContext } from "@src/main";
 import { Lobby } from "./CardGame/Lobby";
-import type { IGetLobbyByIdResult } from "@dice/db";
 import BuyPack from "./BuyPack";
 import Collection from "./Collection";
 import TradeNfts from "./TradeNfts";
 
+export enum Page {
+  MainMenu = "/",
+  CreateLobby = "/create_lobby",
+  OpenLobbies = "/open_lobbies",
+  Game = "/game",
+  MyGames = "/my_games",
+  Collection = "/collection",
+  BuyPacks = "/buy_packs",
+  TradeNfts = "/trade_nfts",
+}
+
 const PageCoordinator: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mainController: MainController = useContext(AppContext) as any;
-  const navigate = useNavigate();
-
-  const [lobby, setLobby] = useState<null | IGetLobbyByIdResult>(null);
-
-  useEffect(() => {
-    mainController.callback = (
-      newPage: Page | null,
-      isLoading: boolean,
-      extraData: IGetLobbyByIdResult | null
-    ) => {
-      // Update the local state and show a message to the user
-      if (newPage === Page.Game) {
-        setLobby(extraData);
-      }
-      if (newPage) {
-        navigate(newPage);
-      }
-    };
-  }, [mainController, navigate]);
-
   return (
-    <div className="dice-app">
+    <div>
       <Routes>
         <Route path={Page.MainMenu} element={<MainMenu />} />
         <Route path={Page.OpenLobbies} element={<OpenLobbies />} />
         <Route path={Page.MyGames} element={<MyGames />} />
-        <Route path={Page.Game} element={<Lobby initialLobbyRaw={lobby} />} />
+        <Route path={Page.Game} element={<Lobby />} />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />
-        <Route path={Page.Landing} element={<LandingPage />} />
         <Route path={Page.Collection} element={<Collection />} />
         <Route path={Page.BuyPacks} element={<BuyPack />} />
         <Route path={Page.TradeNfts} element={<TradeNfts />} />

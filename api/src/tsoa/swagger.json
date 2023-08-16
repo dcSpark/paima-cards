@@ -6,6 +6,227 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Uint8Array": {
+				"description": "A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the\r\nrequested number of bytes could not be allocated an exception is raised.",
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CardCommitmentIndex": {
+				"type": "number",
+				"format": "double",
+				"description": "Index in starting commitments, i.e. in starting deck"
+			},
+			"DrawIndex": {
+				"type": "number",
+				"format": "double",
+				"description": "The sequential position among all cards drawn in some match by some player"
+			},
+			"HandCard": {
+				"properties": {
+					"draw": {
+						"$ref": "#/components/schemas/DrawIndex"
+					},
+					"index": {
+						"$ref": "#/components/schemas/CardCommitmentIndex"
+					}
+				},
+				"required": [
+					"draw",
+					"index"
+				],
+				"type": "object"
+			},
+			"CardDbId": {
+				"type": "number",
+				"format": "double",
+				"description": "Uniquely identifies a card owned by a player globally"
+			},
+			"CardRegistryId": {
+				"type": "number",
+				"format": "double",
+				"description": "Identifies type of card (e.g. 47 -> Queen of Spades)"
+			},
+			"BoardCard": {
+				"properties": {
+					"hasAttack": {
+						"type": "boolean"
+					},
+					"registryId": {
+						"$ref": "#/components/schemas/CardRegistryId"
+					},
+					"index": {
+						"$ref": "#/components/schemas/CardCommitmentIndex"
+					},
+					"id": {
+						"$ref": "#/components/schemas/CardDbId"
+					}
+				},
+				"required": [
+					"hasAttack",
+					"registryId",
+					"index",
+					"id"
+				],
+				"type": "object"
+			},
+			"LocalCard": {
+				"properties": {
+					"salt": {
+						"type": "string"
+					},
+					"registryId": {
+						"$ref": "#/components/schemas/CardRegistryId"
+					},
+					"id": {
+						"$ref": "#/components/schemas/CardDbId"
+					}
+				},
+				"required": [
+					"salt",
+					"registryId",
+					"id"
+				],
+				"type": "object"
+			},
+			"LobbyPlayer": {
+				"properties": {
+					"turn": {
+						"type": "number",
+						"format": "double"
+					},
+					"botLocalDeck": {
+						"items": {
+							"$ref": "#/components/schemas/LocalCard"
+						},
+						"type": "array"
+					},
+					"currentDraw": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentBoard": {
+						"items": {
+							"$ref": "#/components/schemas/BoardCard"
+						},
+						"type": "array"
+					},
+					"currentHand": {
+						"items": {
+							"$ref": "#/components/schemas/HandCard"
+						},
+						"type": "array"
+					},
+					"currentDeck": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"startingCommitments": {
+						"$ref": "#/components/schemas/Uint8Array"
+					},
+					"hitPoints": {
+						"type": "number",
+						"format": "double"
+					},
+					"nftId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"currentDraw",
+					"currentBoard",
+					"currentHand",
+					"currentDeck",
+					"startingCommitments",
+					"hitPoints",
+					"nftId"
+				],
+				"type": "object"
+			},
+			"Move": {
+				"anyOf": [
+					{
+						"properties": {
+							"kind": {
+								"type": "string",
+								"enum": [
+									"end"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"kind"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"salt": {
+								"type": "string"
+							},
+							"cardRegistryId": {
+								"$ref": "#/components/schemas/CardRegistryId"
+							},
+							"cardId": {
+								"$ref": "#/components/schemas/CardDbId"
+							},
+							"cardIndex": {
+								"$ref": "#/components/schemas/CardCommitmentIndex"
+							},
+							"handPosition": {
+								"type": "number",
+								"format": "double"
+							},
+							"kind": {
+								"type": "string",
+								"enum": [
+									"play"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"salt",
+							"cardRegistryId",
+							"cardId",
+							"cardIndex",
+							"handPosition",
+							"kind"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"toBoardPosition": {
+								"type": "number",
+								"format": "double"
+							},
+							"fromBoardPosition": {
+								"type": "number",
+								"format": "double"
+							},
+							"kind": {
+								"type": "string",
+								"enum": [
+									"targetB"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"toBoardPosition",
+							"fromBoardPosition",
+							"kind"
+						],
+						"type": "object"
+					}
+				]
+			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -14,6 +235,220 @@
 					"finished",
 					"open"
 				]
+			},
+			"Pick_IGetLobbyByIdResult.Exclude_keyofIGetLobbyByIdResult.LobbyStateProps__": {
+				"properties": {
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"creation_block_height": {
+						"type": "number",
+						"format": "double"
+					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
+					"hidden": {
+						"type": "boolean"
+					},
+					"lobby_creator": {
+						"type": "number",
+						"format": "double"
+					},
+					"lobby_id": {
+						"type": "string"
+					},
+					"lobby_state": {
+						"$ref": "#/components/schemas/lobby_status"
+					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
+					"num_of_rounds": {
+						"type": "number",
+						"format": "double"
+					},
+					"practice": {
+						"type": "boolean"
+					},
+					"turn_length": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"created_at",
+					"creation_block_height",
+					"current_tx_event_move",
+					"hidden",
+					"lobby_creator",
+					"lobby_id",
+					"lobby_state",
+					"max_players",
+					"num_of_rounds",
+					"practice",
+					"turn_length"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IGetLobbyByIdResult.LobbyStateProps_": {
+				"$ref": "#/components/schemas/Pick_IGetLobbyByIdResult.Exclude_keyofIGetLobbyByIdResult.LobbyStateProps__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"PropertiesNonNullable_Pick_IGetLobbyByIdResult.LobbyStateProps__": {
+				"properties": {
+					"current_match": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_turn": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					}
+				},
+				"required": [
+					"current_match",
+					"current_round",
+					"current_turn",
+					"current_proper_round"
+				],
+				"type": "object"
+			},
+			"LobbyState": {
+				"properties": {
+					"roundSeed": {
+						"type": "string"
+					},
+					"players": {
+						"items": {
+							"$ref": "#/components/schemas/LobbyPlayer"
+						},
+						"type": "array"
+					},
+					"txEventMove": {
+						"$ref": "#/components/schemas/Move"
+					}
+				},
+				"required": [
+					"roundSeed",
+					"players"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IGetMatchMovesResult": {
+				"description": "'GetMatchMoves' return type",
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"lobby_id": {
+						"type": "string"
+					},
+					"match_within_lobby": {
+						"type": "number",
+						"format": "double"
+					},
+					"move_within_round": {
+						"type": "number",
+						"format": "double"
+					},
+					"nft_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"round_within_match": {
+						"type": "number",
+						"format": "double"
+					},
+					"serialized_move": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"lobby_id",
+					"match_within_lobby",
+					"move_within_round",
+					"nft_id",
+					"round_within_match",
+					"serialized_move"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExecutorDataSeed": {
+				"properties": {
+					"seed": {
+						"type": "string"
+					},
+					"block_height": {
+						"type": "number",
+						"format": "double"
+					},
+					"round": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"seed",
+					"block_height",
+					"round"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MatchExecutorData": {
+				"properties": {
+					"lobby": {
+						"$ref": "#/components/schemas/LobbyState"
+					},
+					"moves": {
+						"items": {
+							"$ref": "#/components/schemas/IGetMatchMovesResult"
+						},
+						"type": "array"
+					},
+					"seeds": {
+						"items": {
+							"$ref": "#/components/schemas/ExecutorDataSeed"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"lobby",
+					"moves",
+					"seeds"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MatchExecutorResponse": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/MatchExecutorData"
+					}
+				],
+				"nullable": true
 			},
 			"IGetLobbyByIdResult": {
 				"description": "'GetLobbyById' return type",
@@ -71,14 +506,10 @@
 						"type": "number",
 						"format": "double"
 					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
 					"practice": {
 						"type": "boolean"
 					},
-					"round_length": {
+					"turn_length": {
 						"type": "number",
 						"format": "double"
 					}
@@ -97,14 +528,61 @@
 					"lobby_state",
 					"max_players",
 					"num_of_rounds",
-					"play_time_per_player",
 					"practice",
-					"round_length"
+					"turn_length"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Response": {
+			"RoundExecutorBackendData": {
+				"properties": {
+					"lobby": {
+						"$ref": "#/components/schemas/IGetLobbyByIdResult"
+					},
+					"moves": {
+						"items": {
+							"$ref": "#/components/schemas/IGetMatchMovesResult"
+						},
+						"type": "array"
+					},
+					"seed": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lobby",
+					"moves",
+					"seed"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RoundExecutorResponse": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/RoundExecutorBackendData"
+					},
+					{
+						"properties": {
+							"error": {
+								"type": "string",
+								"enum": [
+									"lobby not found",
+									"bad round number",
+									"round not found",
+									"match not found",
+									"internal error"
+								]
+							}
+						},
+						"required": [
+							"error"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"LobbyRawResponse": {
 				"properties": {
 					"lobby": {
 						"allOf": [
@@ -118,8 +596,23 @@
 				"required": [
 					"lobby"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
+			},
+			"LobbyStateResponse": {
+				"properties": {
+					"lobby": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LobbyState"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"lobby"
+				],
+				"type": "object"
 			},
 			"IGetPaginatedOpenLobbiesResult": {
 				"description": "'GetPaginatedOpenLobbies' return type",
@@ -177,14 +670,10 @@
 						"type": "number",
 						"format": "double"
 					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
 					"practice": {
 						"type": "boolean"
 					},
-					"round_length": {
+					"turn_length": {
 						"type": "number",
 						"format": "double"
 					}
@@ -203,9 +692,8 @@
 					"lobby_state",
 					"max_players",
 					"num_of_rounds",
-					"play_time_per_player",
 					"practice",
-					"round_length"
+					"turn_length"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -222,8 +710,7 @@
 				"required": [
 					"lobbies"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
 			},
 			"IGetRandomActiveLobbyResult": {
 				"description": "'GetRandomActiveLobby' return type",
@@ -281,14 +768,10 @@
 						"type": "number",
 						"format": "double"
 					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
 					"practice": {
 						"type": "boolean"
 					},
-					"round_length": {
+					"turn_length": {
 						"type": "number",
 						"format": "double"
 					}
@@ -307,9 +790,8 @@
 					"lobby_state",
 					"max_players",
 					"num_of_rounds",
-					"play_time_per_player",
 					"practice",
-					"round_length"
+					"turn_length"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -328,211 +810,158 @@
 				"required": [
 					"lobby"
 				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"IGetOpenLobbyByIdResult": {
-				"description": "'GetOpenLobbyById' return type",
-				"properties": {
-					"created_at": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"creation_block_height": {
-						"type": "number",
-						"format": "double"
-					},
-					"current_match": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_proper_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_turn": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_tx_event_move": {
-						"type": "string",
-						"nullable": true
-					},
-					"hidden": {
-						"type": "boolean"
-					},
-					"lobby_creator": {
-						"type": "number",
-						"format": "double"
-					},
-					"lobby_id": {
-						"type": "string"
-					},
-					"lobby_state": {
-						"$ref": "#/components/schemas/lobby_status"
-					},
-					"max_players": {
-						"type": "number",
-						"format": "double"
-					},
-					"num_of_rounds": {
-						"type": "number",
-						"format": "double"
-					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
-					"practice": {
-						"type": "boolean"
-					},
-					"round_length": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"created_at",
-					"creation_block_height",
-					"current_match",
-					"current_proper_round",
-					"current_round",
-					"current_turn",
-					"current_tx_event_move",
-					"hidden",
-					"lobby_creator",
-					"lobby_id",
-					"lobby_state",
-					"max_players",
-					"num_of_rounds",
-					"play_time_per_player",
-					"practice",
-					"round_length"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ISearchPaginatedOpenLobbiesResult": {
-				"description": "'SearchPaginatedOpenLobbies' return type",
-				"properties": {
-					"created_at": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"creation_block_height": {
-						"type": "number",
-						"format": "double"
-					},
-					"current_match": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_proper_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_turn": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_tx_event_move": {
-						"type": "string",
-						"nullable": true
-					},
-					"hidden": {
-						"type": "boolean"
-					},
-					"lobby_creator": {
-						"type": "number",
-						"format": "double"
-					},
-					"lobby_id": {
-						"type": "string"
-					},
-					"lobby_state": {
-						"$ref": "#/components/schemas/lobby_status"
-					},
-					"max_players": {
-						"type": "number",
-						"format": "double"
-					},
-					"num_of_rounds": {
-						"type": "number",
-						"format": "double"
-					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
-					"practice": {
-						"type": "boolean"
-					},
-					"round_length": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"created_at",
-					"creation_block_height",
-					"current_match",
-					"current_proper_round",
-					"current_round",
-					"current_turn",
-					"current_tx_event_move",
-					"hidden",
-					"lobby_creator",
-					"lobby_id",
-					"lobby_state",
-					"max_players",
-					"num_of_rounds",
-					"play_time_per_player",
-					"practice",
-					"round_length"
-				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
 			},
 			"SearchOpenLobbiesResponse": {
 				"properties": {
 					"lobbies": {
-						"anyOf": [
-							{
-								"items": {
-									"$ref": "#/components/schemas/IGetOpenLobbyByIdResult"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/ISearchPaginatedOpenLobbiesResult"
-								},
-								"type": "array"
-							}
-						]
+						"items": {
+							"$ref": "#/components/schemas/IGetLobbyByIdResult"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"lobbies"
 				],
+				"type": "object"
+			},
+			"IGetAllPaginatedUserLobbiesResult": {
+				"description": "'GetAllPaginatedUserLobbies' return type",
+				"properties": {
+					"created_at": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"creation_block_height": {
+						"type": "number",
+						"format": "double"
+					},
+					"current_match": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_turn": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
+					"hidden": {
+						"type": "boolean"
+					},
+					"lobby_creator": {
+						"type": "number",
+						"format": "double"
+					},
+					"lobby_id": {
+						"type": "string"
+					},
+					"lobby_state": {
+						"$ref": "#/components/schemas/lobby_status"
+					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
+					"num_of_rounds": {
+						"type": "number",
+						"format": "double"
+					},
+					"practice": {
+						"type": "boolean"
+					},
+					"turn_length": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"created_at",
+					"creation_block_height",
+					"current_match",
+					"current_proper_round",
+					"current_round",
+					"current_turn",
+					"current_tx_event_move",
+					"hidden",
+					"lobby_creator",
+					"lobby_id",
+					"lobby_state",
+					"max_players",
+					"num_of_rounds",
+					"practice",
+					"turn_length"
+				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"UserLobbiesResponse": {
+				"properties": {
+					"lobbies": {
+						"items": {
+							"$ref": "#/components/schemas/IGetAllPaginatedUserLobbiesResult"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"lobbies"
+				],
+				"type": "object"
+			},
+			"IGetNewLobbiesByUserAndBlockHeightResult": {
+				"description": "'GetNewLobbiesByUserAndBlockHeight' return type",
+				"properties": {
+					"lobby_id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lobby_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NewLobby": {
+				"$ref": "#/components/schemas/IGetNewLobbiesByUserAndBlockHeightResult"
+			},
+			"UserLobbiesBlockHeightResponse": {
+				"properties": {
+					"lobbies": {
+						"items": {
+							"$ref": "#/components/schemas/NewLobby"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"lobbies"
+				],
+				"type": "object"
+			},
+			"AccountNftResponse": {
+				"properties": {
+					"nft": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object"
 			},
 			"IGetOwnedCardsResult": {
 				"description": "'GetOwnedCards' return type",
@@ -571,8 +1000,7 @@
 				"required": [
 					"cards"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
 			},
 			"numberArray": {
 				"items": {
@@ -616,8 +1044,7 @@
 				"required": [
 					"packs"
 				],
-				"type": "object",
-				"additionalProperties": false
+				"type": "object"
 			},
 			"IGetTradeNftsResult": {
 				"description": "'GetTradeNfts' return type",
@@ -649,28 +1076,70 @@
 			},
 			"GetTradeNftsResponse": {
 				"properties": {
+					"cardLookup": {
+						"$ref": "#/components/schemas/Record_string.IGetCardsByIdsResult_"
+					},
 					"tradeNfts": {
 						"items": {
 							"$ref": "#/components/schemas/IGetTradeNftsResult"
 						},
 						"type": "array"
-					},
-					"cardLookup": {
-						"$ref": "#/components/schemas/Record_string.IGetCardsByIdsResult_"
 					}
 				},
 				"required": [
-					"tradeNfts",
-					"cardLookup"
+					"cardLookup",
+					"tradeNfts"
+				],
+				"type": "object"
+			},
+			"IGetUserStatsResult": {
+				"description": "'GetUserStats' return type",
+				"properties": {
+					"losses": {
+						"type": "number",
+						"format": "double"
+					},
+					"nft_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"ties": {
+						"type": "number",
+						"format": "double"
+					},
+					"wins": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"losses",
+					"nft_id",
+					"ties",
+					"wins"
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"UserStats": {
+				"$ref": "#/components/schemas/IGetUserStatsResult"
+			},
+			"UserStatsResponse": {
+				"properties": {
+					"stats": {
+						"$ref": "#/components/schemas/UserStats"
+					}
+				},
+				"required": [
+					"stats"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
 	},
 	"info": {
-		"title": "@dice/api",
+		"title": "@cards/api",
 		"version": "1.0.0",
 		"description": "Webserver REST API for the middleware to interact with game node.",
 		"license": {
@@ -680,72 +1149,16 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/lobby_raw": {
+		"/executor/match": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "Match",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "lobbyID",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/lobby_state": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "lobbyID",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/match_executor": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
+									"$ref": "#/components/schemas/MatchExecutorResponse"
 								}
 							}
 						}
@@ -773,16 +1186,16 @@
 				]
 			}
 		},
-		"/nfts/wallet": {
+		"/executor/round": {
 			"get": {
-				"operationId": "GetWalletNFT",
+				"operationId": "Round",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Response"
+									"$ref": "#/components/schemas/RoundExecutorResponse"
 								}
 							}
 						}
@@ -792,7 +1205,53 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "lobbyID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "matchWithinLobby",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "roundWithinMatch",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/lobby/raw": {
+			"get": {
+				"operationId": "Raw",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LobbyRawResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "lobbyID",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -801,9 +1260,37 @@
 				]
 			}
 		},
-		"/open_lobbies": {
+		"/lobby/state": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "State",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LobbyStateResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "lobbyID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/lobby/open": {
+			"get": {
+				"operationId": "Open",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -848,9 +1335,9 @@
 				]
 			}
 		},
-		"/random_active_lobby": {
+		"/lobby/randomActive": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "RandomActive",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -867,101 +1354,9 @@
 				"parameters": []
 			}
 		},
-		"/round_executor": {
+		"/lobby/searchOpen": {
 			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "lobbyID",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "matchWithinLobby",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "roundWithinMatch",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/round_status": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "lobbyID",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "matchWithinLobby",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "roundWithinMatch",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/search_open_lobbies": {
-			"get": {
-				"operationId": "Get",
+				"operationId": "SearchOpen",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1009,6 +1404,119 @@
 						"schema": {
 							"format": "double",
 							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/lobby/user": {
+			"get": {
+				"operationId": "User",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserLobbiesResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "nftId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "count",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/lobby/userBlockHeight": {
+			"get": {
+				"operationId": "UserBlockHeight",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserLobbiesBlockHeightResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "nftId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "blockHeight",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/accountNft": {
+			"get": {
+				"operationId": "GetWalletNFT",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AccountNftResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "wallet",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]
@@ -1101,101 +1609,16 @@
 				]
 			}
 		},
-		"/user_lobbies": {
+		"/user/stats": {
 			"get": {
-				"operationId": "Get",
+				"operationId": "Stats",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "nftId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "count",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "page",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/user_lobbies_blockheight": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "nftId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "blockHeight",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/user_stats": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Response"
+									"$ref": "#/components/schemas/UserStatsResponse"
 								}
 							}
 						}

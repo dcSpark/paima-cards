@@ -3,18 +3,17 @@ import { roundExecutor } from 'paima-sdk/paima-executors';
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchState, MatchEnvironment, TickEvent } from './types';
 import { processTick } from './tick';
-import type { IGetLobbyByIdResult, IGetRoundMovesResult } from '@dice/db';
+import type { IGetLobbyByIdResult, IGetRoundMovesResult } from '@cards/db';
 
 export * from './tick';
 export * from './cards-logic';
-export * from './types';
+export * from './types/index';
 export * from './constants';
 export * from './helpers';
 export * from './typecheck';
 
 // We initialize the round executor object using lobby data + submitted moves + randomness generator.
-// This function extracts the match environment and match state from the lobby.
-// and the chess `processTick` function
+// This function extracts the match environment and match state from the lobby and the `processTick` function.
 export function initRoundExecutor(
   lobby: IGetLobbyByIdResult,
   matchState: MatchState,

@@ -12,6 +12,9 @@
     },
     {
       "path": "../db"
+    },
+    {
+      "path": "../game-logic"
     }
   ]
 }

@@ -7,21 +7,19 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import type MainController from "./MainController";
-import { AppContext } from "./main";
 import type { UseStateResponse } from "./utils";
 import type { WalletAddress } from "paima-sdk/paima-utils";
-import * as Paima from "@dice/middleware";
+import * as Paima from "@cards/middleware";
 import ConnectingModal from "./ConnectingModal";
-import { PaimaNotice, OasysNotice } from "./components/PaimaNotice";
-import { Box } from "@mui/material";
-import type { CardDbId, LocalCard } from "@dice/game-logic";
+import { PaimaNotice } from "./components/PaimaNotice";
+import type { CardDbId, LocalCard } from "@cards/game-logic";
 import type {
   IGetBoughtPacksResult,
   IGetCardsByIdsResult,
+  IGetLobbyByIdResult,
   IGetOwnedCardsResult,
   IGetTradeNftsResult,
-} from "@dice/db/build/select.queries";
+} from "@cards/db/build/select.queries";
 import LocalStorage from "./LocalStorage";
 
 export const localDeckCache: Map<string, LocalCard[]> = new Map();
@@ -46,9 +44,11 @@ type GlobalState = {
         tradeNfts: IGetTradeNftsResult[];
         cardLookup: Record<string, IGetCardsByIdsResult>;
       };
+  joinedLobbyRawState: UseStateResponse<undefined | IGetLobbyByIdResult>;
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   null as any as GlobalState
 );
 
@@ -57,7 +57,6 @@ export function GlobalStateProvider({
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const mainController: MainController = useContext(AppContext) as any;
   const [connectedWallet, setConnectedWallet] = useState<
     undefined | WalletAddress
   >();
@@ -76,6 +75,7 @@ export function GlobalStateProvider({
         cardLookup: Record<string, IGetCardsByIdsResult>;
       }
   >();
+  const joinedLobbyRawState = useState<undefined | IGetLobbyByIdResult>();
 
   const [selectedDeckSubscription, setSelectedDeckSubscription] =
     useState<number>(0);
@@ -118,18 +118,18 @@ export function GlobalStateProvider({
       const result = await Paima.default.getNftForWallet(connectedWallet);
       if (
         result.success &&
-        (result.result == null || result.result !== selectedNft.nft)
+        (result.result == null || result.result.nft !== selectedNft.nft)
       ) {
         setSelectedNft({
           loading: false,
-          nft: result.result,
+          nft: result.result.nft,
         });
       }
     };
     fetch();
     const interval = setInterval(fetch, 5000);
     return () => clearInterval(interval);
-  }, [mainController, connectedWallet, selectedNft]);
+  }, [connectedWallet, selectedNft]);
 
   useEffect(() => {
     // poll collection
@@ -144,7 +144,7 @@ export function GlobalStateProvider({
           if (result.success) {
             setCollection((oldCollection) => ({
               ...oldCollection,
-              boughtPacks: result.result,
+              boughtPacks: result.result.packs,
             }));
           }
         })(),
@@ -155,7 +155,7 @@ export function GlobalStateProvider({
           if (result.success) {
             const raw = result.result;
             const cards = Object.fromEntries(
-              raw.map((entry) => [entry.id, entry])
+              raw.cards.map((entry) => [entry.id, entry])
             );
 
             setCollection((oldCollection) => ({
@@ -171,7 +171,7 @@ export function GlobalStateProvider({
     return () => {
       clearInterval(interval);
     };
-  }, [mainController, selectedNft]);
+  }, [selectedNft]);
 
   useEffect(() => {
     // poll connection to wallet
@@ -185,7 +185,7 @@ export function GlobalStateProvider({
     fetch();
     const interval = setInterval(fetch, 2000);
     return () => clearInterval(interval);
-  }, [connectedWallet, mainController]);
+  }, [connectedWallet]);
 
   useEffect(() => {
     // poll trade nfts
@@ -218,6 +218,7 @@ export function GlobalStateProvider({
       collection,
       selectedDeckState: [selectedDeck, setSelectedDeck],
       tradeNfts,
+      joinedLobbyRawState,
     }),
     [
       collection,
@@ -226,6 +227,7 @@ export function GlobalStateProvider({
       selectedNft,
       setSelectedDeck,
       tradeNfts,
+      joinedLobbyRawState,
     ]
   );
 
@@ -234,8 +236,6 @@ export function GlobalStateProvider({
       <ConnectingModal open={connectedWallet == null} />
       {children}
       <PaimaNotice />
-      <Box sx={{ marginRight: 1 }} />
-      <OasysNotice />
     </GlobalStateContext.Provider>
   );
 }

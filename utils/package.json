@@ -1,7 +1,7 @@
 {
-  "name": "@dice/utils",
+  "name": "@cards/utils",
   "version": "1.0.0",
-  "description": "Helper library for Paima Dice game",
+  "description": "Helper library for the game",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "type": "module",
@@ -13,5 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bignumber.js": "9.1.1"
   }
 }

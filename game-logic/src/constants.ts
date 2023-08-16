@@ -3,7 +3,7 @@ import type { CardRegistry } from './types';
 export const COMMITMENT_LENGTH = 16;
 export const DECK_LENGTH = 10;
 export const PACK_LENGTH = 5;
-export const INITIAL_HIT_POINTS = 20;
+export const INITIAL_HIT_POINTS = 10;
 
 // Values must match move_kind in db. No need for a type check, it will cause errors somewhere.
 export const MOVE_KIND = {
@@ -35,4 +35,34 @@ export const CARD_IDS = Object.keys(CARD_REGISTRY).map(key => Number.parseInt(ke
 
 export const GENERIC_PAYMENT_MESSAGES = {
   buyCardPack: 'pack',
+} as const;
+
+export const PARSER_KEYS = {
+  accountMint: 'accountMint',
+  tradeNftMint: 'tradeNftMint',
+  createdLobby: 'createdLobby',
+  joinedLobby: 'joinedLobby',
+  closedLobby: 'closedLobby',
+  submittedMoves: 'submittedMoves',
+  practiceMoves: 'practiceMoves',
+  zombieScheduledData: 'zombieScheduledData',
+  userScheduledData: 'userScheduledData',
+  setTradeNftCards: 'setTradeNftCards',
+  genericPayment: 'genericPayment',
+  transferTradeNft: 'transferTradeNft',
+} as const;
+
+export const PARSER_PREFIXES = {
+  [PARSER_KEYS.accountMint]: 'accMint',
+  [PARSER_KEYS.tradeNftMint]: 'tradeMint',
+  [PARSER_KEYS.createdLobby]: 'c',
+  [PARSER_KEYS.joinedLobby]: 'j',
+  [PARSER_KEYS.closedLobby]: 'cs',
+  [PARSER_KEYS.submittedMoves]: 's',
+  [PARSER_KEYS.practiceMoves]: 'p',
+  [PARSER_KEYS.zombieScheduledData]: 'z',
+  [PARSER_KEYS.userScheduledData]: 'u',
+  [PARSER_KEYS.setTradeNftCards]: 't',
+  [PARSER_KEYS.genericPayment]: 'generic',
+  [PARSER_KEYS.transferTradeNft]: 'tradeTransfer',
 } as const;
