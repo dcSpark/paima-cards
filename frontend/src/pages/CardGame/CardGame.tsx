@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import "./CardGame.scss";
 import type {
   MatchState,
@@ -35,6 +35,19 @@ const CardsGame: React.FC<CardGameProps> = ({
   selectedNft,
   localDeck,
 }) => {
+  // waiting for a tx to be accepted and processed by the backend
+  const [awaitingTxEffect, rawSetAwaitingTxEffect] = useState(false);
+  const setAwaitingTxEffect = useCallback((value: boolean) => {
+    // We want to disable interaction after a successful tx while we wait for the backend to process it.
+    // But, if it takes too long (10s), something might have gone wrong, so we let the user try again.
+
+    rawSetAwaitingTxEffect(value);
+    if (value) {
+      setTimeout(() => {
+        rawSetAwaitingTxEffect(false);
+      }, 10_000);
+    }
+  }, []);
   const [selectedCard, setSelectedCard] = useState<
     undefined | CardCommitmentIndex
   >();
@@ -117,7 +130,15 @@ const CardsGame: React.FC<CardGameProps> = ({
       ...oldDisplay,
       isPostTxDone: true,
     }));
-  }, [display, lobbyState, thisPlayer, postTxEventQueue, matchOver]);
+    setAwaitingTxEffect(false);
+  }, [
+    display,
+    lobbyState,
+    thisPlayer,
+    postTxEventQueue,
+    matchOver,
+    setAwaitingTxEffect,
+  ]);
 
   useEffect(
     () =>
@@ -168,6 +189,9 @@ const CardsGame: React.FC<CardGameProps> = ({
       lobbyState.current_round,
       move
     );
+    if (moveResult.success) {
+      setAwaitingTxEffect(true);
+    }
     console.log("Move result:", moveResult);
     await refetchLobbyState();
   }
@@ -340,6 +364,7 @@ const CardsGame: React.FC<CardGameProps> = ({
   }, [matchOver, selectedCard]);
 
   const disableInteraction =
+    awaitingTxEffect ||
     matchOver ||
     display.round !== lobbyState.current_round ||
     thisPlayer.turn !== display.matchState.turn ||
@@ -354,26 +379,61 @@ const CardsGame: React.FC<CardGameProps> = ({
     <>
       <Typography
         variant="caption"
-        sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
+        sx={{ fontSize: "1.75rem", lineHeight: "2.25rem" }}
       >
-        {display.matchState.result != null
-          ? `Match over | ${(() => {
+        {(() => {
+          if (display.matchState.result != null) {
+            const result = (() => {
               const thisPlayerIndex = display.matchState.players.findIndex(
                 (player) => player.nftId === selectedNft
               );
+
               const thisPlayerResult =
                 display.matchState.result[thisPlayerIndex];
 
               if (thisPlayerResult === "w") return "You win!";
               if (thisPlayerResult === "l") return "You lose!";
               return "It's a tie!";
-            })()}`
-          : `Round: ${display.matchState.properRound + 1} | ${
-              caption ??
-              (thisPlayer.turn === display.matchState.turn
-                ? "Your turn"
-                : "Opponent's turn")
-            }`}
+            })();
+
+            return (
+              <>
+                <span>Match over</span>
+                <span> | </span>
+                <span>{result}</span>
+              </>
+            );
+          }
+
+          const finalCaption: JSX.Element = (() => {
+            if (caption != null) return <span>{caption}</span>;
+            if (awaitingTxEffect)
+              return (
+                <span>
+                  <span>Processing tx </span>
+                  <CircularProgress
+                    size="1em"
+                    sx={{ display: "inline-block", verticalAlign: "middle" }}
+                  />
+                </span>
+              );
+            return (
+              <span>
+                {thisPlayer.turn === display.matchState.turn
+                  ? "Your turn"
+                  : "Opponent's turn"}
+              </span>
+            );
+          })();
+
+          return (
+            <>
+              <span>Round:</span>
+              <span> | </span>
+              {finalCaption}
+            </>
+          );
+        })()}
       </Typography>
       <Box
         sx={{
