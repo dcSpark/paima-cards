@@ -41,12 +41,12 @@ export function buildMatchExecutor({
       currentHand: [],
       currentBoard: [],
       currentDraw: 0,
+      currentResult: undefined,
       botLocalDeck: player.botLocalDeck,
       turn: matchTurnOrder[i],
     })),
     properRound: 0,
     turn: 0,
-    result: undefined,
     txEventMove: undefined,
   };
 

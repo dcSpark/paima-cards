@@ -92,6 +92,7 @@ export class LobbyController extends Controller {
       currentHand: raw.current_hand.map(deserializeHandCard),
       currentBoard: raw.current_board.map(deserializeBoardCard),
       currentDraw: raw.current_draw,
+      currentResult: raw.current_result ?? undefined,
       botLocalDeck: undefined,
       turn: raw.turn ?? undefined,
     }));

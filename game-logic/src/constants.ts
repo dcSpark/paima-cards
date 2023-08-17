@@ -3,7 +3,7 @@ import type { CardRegistry } from './types';
 export const COMMITMENT_LENGTH = 16;
 export const DECK_LENGTH = 10;
 export const PACK_LENGTH = 5;
-export const INITIAL_HIT_POINTS = 10;
+export const INITIAL_HIT_POINTS = 4;
 
 // Values must match move_kind in db. No need for a type check, it will cause errors somewhere.
 export const MOVE_KIND = {

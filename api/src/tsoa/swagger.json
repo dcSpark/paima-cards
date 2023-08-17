@@ -70,6 +70,14 @@
 				],
 				"type": "object"
 			},
+			"ConciseResult": {
+				"type": "string",
+				"enum": [
+					"w",
+					"t",
+					"l"
+				]
+			},
 			"LocalCard": {
 				"properties": {
 					"salt": {
@@ -100,6 +108,9 @@
 							"$ref": "#/components/schemas/LocalCard"
 						},
 						"type": "array"
+					},
+					"currentResult": {
+						"$ref": "#/components/schemas/ConciseResult"
 					},
 					"currentDraw": {
 						"type": "number",
