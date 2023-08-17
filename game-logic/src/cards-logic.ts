@@ -7,7 +7,6 @@ import type {
   DrawIndex,
   LobbyPlayer,
   LobbyWithStateProps,
-  MatchResult,
   MatchState,
   Move,
   PostTxTickEvent,
@@ -30,7 +29,7 @@ export function isValidMove(
   return true;
 }
 
-export function matchResults(matchState: MatchState): MatchResult {
+export function matchResults(matchState: MatchState): ConciseResult[] {
   const results: ConciseResult[] = matchState.players.map(player => {
     return player.hitPoints <= 0 ? 'l' : 'w';
   });
@@ -71,6 +70,7 @@ export function buildCurrentMatchState(
       currentHand: player.current_hand.map(deserializeHandCard),
       currentBoard: player.current_board.map(deserializeBoardCard),
       currentDraw: player.current_draw,
+      currentResult: player.current_result ?? undefined,
       botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
       turn: player.turn,
     };
@@ -84,7 +84,6 @@ export function buildCurrentMatchState(
       lobby.current_tx_event_move == null
         ? undefined
         : deserializeMove(lobby.current_tx_event_move),
-    result: undefined,
   };
 }
 

@@ -13,15 +13,10 @@ export interface MatchState {
   // Not to be confused with round everywhere else (1 move + 1 random seed).
   properRound: number;
   turn: number; // whose turn is it
-  result: undefined | MatchResult;
   // Move that required a tx submission. It it was for new randomness,
   // we'll want to provide new randomness in postTx event (e.g. decide to draw a card).
   txEventMove: undefined | Move;
 }
-
-export type ConciseResult = 'w' | 't' | 'l';
-
-export type MatchResult = ConciseResult[];
 
 export interface RoundExecutorBackendData {
   lobby: IGetLobbyByIdResult;

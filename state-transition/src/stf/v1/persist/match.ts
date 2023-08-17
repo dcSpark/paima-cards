@@ -97,10 +97,10 @@ export function persistInitialMatchState(
       currentHand: [],
       currentBoard: [],
       currentDraw: player.currentDraw,
+      currentResult: undefined,
       botLocalDeck: player.botLocalDeck,
       turn: newTurnOrder[i],
     })),
-    result: undefined,
     txEventMove: undefined,
   };
   const matchStateUpdates = persistUpdateMatchState(
@@ -217,7 +217,11 @@ export function persistExecutedRound(
 
 // Persist match results in the final states table
 export function persistMatchResults(finalMatchState: MatchState): SQLUpdate[] {
-  const results = finalMatchState.result;
+  const results = finalMatchState.players.map((player, i) => {
+    if (player.currentResult == null)
+      throw new Error(`persistMatchResults: no result on player ${i}`);
+    return player.currentResult;
+  });
   // TODO
   return [];
 }
@@ -240,6 +244,7 @@ export function persistUpdateMatchState(
     current_hand: player.currentHand.map(serializeHandCard),
     current_draw: player.currentDraw,
     current_board: player.currentBoard.map(serializeBoardCard),
+    current_result: player.currentResult ?? null,
     turn: player.turn,
   }));
   const playerUpdates: SQLUpdate[] = playerParams.map(param => [updateLobbyPlayer, param]);
@@ -265,8 +270,10 @@ function finalizeMatch(
   newMatchState: MatchState,
   blockHeight: number
 ): SQLUpdate[] {
-  if (newMatchState.result == null) return [];
-  const result = newMatchState.result;
+  // if match ended finalize, else do nothing
+  if (!newMatchState.players.some(player => player.currentResult != null)) {
+    return [];
+  }
 
   // TODO: support more than 1 match
   const updateStateParams: IUpdateLobbyStateParams = {
@@ -286,8 +293,10 @@ function finalizeMatch(
 
   // Create the new scheduled data for updating user stats.
   // Stats are updated with scheduled data to support parallelism safely.
-  const statsUpdates = newMatchState.players.map((player, i) =>
-    scheduleStatsUpdate(player.nftId, result[i], blockHeight + 1)
-  );
+  const statsUpdates = newMatchState.players.map((player, i) => {
+    if (player.currentResult == null) throw new Error(`finalizeMatch: no result on player ${i}`);
+
+    return scheduleStatsUpdate(player.nftId, player.currentResult, blockHeight + 1);
+  });
   return [...lobbyStateUpdates, ...resultsUpdates, ...statsUpdates];
 }

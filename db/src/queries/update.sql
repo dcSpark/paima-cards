@@ -29,7 +29,8 @@ SET
   current_deck = :current_deck!,
   current_draw = :current_draw!,
   current_hand = :current_hand!,
-  current_board = :current_board!
+  current_board = :current_board!,
+  current_result = :current_result
 WHERE 
   lobby_id = :lobby_id! AND nft_id = :nft_id!;
 

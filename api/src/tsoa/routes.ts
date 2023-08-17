@@ -51,6 +51,11 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"hasAttack":{"dataType":"boolean","required":true},"registryId":{"ref":"CardRegistryId","required":true},"index":{"ref":"CardCommitmentIndex","required":true},"id":{"ref":"CardDbId","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ConciseResult": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["w"]},{"dataType":"enum","enums":["t"]},{"dataType":"enum","enums":["l"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LocalCard": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"salt":{"dataType":"string","required":true},"registryId":{"ref":"CardRegistryId","required":true},"id":{"ref":"CardDbId","required":true}},"validators":{}},
@@ -58,7 +63,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LobbyPlayer": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"turn":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"double"}],"required":true},"botLocalDeck":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"array","array":{"dataType":"refAlias","ref":"LocalCard"}}],"required":true},"currentDraw":{"dataType":"double","required":true},"currentBoard":{"dataType":"array","array":{"dataType":"refAlias","ref":"BoardCard"},"required":true},"currentHand":{"dataType":"array","array":{"dataType":"refAlias","ref":"HandCard"},"required":true},"currentDeck":{"dataType":"array","array":{"dataType":"double"},"required":true},"startingCommitments":{"ref":"Uint8Array","required":true},"hitPoints":{"dataType":"double","required":true},"nftId":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"turn":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"double"}],"required":true},"botLocalDeck":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"array","array":{"dataType":"refAlias","ref":"LocalCard"}}],"required":true},"currentResult":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"ref":"ConciseResult"}],"required":true},"currentDraw":{"dataType":"double","required":true},"currentBoard":{"dataType":"array","array":{"dataType":"refAlias","ref":"BoardCard"},"required":true},"currentHand":{"dataType":"array","array":{"dataType":"refAlias","ref":"HandCard"},"required":true},"currentDeck":{"dataType":"array","array":{"dataType":"double"},"required":true},"startingCommitments":{"ref":"Uint8Array","required":true},"hitPoints":{"dataType":"double","required":true},"nftId":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Move": {

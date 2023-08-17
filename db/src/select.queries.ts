@@ -1,6 +1,8 @@
 /** Types generated for queries found in "src/queries/select.sql" */
 import { PreparedQuery } from '@pgtyped/query';
 
+export type concise_result = 'l' | 't' | 'w';
+
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
 export type numberArray = (number)[];
@@ -160,6 +162,7 @@ export interface IGetLobbyPlayersResult {
   current_deck: numberArray;
   current_draw: number;
   current_hand: stringArray;
+  current_result: concise_result | null;
   hit_points: number;
   id: number;
   lobby_id: string;

@@ -67,13 +67,27 @@ const CardsGame: React.FC<CardGameProps> = ({
       properRound: lobbyState.current_proper_round,
       players: lobbyState.players,
       txEventMove: lobbyState.txEventMove,
-      result: undefined,
     },
     isPostTxDone: false,
   });
   const matchOver = useMemo(() => {
-    return display.matchState.result != null;
-  }, [display.matchState.result]);
+    if (
+      display.matchState.players.some((player) => player.currentResult != null)
+    ) {
+      if (
+        display.matchState.players.some(
+          (player) => player.currentResult == null
+        )
+      )
+        throw new Error(
+          `CardsGame: inconsistent match state, only some players have result`
+        );
+
+      return true;
+    }
+
+    return false;
+  }, [display.matchState]);
 
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
@@ -299,7 +313,6 @@ const CardsGame: React.FC<CardGameProps> = ({
     properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
     txEventMove: lobbyState.txEventMove,
-    result: undefined,
   });
   const [nextFetchedRound, setNextFetchedRound] = useState(
     lobbyState.current_round
@@ -374,6 +387,7 @@ const CardsGame: React.FC<CardGameProps> = ({
   const canPlay = !disableInteraction;
 
   if (lobbyState == null) return <></>;
+  console.log("HELLO", display.matchState);
 
   return (
     <>
@@ -382,17 +396,10 @@ const CardsGame: React.FC<CardGameProps> = ({
         sx={{ fontSize: "1.75rem", lineHeight: "2.25rem" }}
       >
         {(() => {
-          if (display.matchState.result != null) {
+          if (matchOver) {
             const result = (() => {
-              const thisPlayerIndex = display.matchState.players.findIndex(
-                (player) => player.nftId === selectedNft
-              );
-
-              const thisPlayerResult =
-                display.matchState.result[thisPlayerIndex];
-
-              if (thisPlayerResult === "w") return "You win!";
-              if (thisPlayerResult === "l") return "You lose!";
+              if (thisPlayer.currentResult === "w") return "You win!";
+              if (thisPlayer.currentResult === "l") return "You lose!";
               return "It's a tie!";
             })();
 

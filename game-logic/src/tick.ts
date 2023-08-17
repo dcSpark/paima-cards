@@ -206,7 +206,9 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   }
 
   if (event.kind === TICK_EVENT_KIND.matchEnd) {
-    matchState.result = event.result;
+    for (const player of matchState.players.keys()) {
+      matchState.players[player].currentResult = event.result[player];
+    }
   }
 
   if (event.kind === TICK_EVENT_KIND.tx) {

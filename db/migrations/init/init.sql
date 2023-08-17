@@ -7,6 +7,7 @@ CREATE TABLE block_heights (
 
 -- Extend the schema to fit your needs
 CREATE TYPE lobby_status AS ENUM ('open', 'active', 'finished', 'closed');
+CREATE TYPE concise_result AS ENUM ('w', 't', 'l');
 CREATE TABLE lobbies (
   lobby_id TEXT PRIMARY KEY,
   max_players INTEGER NOT NULL,
@@ -69,6 +70,7 @@ CREATE TABLE lobby_player (
   current_hand TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_board TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_draw INTEGER NOT NULL DEFAULT 0,
+  current_result concise_result DEFAULT null,
   -- local deck in case this is a bot player
   bot_local_deck TEXT[] DEFAULT NULL,
   turn INTEGER

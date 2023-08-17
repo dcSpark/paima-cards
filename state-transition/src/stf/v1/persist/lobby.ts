@@ -52,6 +52,7 @@ export async function persistLobbyCreation(
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
+    currentResult: undefined,
     botLocalDeck: undefined,
     turn: undefined,
   });
@@ -84,6 +85,7 @@ export async function persistLobbyCreation(
             currentHand: [],
             currentBoard: [],
             currentDraw: 0,
+            currentResult: undefined,
             botLocalDeck: localDeck,
             turn: undefined,
           });

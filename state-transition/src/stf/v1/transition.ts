@@ -192,6 +192,7 @@ export const joinedLobby = async (
     currentHand: player.current_hand.map(deserializeHandCard),
     currentBoard: player.current_board.map(deserializeBoardCard),
     currentDraw: player.current_draw,
+    currentResult: player.current_result ?? undefined,
     botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
     turn: player.turn ?? undefined,
   }));
@@ -219,6 +220,7 @@ export const joinedLobby = async (
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
+    currentResult: undefined,
     botLocalDeck: undefined,
     turn: undefined,
   });

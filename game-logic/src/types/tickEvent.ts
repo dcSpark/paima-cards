@@ -1,6 +1,6 @@
 import type { ValuesType } from 'utility-types';
 import type { TICK_EVENT_KIND } from '../constants';
-import type { BoardCard, CardDraw, HandCard, MatchResult, Move } from '.';
+import type { BoardCard, CardDraw, ConciseResult, HandCard, Move } from '.';
 
 export type TickEventKind = ValuesType<typeof TICK_EVENT_KIND>;
 
@@ -34,7 +34,7 @@ export type RoundEndTickEvent = {
 };
 export type MatchEndTickEvent = {
   kind: typeof TICK_EVENT_KIND.matchEnd;
-  result: MatchResult;
+  result: ConciseResult[];
 };
 
 export type TickEvent =

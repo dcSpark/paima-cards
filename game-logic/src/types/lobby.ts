@@ -6,6 +6,7 @@ export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 
 export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
+export type ConciseResult = 'w' | 't' | 'l';
 export type LobbyPlayer = {
   nftId: number;
   hitPoints: number;
@@ -14,6 +15,7 @@ export type LobbyPlayer = {
   currentHand: HandCard[];
   currentBoard: BoardCard[];
   currentDraw: number;
+  currentResult: undefined | ConciseResult;
   botLocalDeck: undefined | LocalCard[]; // only defined for bot player
   turn: undefined | number;
 };
