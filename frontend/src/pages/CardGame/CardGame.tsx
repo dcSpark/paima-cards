@@ -387,7 +387,6 @@ const CardsGame: React.FC<CardGameProps> = ({
   const canPlay = !disableInteraction;
 
   if (lobbyState == null) return <></>;
-  console.log("HELLO", display.matchState);
 
   return (
     <>

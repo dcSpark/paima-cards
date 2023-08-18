@@ -1,7 +1,13 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@cards/db';
-import type { MatchExecutorResponse, LobbyPlayer, RoundExecutorResponse } from '@cards/game-logic';
+import type {
+  MatchExecutorResponse,
+  LobbyPlayer,
+  RoundExecutorResponse,
+  ApiResult,
+} from '@cards/game-logic';
 import {
+  MiddlewareErrorCode,
   deserializeBoardCard,
   deserializeHandCard,
   deserializeMove,
@@ -18,7 +24,7 @@ export class ExecutorController extends Controller {
   public async match(
     @Query() lobbyID: string,
     @Query() matchWithinLobby: number
-  ): Promise<MatchExecutorResponse> {
+  ): Promise<ApiResult<MatchExecutorResponse>> {
     const valMatch = psqlInt.decode(matchWithinLobby);
     if (isLeft(valMatch)) {
       throw new ValidateError({ round: { message: 'invalid number' } }, '');
@@ -32,7 +38,7 @@ export class ExecutorController extends Controller {
     );
     const rawPlayers = await getLobbyPlayers.run({ lobby_id: lobbyID }, pool);
     if (lobby == null || !isLobbyWithStateProps(lobby) || match == null) {
-      return null;
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
@@ -72,14 +78,17 @@ export class ExecutorController extends Controller {
     );
 
     return {
-      lobby: {
-        ...lobby,
-        roundSeed: initialSeed.seed,
-        players,
-        txEventMove,
+      success: true,
+      result: {
+        lobby: {
+          ...lobby,
+          roundSeed: initialSeed.seed,
+          players,
+          txEventMove,
+        },
+        seeds,
+        moves,
       },
-      seeds,
-      moves,
     };
   }
 
@@ -88,10 +97,10 @@ export class ExecutorController extends Controller {
     @Query() lobbyID: string,
     @Query() matchWithinLobby: number,
     @Query() roundWithinMatch: number
-  ): Promise<RoundExecutorResponse> {
+  ): Promise<ApiResult<RoundExecutorResponse>> {
     const valMatch = psqlInt.decode(matchWithinLobby);
     if (isLeft(valMatch)) {
-      throw new ValidateError({ matchWithinLobby: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
     const valRound = psqlInt.decode(roundWithinMatch);
     if (isLeft(valRound)) {
@@ -105,10 +114,10 @@ export class ExecutorController extends Controller {
       pool
     );
     if (!lobby) {
-      return { error: 'lobby not found' };
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
     if (match == null) {
-      return { error: 'match not found' };
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
     const [last_round_data] =
@@ -128,7 +137,7 @@ export class ExecutorController extends Controller {
         ? match.starting_block_height
         : last_round_data?.execution_block_height;
     if (seedBlockHeight == null) {
-      return { error: 'internal error' };
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
     const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
@@ -142,9 +151,12 @@ export class ExecutorController extends Controller {
       pool
     );
     return {
-      lobby,
-      moves,
-      seed,
+      success: true,
+      result: {
+        lobby,
+        moves,
+        seed,
+      },
     };
   }
 }

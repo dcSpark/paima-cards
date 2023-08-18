@@ -5,7 +5,11 @@ import { buildEndpointErrorFxn } from '../errors';
 import type { NewLobbies, PackedLobbyState } from '../types';
 import { userCreatedLobby, userJoinedLobby } from './utility-functions';
 import { backendQueryLobbyState, backendQueryUserLobbiesBlockheight } from './query-constructors';
-import type { LobbyStateResponse, UserLobbiesBlockHeightResponse } from '@cards/game-logic';
+import type {
+  ApiResult,
+  LobbyStateResponse,
+  UserLobbiesBlockHeightResponse,
+} from '@cards/game-logic';
 
 export async function auxGet<R>(
   builtQuery: string,
@@ -19,11 +23,9 @@ export async function auxGet<R>(
   }
 
   try {
-    const result = (await response.json()) as R;
-    return {
-      success: true,
-      result,
-    };
+    const result = (await response.json()) as ApiResult<R>;
+    if (result.success) return result;
+    return errorFxn(result.errorCode);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
   }
@@ -41,11 +43,9 @@ export async function auxGetLobbyState(lobbyID: string): Promise<PackedLobbyStat
   }
 
   try {
-    const j = (await res.json()) as LobbyStateResponse;
-    return {
-      success: true,
-      lobby: j.lobby,
-    };
+    const j = (await res.json()) as ApiResult<LobbyStateResponse>;
+    if (j.success) return { success: true, lobby: j.result.lobby };
+    return errorFxn(j.errorCode);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
   }
@@ -66,11 +66,9 @@ export async function getRawNewLobbies(
   }
 
   try {
-    const j = (await res.json()) as UserLobbiesBlockHeightResponse;
-    return {
-      success: true,
-      lobbies: j.lobbies,
-    };
+    const j = (await res.json()) as ApiResult<UserLobbiesBlockHeightResponse>;
+    if (j.success) return { success: true, lobbies: j.result.lobbies };
+    return errorFxn(j.errorCode);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
   }

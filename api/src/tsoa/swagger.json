@@ -461,6 +461,61 @@
 				],
 				"nullable": true
 			},
+			"SuccessfulResult_MatchExecutorResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/MatchExecutorResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_FailedResult.Exclude_keyofFailedResult.errorMessage__": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							false
+						],
+						"nullable": false
+					},
+					"errorCode": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"success",
+					"errorCode"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_FailedResult.errorMessage_": {
+				"$ref": "#/components/schemas/Pick_FailedResult.Exclude_keyofFailedResult.errorMessage__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"ApiResult_MatchExecutorResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_MatchExecutorResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"IGetLobbyByIdResult": {
 				"description": "'GetLobbyById' return type",
 				"properties": {
@@ -593,6 +648,36 @@
 					}
 				]
 			},
+			"SuccessfulResult_RoundExecutorResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/RoundExecutorResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_RoundExecutorResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_RoundExecutorResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"LobbyRawResponse": {
 				"properties": {
 					"lobby": {
@@ -609,6 +694,36 @@
 				],
 				"type": "object"
 			},
+			"SuccessfulResult_LobbyRawResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/LobbyRawResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_LobbyRawResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_LobbyRawResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"LobbyStateResponse": {
 				"properties": {
 					"lobby": {
@@ -624,6 +739,36 @@
 					"lobby"
 				],
 				"type": "object"
+			},
+			"SuccessfulResult_LobbyStateResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/LobbyStateResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_LobbyStateResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_LobbyStateResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			},
 			"IGetPaginatedOpenLobbiesResult": {
 				"description": "'GetPaginatedOpenLobbies' return type",
@@ -722,6 +867,36 @@
 					"lobbies"
 				],
 				"type": "object"
+			},
+			"SuccessfulResult_OpenLobbiesResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/OpenLobbiesResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_OpenLobbiesResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_OpenLobbiesResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			},
 			"IGetRandomActiveLobbyResult": {
 				"description": "'GetRandomActiveLobby' return type",
@@ -823,6 +998,36 @@
 				],
 				"type": "object"
 			},
+			"SuccessfulResult_RandomActiveLobbyResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/RandomActiveLobbyResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_RandomActiveLobbyResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_RandomActiveLobbyResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"SearchOpenLobbiesResponse": {
 				"properties": {
 					"lobbies": {
@@ -837,103 +1042,35 @@
 				],
 				"type": "object"
 			},
-			"IGetAllPaginatedUserLobbiesResult": {
-				"description": "'GetAllPaginatedUserLobbies' return type",
+			"SuccessfulResult_SearchOpenLobbiesResponse_": {
 				"properties": {
-					"created_at": {
-						"type": "string",
-						"format": "date-time"
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
 					},
-					"creation_block_height": {
-						"type": "number",
-						"format": "double"
-					},
-					"current_match": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_proper_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_turn": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_tx_event_move": {
-						"type": "string",
-						"nullable": true
-					},
-					"hidden": {
-						"type": "boolean"
-					},
-					"lobby_creator": {
-						"type": "number",
-						"format": "double"
-					},
-					"lobby_id": {
-						"type": "string"
-					},
-					"lobby_state": {
-						"$ref": "#/components/schemas/lobby_status"
-					},
-					"max_players": {
-						"type": "number",
-						"format": "double"
-					},
-					"num_of_rounds": {
-						"type": "number",
-						"format": "double"
-					},
-					"practice": {
-						"type": "boolean"
-					},
-					"turn_length": {
-						"type": "number",
-						"format": "double"
+					"result": {
+						"$ref": "#/components/schemas/SearchOpenLobbiesResponse"
 					}
 				},
 				"required": [
-					"created_at",
-					"creation_block_height",
-					"current_match",
-					"current_proper_round",
-					"current_round",
-					"current_turn",
-					"current_tx_event_move",
-					"hidden",
-					"lobby_creator",
-					"lobby_id",
-					"lobby_state",
-					"max_players",
-					"num_of_rounds",
-					"practice",
-					"turn_length"
+					"success",
+					"result"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserLobbiesResponse": {
-				"properties": {
-					"lobbies": {
-						"items": {
-							"$ref": "#/components/schemas/IGetAllPaginatedUserLobbiesResult"
-						},
-						"type": "array"
+			"ApiResult_SearchOpenLobbiesResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_SearchOpenLobbiesResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
 					}
-				},
-				"required": [
-					"lobbies"
-				],
-				"type": "object"
+				]
 			},
 			"IGetNewLobbiesByUserAndBlockHeightResult": {
 				"description": "'GetNewLobbiesByUserAndBlockHeight' return type",
@@ -965,6 +1102,36 @@
 				],
 				"type": "object"
 			},
+			"SuccessfulResult_UserLobbiesBlockHeightResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/UserLobbiesBlockHeightResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_UserLobbiesBlockHeightResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_UserLobbiesBlockHeightResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"AccountNftResponse": {
 				"properties": {
 					"nft": {
@@ -973,6 +1140,36 @@
 					}
 				},
 				"type": "object"
+			},
+			"SuccessfulResult_AccountNftResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/AccountNftResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_AccountNftResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_AccountNftResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			},
 			"IGetOwnedCardsResult": {
 				"description": "'GetOwnedCards' return type",
@@ -1012,6 +1209,36 @@
 					"cards"
 				],
 				"type": "object"
+			},
+			"SuccessfulResult_GetCardsResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/GetCardsResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_GetCardsResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_GetCardsResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			},
 			"numberArray": {
 				"items": {
@@ -1056,6 +1283,36 @@
 					"packs"
 				],
 				"type": "object"
+			},
+			"SuccessfulResult_GetPacksResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/GetPacksResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_GetPacksResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_GetPacksResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			},
 			"IGetTradeNftsResult": {
 				"description": "'GetTradeNfts' return type",
@@ -1103,6 +1360,36 @@
 				],
 				"type": "object"
 			},
+			"SuccessfulResult_GetTradeNftsResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/GetTradeNftsResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_GetTradeNftsResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_GetTradeNftsResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
+			},
 			"IGetUserStatsResult": {
 				"description": "'GetUserStats' return type",
 				"properties": {
@@ -1145,6 +1432,36 @@
 					"stats"
 				],
 				"type": "object"
+			},
+			"SuccessfulResult_UserStatsResponse_": {
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"enum": [
+							true
+						],
+						"nullable": false
+					},
+					"result": {
+						"$ref": "#/components/schemas/UserStatsResponse"
+					}
+				},
+				"required": [
+					"success",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApiResult_UserStatsResponse_": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/SuccessfulResult_UserStatsResponse_"
+					},
+					{
+						"$ref": "#/components/schemas/Omit_FailedResult.errorMessage_"
+					}
+				]
 			}
 		},
 		"securitySchemes": {}
@@ -1169,7 +1486,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/MatchExecutorResponse"
+									"$ref": "#/components/schemas/ApiResult_MatchExecutorResponse_"
 								}
 							}
 						}
@@ -1206,7 +1523,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/RoundExecutorResponse"
+									"$ref": "#/components/schemas/ApiResult_RoundExecutorResponse_"
 								}
 							}
 						}
@@ -1252,7 +1569,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/LobbyRawResponse"
+									"$ref": "#/components/schemas/ApiResult_LobbyRawResponse_"
 								}
 							}
 						}
@@ -1280,7 +1597,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/LobbyStateResponse"
+									"$ref": "#/components/schemas/ApiResult_LobbyStateResponse_"
 								}
 							}
 						}
@@ -1308,7 +1625,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OpenLobbiesResponse"
+									"$ref": "#/components/schemas/ApiResult_OpenLobbiesResponse_"
 								}
 							}
 						}
@@ -1355,7 +1672,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/RandomActiveLobbyResponse"
+									"$ref": "#/components/schemas/ApiResult_RandomActiveLobbyResponse_"
 								}
 							}
 						}
@@ -1374,7 +1691,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/SearchOpenLobbiesResponse"
+									"$ref": "#/components/schemas/ApiResult_SearchOpenLobbiesResponse_"
 								}
 							}
 						}
@@ -1420,53 +1737,6 @@
 				]
 			}
 		},
-		"/lobby/user": {
-			"get": {
-				"operationId": "User",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserLobbiesResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "nftId",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "count",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "page",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
 		"/lobby/userBlockHeight": {
 			"get": {
 				"operationId": "UserBlockHeight",
@@ -1476,7 +1746,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/UserLobbiesBlockHeightResponse"
+									"$ref": "#/components/schemas/ApiResult_UserLobbiesBlockHeightResponse_"
 								}
 							}
 						}
@@ -1514,7 +1784,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AccountNftResponse"
+									"$ref": "#/components/schemas/ApiResult_AccountNftResponse_"
 								}
 							}
 						}
@@ -1542,7 +1812,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetCardsResponse"
+									"$ref": "#/components/schemas/ApiResult_GetCardsResponse_"
 								}
 							}
 						}
@@ -1571,7 +1841,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetPacksResponse"
+									"$ref": "#/components/schemas/ApiResult_GetPacksResponse_"
 								}
 							}
 						}
@@ -1600,7 +1870,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetTradeNftsResponse"
+									"$ref": "#/components/schemas/ApiResult_GetTradeNftsResponse_"
 								}
 							}
 						}
@@ -1629,7 +1899,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/UserStatsResponse"
+									"$ref": "#/components/schemas/ApiResult_UserStatsResponse_"
 								}
 							}
 						}

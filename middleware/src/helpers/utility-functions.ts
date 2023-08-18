@@ -1,7 +1,8 @@
 import { ENV } from 'paima-sdk/paima-utils';
-import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
+import { buildEndpointErrorFxn } from '../errors';
 import type { PackedLobbyRaw, PackedLobbyState, RoundEnd } from '../types';
 import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
+import { MiddlewareErrorCode } from '@cards/game-logic';
 
 export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean {
   if (!lobby.hasOwnProperty('lobby')) {
