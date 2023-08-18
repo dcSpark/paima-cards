@@ -1,23 +1,23 @@
-import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
+import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@cards/db';
 import type {
+  ApiResult,
   LobbyPlayer,
   LobbyStateResponse,
   OpenLobbiesResponse,
   RandomActiveLobbyResponse,
   SearchOpenLobbiesResponse,
   UserLobbiesBlockHeightResponse,
-  UserLobbiesResponse,
 } from '@cards/game-logic';
 import {
   deserializeBoardCard,
   deserializeHandCard,
   deserializeMove,
   isLobbyWithStateProps,
+  MiddlewareErrorCode,
   type LobbyRawResponse,
 } from '@cards/game-logic';
 import {
-  getAllPaginatedUserLobbies,
   getMatch,
   getNewLobbiesByUserAndBlockHeight,
   getOpenLobbyById,
@@ -36,22 +36,23 @@ const LOBBY_ID_LENGTH = 12;
 @Route('lobby')
 export class LobbyController extends Controller {
   @Get('raw')
-  public async raw(@Query() lobbyID: string): Promise<LobbyRawResponse> {
+  public async raw(@Query() lobbyID: string): Promise<ApiResult<LobbyRawResponse>> {
     const pool = requirePool();
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
-    return { lobby };
+    return { success: true, result: { lobby } };
   }
 
   @Get('state')
-  public async state(@Query() lobbyID: string): Promise<LobbyStateResponse> {
+  public async state(@Query() lobbyID: string): Promise<ApiResult<LobbyStateResponse>> {
     const pool = requirePool();
     const [[lobby], rawPlayers] = await Promise.all([
       getLobbyById.run({ lobby_id: lobbyID }, pool),
       getLobbyPlayers.run({ lobby_id: lobbyID }, pool),
     ]);
-    if (!lobby) return { lobby: null };
+    if (!lobby) return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
 
-    if (!isLobbyWithStateProps(lobby)) return { lobby: null };
+    if (!isLobbyWithStateProps(lobby))
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
 
     const [match] = await getMatch.run(
       {
@@ -79,7 +80,7 @@ export class LobbyController extends Controller {
         : last_round_data?.execution_block_height;
 
     if (seedBlockHeight == null) {
-      return { lobby: null };
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
     const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
     const roundSeed = seedBlockRow.seed;
@@ -103,11 +104,14 @@ export class LobbyController extends Controller {
         : deserializeMove(lobby.current_tx_event_move);
 
     return {
-      lobby: {
-        ...lobby,
-        roundSeed,
-        players,
-        txEventMove,
+      success: true,
+      result: {
+        lobby: {
+          ...lobby,
+          roundSeed,
+          players,
+          txEventMove,
+        },
       },
     };
   }
@@ -117,16 +121,14 @@ export class LobbyController extends Controller {
     @Query() nftId: number,
     @Query() count?: number,
     @Query() page?: number
-  ): Promise<OpenLobbiesResponse> {
+  ): Promise<ApiResult<OpenLobbiesResponse>> {
     const pool = requirePool();
-    const valPage = psqlNum.decode(page || 1); // pass 1 if undefined (or 0)
-    const valCount = psqlNum.decode(count || 10); // pass 10 if undefined (or 0)
-    // io-ts output typecheck. isLeft() is invalid, isRight() is valid
-    // we'll reuse TSOA's error handling logic to throw an error
+    const valPage = psqlNum.decode(page || 1);
+    const valCount = psqlNum.decode(count || 10);
     if (isLeft(valPage)) {
-      throw new ValidateError({ page: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     } else if (isLeft(valCount)) {
-      throw new ValidateError({ count: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     } else {
       const p = valPage.right;
       const c = valCount.right;
@@ -136,16 +138,16 @@ export class LobbyController extends Controller {
         pool
       );
 
-      return { lobbies };
+      return { success: true, result: { lobbies } };
     }
   }
 
   @Get('randomActive')
-  public async randomActive(): Promise<RandomActiveLobbyResponse> {
+  public async randomActive(): Promise<ApiResult<RandomActiveLobbyResponse>> {
     const pool = requirePool();
     const [lobby] = await getRandomActiveLobby.run(undefined, pool);
     const result = lobby || null;
-    return { lobby: result };
+    return { success: true, result: { lobby: result } };
   }
 
   @Get('searchOpen')
@@ -154,27 +156,24 @@ export class LobbyController extends Controller {
     @Query() searchQuery: string,
     @Query() page?: number,
     @Query() count?: number
-  ): Promise<SearchOpenLobbiesResponse> {
+  ): Promise<ApiResult<SearchOpenLobbiesResponse>> {
     const pool = requirePool();
-    const emptyResponse = { lobbies: [] };
     if (searchQuery.length < MIN_SEARCH_LENGTH || searchQuery.length > LOBBY_ID_LENGTH)
-      return emptyResponse;
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
 
     if (searchQuery.length == LOBBY_ID_LENGTH) {
       const lobbies = await getOpenLobbyById.run({ searchQuery, nft_id: nftId }, pool);
-      return { lobbies };
+      return { success: true, result: { lobbies } };
     }
 
-    const valPage = psqlNum.decode(page || 1); // pass 1 if undefined (or 0)
-    const valCount = psqlNum.decode(count || 10); // pass 10 if undefined (or 0)
-    // io-ts output typecheck. isLeft() is invalid, isRight() is valid
-    // we'll reuse TSOA's error handling logic to throw an error
+    const valPage = psqlNum.decode(page || 1);
+    const valCount = psqlNum.decode(count || 10);
     if (isLeft(valPage)) {
-      throw new ValidateError({ page: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
     if (isLeft(valCount)) {
-      throw new ValidateError({ count: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
     const c = valCount.right;
@@ -183,53 +182,24 @@ export class LobbyController extends Controller {
       { count: `${c}`, page: `${offset}`, searchQuery: `%${searchQuery}%`, nft_id: nftId },
       pool
     );
-    return { lobbies };
-  }
-
-  @Get('user')
-  public async user(
-    @Query() nftId: number,
-    @Query() count?: number,
-    @Query() page?: number
-  ): Promise<UserLobbiesResponse> {
-    const pool = requirePool();
-    const valPage = psqlNum.decode(page || 1); // pass 1 if undefined (or 0)
-    const valCount = psqlNum.decode(count || 10); // pass 10 if undefined (or 0)
-    // io-ts output typecheck. isLeft() is invalid, isRight() is valid
-    // we'll reuse TSOA's error handling logic to throw an error
-    if (isLeft(valPage)) {
-      throw new ValidateError({ page: { message: 'invalid number' } }, '');
-    }
-    if (isLeft(valCount)) {
-      throw new ValidateError({ count: { message: 'invalid number' } }, '');
-    }
-
-    // after typecheck, valid data output is given in .right
-    const p = valPage.right;
-    const c = valCount.right;
-    const offset = (p - 1) * c;
-    const userLobbies = await getAllPaginatedUserLobbies.run(
-      { nft_id: nftId, count: `${c}`, page: `${offset}` },
-      pool
-    );
-    return { lobbies: userLobbies };
+    return { success: true, result: { lobbies } };
   }
 
   @Get('userBlockHeight')
   public async userBlockHeight(
     @Query() nftId: number,
     @Query() blockHeight: number
-  ): Promise<UserLobbiesBlockHeightResponse> {
+  ): Promise<ApiResult<UserLobbiesBlockHeightResponse>> {
     const pool = requirePool();
     const valBH = psqlNum.decode(blockHeight);
     if (isLeft(valBH)) {
-      throw new ValidateError({ blockHeight: { message: 'invalid number' } }, '');
+      return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
     const lobbies = await getNewLobbiesByUserAndBlockHeight.run(
       { nft_id: nftId, block_height: blockHeight },
       pool
     );
-    return { lobbies };
+    return { success: true, result: { lobbies } };
   }
 }

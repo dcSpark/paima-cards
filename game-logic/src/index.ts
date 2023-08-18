@@ -11,6 +11,7 @@ export * from './types/index';
 export * from './constants';
 export * from './helpers';
 export * from './typecheck';
+export * from './errors';
 
 // We initialize the round executor object using lobby data + submitted moves + randomness generator.
 // This function extracts the match environment and match state from the lobby and the `processTick` function.

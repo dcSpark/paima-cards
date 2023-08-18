@@ -20,10 +20,11 @@ import {
   type GetTradeNftsResponse,
 } from '@cards/game-logic';
 
-import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
+import { buildEndpointErrorFxn } from '../errors';
 import { auxGet } from '../helpers/auxiliary-queries';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
+import { MiddlewareErrorCode } from '@cards/game-logic';
 
 async function getLobbyRaw(lobbyID: string): Promise<Result<LobbyRawResponse>> {
   const errorFxn = buildEndpointErrorFxn('getLobbyRaw');
