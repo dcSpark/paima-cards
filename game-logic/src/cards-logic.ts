@@ -11,7 +11,7 @@ import type {
   Move,
   PostTxTickEvent,
 } from './types';
-import Prando from 'paima-sdk/paima-prando';
+import Prando from '@paima/sdk/prando';
 import {
   deserializeBoardCard,
   deserializeHandCard,

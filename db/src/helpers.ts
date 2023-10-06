@@ -1,4 +1,4 @@
-import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
+import { getOwnedNfts } from '@paima/sdk/utils-backend';
 
 export async function getOwnedNft(
   ...args: Parameters<typeof getOwnedNfts>

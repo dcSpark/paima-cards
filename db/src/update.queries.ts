@@ -1,5 +1,5 @@
 /** Types generated for queries found in "src/queries/update.sql" */
-import { PreparedQuery } from '@pgtyped/query';
+import { PreparedQuery } from '@pgtyped/runtime';
 
 export type concise_result = 'l' | 't' | 'w';
 

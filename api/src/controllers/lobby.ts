@@ -26,7 +26,7 @@ import {
   getRound,
   searchPaginatedOpenLobbies,
 } from '@cards/db/src/select.queries';
-import { getBlockHeight } from 'paima-sdk/paima-db';
+import { getBlockHeights } from '@paima/sdk/db';
 import { isLeft } from 'fp-ts/lib/Either';
 import { psqlNum } from '../validation';
 
@@ -82,7 +82,7 @@ export class LobbyController extends Controller {
     if (seedBlockHeight == null) {
       return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
-    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const [seedBlockRow] = await getBlockHeights.run({ block_heights: [seedBlockHeight] }, pool);
     const roundSeed = seedBlockRow.seed;
 
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({

@@ -1,4 +1,4 @@
-import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
+import { PaimaMiddlewareErrorCode } from '@paima/sdk/mw-core';
 
 export enum MiddlewareErrorCode {
   GENERIC_ERROR = PaimaMiddlewareErrorCode.FINAL_PAIMA_GENERIC_ERROR + 1,

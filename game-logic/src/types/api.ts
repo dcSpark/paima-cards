@@ -17,7 +17,7 @@ import type {
   IGetCardsByIdsResult,
   IGetAllPaginatedUserLobbiesResult,
 } from '@cards/db/build/select.queries';
-import type { FailedResult, SuccessfulResult } from 'paima-sdk/paima-mw-core';
+import type { FailedResult, SuccessfulResult } from '@paima/sdk/mw-core';
 
 export type ApiResult<T> = SuccessfulResult<T> | Omit<FailedResult, 'errorMessage'>;
 

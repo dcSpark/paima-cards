@@ -19,7 +19,7 @@ import {
   TICK_EVENT_KIND,
 } from "@cards/game-logic";
 import * as Paima from "@cards/middleware";
-import Prando from "paima-sdk/paima-prando";
+import Prando from "@paima/sdk/prando";
 import Player from "./Player";
 
 interface CardGameProps {
