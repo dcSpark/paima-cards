@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import type { UseStateResponse } from "./utils";
-import type { WalletAddress } from "paima-sdk/paima-utils";
+import type { WalletAddress } from "@paima/sdk/utils";
 import * as Paima from "@cards/middleware";
 import ConnectingModal from "./ConnectingModal";
 import { PaimaNotice } from "./components/PaimaNotice";

@@ -13,7 +13,7 @@ import type {
 import { DECK_LENGTH, genCommitments } from "@cards/game-logic";
 import * as Paima from "@cards/middleware";
 import LocalStorage from "@src/LocalStorage";
-import type { MatchExecutor } from "paima-sdk/paima-executors";
+import type { MatchExecutor } from "@paima/sdk/executors";
 
 export type Characters = typeof characters[number];
 export const characters = ["null"] as const;
