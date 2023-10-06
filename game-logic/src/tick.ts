@@ -1,4 +1,4 @@
-import type Prando from 'paima-sdk/paima-prando';
+import type Prando from '@paima/sdk/prando';
 import type {
   MatchEndTickEvent,
   RoundEndTickEvent,

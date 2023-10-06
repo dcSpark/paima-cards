@@ -1,7 +1,7 @@
 import type { CreatedLobbyInput } from '../types.js';
 import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@cards/db';
 import { createLobby, updateLobbyState } from '@cards/db';
-import Prando from 'paima-sdk/paima-prando';
+import Prando from '@paima/sdk/prando';
 import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@cards/game-logic';
 import {
   INITIAL_HIT_POINTS,
@@ -11,7 +11,7 @@ import {
   serializeLocalCard,
 } from '@cards/game-logic';
 import { persistStartMatch } from './match.js';
-import type { SQLUpdate } from 'paima-sdk/paima-db';
+import type { SQLUpdate } from '@paima/sdk/db';
 import type { IJoinPlayerToLobbyParams } from '@cards/db/src/insert.queries.js';
 import { joinPlayerToLobby } from '@cards/db/src/insert.queries.js';
 import { PRACTICE_BOT_NFT_ID } from '@cards/utils';

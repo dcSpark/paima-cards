@@ -1,6 +1,6 @@
 import type { Pool } from 'pg';
-import Prando from 'paima-sdk/paima-prando';
-import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
+import Prando from '@paima/sdk/prando';
+import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from '@paima/sdk/utils';
 import type { IGetLobbyPlayersResult, IGetRoundMovesResult } from '@cards/db';
 import { getLobbyById, getUserStats, getLobbyPlayers, getOwnedNft } from '@cards/db';
 import type { INewCardParams, INewTradeNftParams } from '@cards/db/src/insert.queries.js';
@@ -59,7 +59,7 @@ import type {
   ZombieRoundInput,
 } from './types.js';
 import { CARD_PACK_PRICE, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@cards/utils';
-import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
+import { getBlockHeights, type SQLUpdate } from '@paima/sdk/db';
 import { PracticeAI } from './persist/practice-ai';
 import type { IGetRoundResult } from '@cards/db/src/select.queries';
 import {
@@ -150,7 +150,7 @@ export const createdLobby = async (
   dbConn: Pool,
   randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
-  const [block] = await getBlockHeight.run({ block_height: blockHeight }, dbConn);
+  const [block] = await getBlockHeights.run({ block_heights: [blockHeight] }, dbConn);
   if (!(await checkUserOwns(player, input.creatorNftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
     return [];
@@ -707,7 +707,7 @@ async function fetchPrandoSeed(
   const seedBlockHeight =
     lobby.current_round === 0 ? match.starting_block_height : lastRound.execution_block_height;
   if (seedBlockHeight == null) return;
-  const [seedBlock] = await getBlockHeight.run({ block_height: seedBlockHeight }, dbConn);
+  const [seedBlock] = await getBlockHeights.run({ block_heights: [seedBlockHeight] }, dbConn);
   if (seedBlock == null) return;
   return seedBlock.seed;
 }

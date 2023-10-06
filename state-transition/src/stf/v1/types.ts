@@ -1,5 +1,5 @@
 import type { CardDbId, ConciseResult, PARSER_KEYS, SerializedMove } from '@cards/game-logic';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { WalletAddress } from '@paima/sdk/utils';
 
 export type ParsedSubmittedInputRaw =
   | InvalidInput

@@ -1,5 +1,5 @@
-import type { ParserRecord } from 'paima-sdk/paima-utils-backend';
-import { PaimaParser } from 'paima-sdk/paima-utils-backend';
+import type { ParserRecord } from '@paima/sdk/concise';
+import { PaimaParser } from '@paima/sdk/concise';
 import type {
   ClosedLobbyInput,
   CreatedLobbyInput,

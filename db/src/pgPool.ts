@@ -1,5 +1,5 @@
 import type pg from 'pg';
-import { getConnection } from 'paima-sdk/paima-db';
+import { getConnection } from '@paima/sdk/db';
 
 /**
  * Pool of Postgres connections to avoid overhead of connecting on every request.
@@ -19,5 +19,5 @@ export function requirePool(): pg.Pool {
   if (pool == null) {
     pool = getConnection(creds, false);
   }
-  return pool;
+  return pool as pg.Pool;
 }

@@ -1,6 +1,6 @@
-import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
-import { matchExecutor } from 'paima-sdk/paima-executors';
-import Prando from 'paima-sdk/paima-prando';
+import type { MatchExecutor, RoundExecutor } from '@paima/sdk/executors';
+import { matchExecutor } from '@paima/sdk/executors';
+import Prando from '@paima/sdk/prando';
 
 import {
   INITIAL_HIT_POINTS,

@@ -1,6 +1,6 @@
-import type { QueryOptions, Result } from 'paima-sdk/paima-mw-core';
-import { buildBackendQuery } from 'paima-sdk/paima-mw-core';
-import { type MatchExecutor, type RoundExecutor } from 'paima-sdk/paima-executors';
+import type { QueryOptions, Result } from '@paima/sdk/mw-core';
+import { buildBackendQuery } from '@paima/sdk/mw-core';
+import { type MatchExecutor, type RoundExecutor } from '@paima/sdk/executors';
 
 import {
   type MatchState,
@@ -23,7 +23,7 @@ import {
 import { buildEndpointErrorFxn } from '../errors';
 import { auxGet } from '../helpers/auxiliary-queries';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { WalletAddress } from '@paima/sdk/utils';
 import { MiddlewareErrorCode } from '@cards/game-logic';
 
 async function getLobbyRaw(lobbyID: string): Promise<Result<LobbyRawResponse>> {

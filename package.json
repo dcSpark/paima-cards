@@ -2,7 +2,7 @@
   "name": "cards",
   "version": "1.0.0",
   "engines": {
-    "node": "^16.18"
+    "node": "^18.17"
   },
   "private": true,
   "scripts": {

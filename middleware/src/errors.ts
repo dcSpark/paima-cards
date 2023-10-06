@@ -1,10 +1,10 @@
-import type { ErrorMessageFxn } from 'paima-sdk/paima-utils';
-import { buildErrorCodeTranslator } from 'paima-sdk/paima-utils';
-import type { EndpointErrorFxn } from 'paima-sdk/paima-mw-core';
+import type { ErrorMessageFxn } from '@paima/sdk/utils';
+import { buildErrorCodeTranslator } from '@paima/sdk/utils';
+import type { EndpointErrorFxn } from '@paima/sdk/mw-core';
 import {
   PAIMA_MIDDLEWARE_ERROR_MESSAGES,
   buildAbstractEndpointErrorFxn,
-} from 'paima-sdk/paima-mw-core';
+} from '@paima/sdk/mw-core';
 import { MiddlewareErrorCode } from '@cards/game-logic';
 
 type ErrorMessageMapping = Record<MiddlewareErrorCode, string>;

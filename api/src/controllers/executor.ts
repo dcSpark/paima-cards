@@ -16,7 +16,7 @@ import {
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
 import { getMatch, getMatchMoves, getRound, getRoundMoves } from '@cards/db/src/select.queries';
-import { getBlockHeight } from 'paima-sdk/paima-db';
+import { getBlockHeights } from '@paima/sdk/db';
 
 @Route('executor')
 export class ExecutorController extends Controller {
@@ -58,8 +58,8 @@ export class ExecutorController extends Controller {
         ? undefined
         : deserializeMove(lobby.current_tx_event_move);
 
-    const [initialSeed] = await getBlockHeight.run(
-      { block_height: match.starting_block_height },
+    const [initialSeed] = await getBlockHeights.run(
+      { block_heights: [match.starting_block_height] },
       pool
     );
     const matchSeeds = await getMatchSeeds.run(
@@ -140,7 +140,8 @@ export class ExecutorController extends Controller {
       return { success: false, errorCode: MiddlewareErrorCode.GENERIC_ERROR };
     }
 
-    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const [seedBlockRow] = await getBlockHeights.run({ block_heights: [seedBlockHeight] }, pool);
+
     const seed = seedBlockRow.seed;
     const moves = await getRoundMoves.run(
       {

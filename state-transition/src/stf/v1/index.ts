@@ -1,8 +1,8 @@
 import type { Pool } from 'pg';
 
 import parse from './parser.js';
-import type Prando from 'paima-sdk/paima-prando';
-import { SCHEDULED_DATA_ADDRESS, type SubmittedChainData } from 'paima-sdk/paima-utils';
+import type Prando from '@paima/sdk/prando';
+import { SCHEDULED_DATA_ADDRESS, type SubmittedChainData } from '@paima/sdk/utils';
 import {
   createdLobby,
   joinedLobby,
@@ -17,7 +17,7 @@ import {
   zombieRound,
   updateStats,
 } from './transition';
-import type { SQLUpdate } from 'paima-sdk/paima-db';
+import type { SQLUpdate } from '@paima/sdk/db';
 import { GENERIC_PAYMENT_MESSAGES, PARSER_KEYS } from '@cards/game-logic';
 import { ZERO_ADDRESS } from '@cards/utils';
 

@@ -15,7 +15,7 @@ import {
   serializeHandCard,
   serializeMove,
 } from '@cards/game-logic';
-import type { SQLUpdate } from 'paima-sdk/paima-db';
+import type { SQLUpdate } from '@paima/sdk/db';
 import {
   updateLobbyCurrentMatch,
   updateLobbyCurrentRound,
@@ -31,7 +31,7 @@ import type {
 import type { INewMatchParams, INewMoveParams } from '@cards/db/src/insert.queries.js';
 import { newMatch, newMove } from '@cards/db/src/insert.queries.js';
 import type { IGetRoundResult } from '@cards/db/src/select.queries.js';
-import type Prando from 'paima-sdk/paima-prando';
+import type Prando from '@paima/sdk/prando';
 import { schedulePracticeMove } from './practice.js';
 import { scheduleStatsUpdate } from './stats.js';
 import { PRACTICE_BOT_NFT_ID } from '@cards/utils';
